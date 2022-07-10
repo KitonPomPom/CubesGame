@@ -1,4 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/id_group_im_offline"
+        android:title=""
+        android:icon="@drawable/ic_group_im_offline"
+        app:showAsAction="ifRoom"
+        />
+    <item
+        android:id="@+id/id_group_im_online"
+        android:title=""
+        android:icon="@drawable/ic_group_online"
+        app:showAsAction="ifRoom"
+        />
+    <item
+        android:id="@+id/id_add_im"
+        android:title=""
+        android:icon="@drawable/ic_add_image"
+        app:showAsAction="ifRoom"
+        />
+    <item
+        android:id="@+id/id_friends"
+        android:title=""
+        android:icon="@drawable/ic_friend"
+        app:showAsAction="ifRoom"
+        />
+    <item
+        android:id="@+id/id_my_page"
+        android:title=""
+        android:icon="@drawable/ic_my_page"
+        app:showAsAction="ifRoom"
+    />
 </menu>

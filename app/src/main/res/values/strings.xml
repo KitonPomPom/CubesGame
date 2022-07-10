@@ -2,4 +2,9 @@
     <string name="app_name">CubesGame</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="my_page">Моя страница</string>
+    <string name="groups_image_offline">Группы картинок оффлайн</string>
+    <string name="group_image_online_all">Группы картинок онлайн</string>
+    <string name="friends">Друзья</string>
+    <string name="add_image">Добавить картинку</string>
 </resources>
