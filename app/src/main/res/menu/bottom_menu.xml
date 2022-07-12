@@ -2,31 +2,31 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/id_group_im_offline"
+        android:id="@+id/fragGroupImageOffline"
         android:title=""
         android:icon="@drawable/ic_group_im_offline"
         app:showAsAction="ifRoom"
         />
     <item
-        android:id="@+id/id_group_im_online"
+        android:id="@+id/fragGroupImageOnline"
         android:title=""
         android:icon="@drawable/ic_group_online"
         app:showAsAction="ifRoom"
         />
     <item
-        android:id="@+id/id_add_im"
+        android:id="@+id/fragment_add_image"
         android:title=""
         android:icon="@drawable/ic_add_image"
         app:showAsAction="ifRoom"
         />
     <item
-        android:id="@+id/id_friends"
+        android:id="@+id/fragment_friends"
         android:title=""
         android:icon="@drawable/ic_friend"
         app:showAsAction="ifRoom"
         />
     <item
-        android:id="@+id/id_my_page"
+        android:id="@+id/fragment_my_page"
         android:title=""
         android:icon="@drawable/ic_my_page"
         app:showAsAction="ifRoom"

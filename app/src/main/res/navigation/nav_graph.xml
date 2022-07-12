@@ -7,7 +7,27 @@
 
     <fragment
         android:id="@+id/fragGroupImageOffline"
-        android:name="kitonpompom.cubesgame.FragGroupImageOffline"
+        android:name="kitonpompom.cubesgame.activities.FragGroupImageOffline"
         android:label="fragment_frag_group_image_offline"
         tools:layout="@layout/fragment_frag_group_image_offline" />
+    <fragment
+        android:id="@+id/fragGroupImageOnline"
+        android:name="kitonpompom.cubesgame.FragGroupImageOnline"
+        android:label="fragment_frag_group_image_online"
+        tools:layout="@layout/fragment_frag_group_image_online" />
+    <fragment
+        android:id="@+id/fragment_add_image"
+        android:name="kitonpompom.cubesgame.fragment_add_image"
+        android:label="fragment_add_image"
+        tools:layout="@layout/fragment_add_image" />
+    <fragment
+        android:id="@+id/fragment_friends"
+        android:name="kitonpompom.cubesgame.fragment_friends"
+        android:label="fragment_friends"
+        tools:layout="@layout/fragment_friends" />
+    <fragment
+        android:id="@+id/fragment_my_page"
+        android:name="kitonpompom.cubesgame.fragment_my_page"
+        android:label="fragment_my_page"
+        tools:layout="@layout/fragment_my_page" />
 </navigation>
