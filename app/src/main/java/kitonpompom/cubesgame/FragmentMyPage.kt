@@ -6,19 +6,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
-
-class FragGroupImageOnline : Fragment() {
+class FragmentMyPage : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_frag_group_image_online, container, false)
+        return inflater.inflate(R.layout.fragment_my_page, container, false)
     }
 
     companion object {
 
-        fun newInstance() = FragGroupImageOnline()
+        fun newInstance() = FragmentMyPage()
     }
 }
