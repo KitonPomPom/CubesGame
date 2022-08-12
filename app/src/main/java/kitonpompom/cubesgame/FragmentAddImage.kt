@@ -17,6 +17,6 @@ class FragmentAddImage : Fragment() {
     }
 
     companion object {
-        fun newInstance() = FragmentAddImage()
+        fun newInstance() = FragmentAddImage
     }
 }
