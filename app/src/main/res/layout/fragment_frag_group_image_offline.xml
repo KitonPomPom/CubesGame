@@ -12,49 +12,44 @@
         android:layout_height="match_parent"
         android:background="#F4D2C9">
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/id_tb_name_group"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/id_rcView_frag_offline_group"
             android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/id_tabeLayGroupOffline" />
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/id_tabeLayGroupOffline"
+            android:layout_width="409dp"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tabMode="scrollable">
+            app:tabMode="auto">
 
             <com.google.android.material.tabs.TabItem
-                android:id="@+id/sity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Города" />
 
             <com.google.android.material.tabs.TabItem
-                android:id="@+id/id_animals"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Животные" />
 
             <com.google.android.material.tabs.TabItem
-                android:id="@+id/id_car"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Автомобили" />
+                android:text="Рыбы" />
 
             <com.google.android.material.tabs.TabItem
-                android:id="@+id/id_fish"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Рыба" />
+                android:text="Авто" />
         </com.google.android.material.tabs.TabLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="#BAF1ED"
-            android:text="@string/frag_group_image_offline"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>
