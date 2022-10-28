@@ -3,14 +3,31 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/drawable-v24/ed_image_bg_normal.xml" value="0.106" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/drawable-v24/edit_image_bg.xml" value="0.108" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/drawable-v24/ic_baseline_edit_24.xml" value="0.108" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/drawable-v24/ic_baseline_image_24.xml" value="0.106" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/drawable-v24/ic_delete_image.xml" value="0.108" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/drawable-v24/ic_drag.xml" value="0.106" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/drawable/edit_image_bg.xml" value="0.108" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/drawable/ic_baseline_image_24.xml" value="0.106" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/drawable/ic_drag.xml" value="0.1" />
         <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/activity_main.xml" value="0.22" />
-        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/fragment_add_image.xml" value="0.22" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/activity_pwp.xml" value="0.125" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/fragment_add_image.xml" value="0.3408239700374532" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/fragment_camera.xml" value="0.1640625" />
         <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/fragment_frag_group_image_offline.xml" value="0.21232876712328766" />
         <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/fragment_frag_group_image_online.xml" value="0.10885416666666667" />
         <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/fragment_friends.xml" value="0.10885416666666667" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/fragment_image_list.xml" value="0.1640625" />
         <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/fragment_my_page.xml" value="0.10885416666666667" />
-        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/item_rc_offline_group_image_adapter.xml" value="0.3333333333333333" />
-        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/item_rc_offline_image_adapter.xml" value="0.22" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/fragment_playing_with_pictures.xml" value="0.22" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/item_rc_add_im_adapter.xml" value="0.1234375" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/item_rc_add_image_adapter.xml" value="0.5" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/item_rc_add_image_add_hor_adapter.xml" value="0.41042345276872966" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/item_rc_offline_group_image_adapter.xml" value="0.1" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/item_rc_offline_image_adapter.xml" value="0.16824644549763032" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/item_rc_playing_with_pictures.xml" value="0.3333333333333333" />
         <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/menu/bottom_menu.xml" value="0.1140625" />
       </map>
     </option>

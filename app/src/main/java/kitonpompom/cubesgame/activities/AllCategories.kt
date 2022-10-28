@@ -1,3 +1,5 @@
 package kitonpompom.cubesgame.activities
 
-class AllCategories(var categoryTitle: String, var categoryItem: List<CategoryItem>)
+import android.graphics.Bitmap
+
+class AllCategories(var categoryTitle: String, var bitmapItem: List<Bitmap>)

@@ -9,7 +9,11 @@
         android:id="@+id/fragGroupImageOffline"
         android:name="kitonpompom.cubesgame.activities.FragGroupImageOffline"
         android:label="fragment_frag_group_image_offline"
-        tools:layout="@layout/fragment_frag_group_image_offline" />
+        tools:layout="@layout/fragment_frag_group_image_offline" >
+        <action
+            android:id="@+id/action_fragGroupImageOffline_to_fragmentPlayingWithPictures"
+            app:destination="@id/fragmentPlayingWithPictures" />
+    </fragment>
     <fragment
         android:id="@+id/fragGroupImageOnline"
         android:name="kitonpompom.cubesgame.activities.FragGroupImageOnline"
@@ -19,7 +23,17 @@
         android:id="@+id/fragment_add_image"
         android:name="kitonpompom.cubesgame.activities.FragmentAddImage"
         android:label="fragment_add_image"
-        tools:layout="@layout/fragment_add_image" />
+        tools:layout="@layout/fragment_add_image" >
+        <action
+            android:id="@+id/action_fragment_add_image_to_cameraFragment"
+            app:destination="@id/CameraFragment" />
+        <action
+            android:id="@+id/action_fragment_add_image_to_fragmentImageList2"
+            app:destination="@id/fragmentImageList" />
+        <action
+            android:id="@+id/action_fragment_add_image_to_fragmentPlayingWithPictures"
+            app:destination="@id/fragmentPlayingWithPictures" />
+    </fragment>
     <fragment
         android:id="@+id/fragment_friends"
         android:name="kitonpompom.cubesgame.activities.FragmentFriends"
@@ -32,7 +46,17 @@
         tools:layout="@layout/fragment_my_page" />
     <fragment
         android:id="@+id/fragmentPlayingWithPictures"
-        android:name="kitonpompom.cubesgame.FragmentPlayingWithPictures"
+        android:name="kitonpompom.cubesgame.activities.FragmentPlayingWithPictures"
         android:label="fragment_playing_with_pictures"
         tools:layout="@layout/fragment_playing_with_pictures" />
+    <fragment
+        android:id="@+id/CameraFragment"
+        android:name="io.ak1.pix.PixFragment"
+        android:label="fragment_camera"
+        tools:layout="@layout/fragment_camera" />
+    <fragment
+        android:id="@+id/fragmentImageList"
+        android:name="kitonpompom.cubesgame.activities.FragmentImageList"
+        android:label="fragment_image_list"
+        tools:layout="@layout/fragment_image_list" />
 </navigation>

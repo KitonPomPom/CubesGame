@@ -10,6 +10,8 @@
     <string name="group_image_online_all">Группы картинок онлайн</string>
     <string name="friends">Друзья</string>
     <string name="add_image">Добавить картинку</string>
+    <string name="add_six_image">Добавьте шесть изоброжений</string>
+    <string name="save">Сохранить</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

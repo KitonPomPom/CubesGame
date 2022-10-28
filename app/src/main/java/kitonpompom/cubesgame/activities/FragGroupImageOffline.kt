@@ -1,25 +1,52 @@
 package kitonpompom.cubesgame.activities
 
+import android.Manifest
+import android.content.ContentResolver
+import android.content.Context
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.tabs.TabLayout
 import kitonpompom.cubesgame.R
+import kitonpompom.cubesgame.activities.data.DataModel
+import kitonpompom.cubesgame.activities.utils.ImageManager
 import kitonpompom.cubesgame.databinding.FragmentFragGroupImageOfflineBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
-class FragGroupImageOffline : Fragment() {
+class FragGroupImageOffline : Fragment(), AdapterFragOfflineGroupImage.OpenFragPlayInterface {
 
     lateinit var binding : FragmentFragGroupImageOfflineBinding
 
+    lateinit var pLauncher : ActivityResultLauncher<String>
+
     private var adapterFragOfflineGroupImage: AdapterFragOfflineGroupImage? = null
+
     var arrayHeadCity: ArrayList<String> = ArrayList()
     var arrayHeadAuto: ArrayList<String> = ArrayList()
     var arrayHeadFish: ArrayList<String> = ArrayList()
     var arrayHeadAnimal: ArrayList<String> = ArrayList()
+
+    private val dataModel: DataModel by activityViewModels()
 
 
     override fun onCreateView(
@@ -32,6 +59,14 @@ class FragGroupImageOffline : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        //registerPermissionListener()
+        //chekPermission()
+
+
+
+
+
+
         arrayHeadCity.clear()
         arrayHeadAuto.clear()
         arrayHeadFish.clear()
@@ -48,89 +83,129 @@ class FragGroupImageOffline : Fragment() {
         binding.idRcViewFragOfflineGroup.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
 
 
-        val categoryItemListCity1: MutableList<CategoryItem> = ArrayList()
-        categoryItemListCity1.add(CategoryItem(1, R.drawable.city1))
-        categoryItemListCity1.add(CategoryItem(1, R.drawable.city2))
-        categoryItemListCity1.add(CategoryItem(1, R.drawable.city3))
-        categoryItemListCity1.add(CategoryItem(1, R.drawable.city4))
-        categoryItemListCity1.add(CategoryItem(1, R.drawable.city5))
-        categoryItemListCity1.add(CategoryItem(1, R.drawable.city6))
 
-        val categoryItemListCity2: MutableList<CategoryItem> = ArrayList()
-        categoryItemListCity2.add(CategoryItem(2, R.drawable.city21))
-        categoryItemListCity2.add(CategoryItem(2, R.drawable.city22))
-        categoryItemListCity2.add(CategoryItem(2, R.drawable.city23))
-        categoryItemListCity2.add(CategoryItem(2, R.drawable.city24))
-        categoryItemListCity2.add(CategoryItem(2, R.drawable.city25))
-        categoryItemListCity2.add(CategoryItem(2, R.drawable.city26))
 
-        val categoryItemListAnimal1: MutableList<CategoryItem> = ArrayList()
-        categoryItemListAnimal1.add(CategoryItem(1, R.drawable.animal11))
-        categoryItemListAnimal1.add(CategoryItem(1, R.drawable.animal12))
-        categoryItemListAnimal1.add(CategoryItem(1, R.drawable.animal13))
-        categoryItemListAnimal1.add(CategoryItem(1, R.drawable.animal14))
-        categoryItemListAnimal1.add(CategoryItem(1, R.drawable.animal15))
-        categoryItemListAnimal1.add(CategoryItem(1, R.drawable.animal16))
+        //val uri1: Uri = Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.city1)
+        //val uri2: Uri = Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.city2)
+        //val uri3: Uri = Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.city3)
+        //val uri1: Uri = Uri.parse("android.resource://kitonpompom.cubesgame/drawable/city1")
+        //val uri2: Uri = Uri.parse("android.resource://kitonpompom.cubesgame/drawable/city2")
+        //val uri3: Uri = Uri.parse("android.resource://kitonpompom.cubesgame/drawable/city3")
 
-        val categoryItemListAnimal2: MutableList<CategoryItem> = ArrayList()
-        categoryItemListAnimal2.add(CategoryItem(2, R.drawable.animal21))
-        categoryItemListAnimal2.add(CategoryItem(2, R.drawable.animal22))
-        categoryItemListAnimal2.add(CategoryItem(2, R.drawable.animal23))
-        categoryItemListAnimal2.add(CategoryItem(2, R.drawable.animal24))
-        categoryItemListAnimal2.add(CategoryItem(2, R.drawable.animal25))
-        categoryItemListAnimal2.add(CategoryItem(2, R.drawable.animal26))
+        val listCity1: ArrayList<Uri> = ArrayList()
+        listCity1.clear()
+        listCity1.add (Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.city1))
+        listCity1.add (Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.city2))
+        listCity1.add (Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.city3))
+        listCity1.add (Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.city4))
+        listCity1.add (Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.city5))
+        listCity1.add (Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.city6))
+        //listCity1.add(R.drawable.city1.toString())
+        //listCity1.add(R.drawable.city2.toString())
+        //listCity1.add(R.drawable.city3.toString())
+        //listCity1.add(R.drawable.city4.toString())
+        //listCity1.add(R.drawable.city5.toString())
+        //listCity1.add(R.drawable.city6.toString())
 
-        val categoryItemListFish1: MutableList<CategoryItem> = ArrayList()
-        categoryItemListFish1.add(CategoryItem(1, R.drawable.fish11))
-        categoryItemListFish1.add(CategoryItem(1, R.drawable.fish12))
-        categoryItemListFish1.add(CategoryItem(1, R.drawable.fish13))
-        categoryItemListFish1.add(CategoryItem(1, R.drawable.fish14))
-        categoryItemListFish1.add(CategoryItem(1, R.drawable.fish15))
-        categoryItemListFish1.add(CategoryItem(1, R.drawable.fish16))
+        val listCity2: ArrayList<Uri> = ArrayList()
+        listCity2.clear()
+        listCity2.add (Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.city21))
+        listCity2.add (Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.city22))
+        listCity2.add (Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.city23))
+        listCity2.add (Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.city24))
+        listCity2.add (Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.city25))
+        listCity2.add (Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.city26))
+        //listCity2.add(R.drawable.city21.toString())
+        //listCity2.add(R.drawable.city22.toString())
+        //listCity2.add(R.drawable.city23.toString())
+        //listCity2.add(R.drawable.city24.toString())
+        //listCity2.add(R.drawable.city25.toString())
+        //listCity2.add(R.drawable.city26.toString())
 
-        val categoryItemListFish2: MutableList<CategoryItem> = ArrayList()
-        categoryItemListFish2.add(CategoryItem(2, R.drawable.fish21))
-        categoryItemListFish2.add(CategoryItem(2, R.drawable.fish22))
-        categoryItemListFish2.add(CategoryItem(2, R.drawable.fish23))
-        categoryItemListFish2.add(CategoryItem(2, R.drawable.fish24))
-        categoryItemListFish2.add(CategoryItem(2, R.drawable.fish25))
-        categoryItemListFish2.add(CategoryItem(2, R.drawable.fish26))
+        val listAnimal1: ArrayList<Uri> = ArrayList()
+        listAnimal1.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.animal11))
+        listAnimal1.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.animal12))
+        listAnimal1.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.animal13))
+        listAnimal1.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.animal14))
+        listAnimal1.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.animal15))
+        listAnimal1.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.animal16))
 
-        val categoryItemListAuto1: MutableList<CategoryItem> = ArrayList()
-        categoryItemListAuto1.add(CategoryItem(1, R.drawable.auto11))
-        categoryItemListAuto1.add(CategoryItem(1, R.drawable.auto12))
-        categoryItemListAuto1.add(CategoryItem(1, R.drawable.auto13))
-        categoryItemListAuto1.add(CategoryItem(1, R.drawable.auto14))
-        categoryItemListAuto1.add(CategoryItem(1, R.drawable.auto15))
-        categoryItemListAuto1.add(CategoryItem(1, R.drawable.auto16))
+        val listAnimal2: ArrayList<Uri> = ArrayList()
+        listAnimal2.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.animal21))
+        listAnimal2.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.animal22))
+        listAnimal2.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.animal23))
+        listAnimal2.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.animal24))
+        listAnimal2.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.animal25))
+        listAnimal2.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.animal26))
 
-        val categoryItemListAuto2: MutableList<CategoryItem> = ArrayList()
-        categoryItemListAuto2.add(CategoryItem(2, R.drawable.auto21))
-        categoryItemListAuto2.add(CategoryItem(2, R.drawable.auto22))
-        categoryItemListAuto2.add(CategoryItem(2, R.drawable.auto23))
-        categoryItemListAuto2.add(CategoryItem(2, R.drawable.auto24))
-        categoryItemListAuto2.add(CategoryItem(2, R.drawable.auto25))
-        categoryItemListAuto2.add(CategoryItem(2, R.drawable.auto26))
+        val listFish1: ArrayList<Uri> = ArrayList()
+        listFish1.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.fish11))
+        listFish1.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.fish12))
+        listFish1.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.fish13))
+        listFish1.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.fish14))
+        listFish1.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.fish15))
+        listFish1.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.fish16))
+
+        val listFish2: ArrayList<Uri> = ArrayList()
+        listFish2.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.fish21))
+        listFish2.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.fish22))
+        listFish2.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.fish23))
+        listFish2.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.fish24))
+        listFish2.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.fish25))
+        listFish2.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.fish26))
+
+
+        val listAuto1: ArrayList<Uri> = ArrayList()
+        listAuto1.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.auto11))
+        listAuto1.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.auto12))
+        listAuto1.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.auto13))
+        listAuto1.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.auto14))
+        listAuto1.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.auto15))
+        listAuto1.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.auto16))
+
+        val listAuto2: ArrayList<Uri> = ArrayList()
+        listAuto2.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.auto21))
+        listAuto2.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.auto22))
+        listAuto2.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.auto23))
+        listAuto2.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.auto24))
+        listAuto2.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.auto25))
+        listAuto2.add(Uri.parse("android.resource://kitonpompom.cubesgame/" + R.drawable.auto26))
+
+        adapterFragOfflineGroupImage = AdapterFragOfflineGroupImage(this)
+        binding.idRcViewFragOfflineGroup.adapter = adapterFragOfflineGroupImage
+        //og.d("MyLog", "Размер listCity1: ${listCity1.size}")
 
         val allCategoryCity: MutableList<AllCategories> = ArrayList()
-        allCategoryCity.add(AllCategories("Один",categoryItemListCity1))
-        allCategoryCity.add(AllCategories("Два",categoryItemListCity2))
-
         val allCategoryAnimal: MutableList<AllCategories> = ArrayList()
-        allCategoryAnimal.add(AllCategories("Один",categoryItemListAnimal1))
-        allCategoryAnimal.add(AllCategories("Два",categoryItemListAnimal2))
-
         val allCategoryFish: MutableList<AllCategories> = ArrayList()
-        allCategoryFish.add(AllCategories("Один",categoryItemListFish1))
-        allCategoryFish.add(AllCategories("Два",categoryItemListFish2))
-
         val allCategoryAuto: MutableList<AllCategories> = ArrayList()
-        allCategoryAuto.add(AllCategories("Один",categoryItemListAuto1))
-        allCategoryAuto.add(AllCategories("Два",categoryItemListAuto2))
 
-        adapterFragOfflineGroupImage = AdapterFragOfflineGroupImage()
-        binding.idRcViewFragOfflineGroup.adapter = adapterFragOfflineGroupImage
-        adapterFragOfflineGroupImage!!.updateAdapter(allCategoryCity)
+        CoroutineScope(Dispatchers.Main).launch {
+
+            allCategoryCity.clear()
+            allCategoryCity.add(AllCategories("Один",ImageManager.imageResize(activity as AppCompatActivity, listCity1)))
+            allCategoryCity.add(AllCategories("Два",ImageManager.imageResize(activity as AppCompatActivity, listCity2)))
+
+
+            allCategoryAnimal.add(AllCategories("Один",ImageManager.imageResize(activity as AppCompatActivity, listAnimal1)))
+            allCategoryAnimal.add(AllCategories("Два",ImageManager.imageResize(activity as AppCompatActivity, listAnimal2)))
+
+
+            allCategoryFish.add(AllCategories("Один",ImageManager.imageResize(activity as AppCompatActivity, listFish1)))
+            allCategoryFish.add(AllCategories("Два",ImageManager.imageResize(activity as AppCompatActivity, listFish2)))
+
+
+            allCategoryAuto.add(AllCategories("Один",ImageManager.imageResize(activity as AppCompatActivity, listAuto1)))
+            allCategoryAuto.add(AllCategories("Два",ImageManager.imageResize(activity as AppCompatActivity, listAuto2)))
+            adapterFragOfflineGroupImage!!.updateAdapter(allCategoryCity)
+        }
+
+
+
+
+
+
+
 
         binding.idTabeLayGroupOffline.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
             override fun onTabSelected(tab: TabLayout.Tab?) {
@@ -155,5 +230,40 @@ class FragGroupImageOffline : Fragment() {
     companion object {
         fun newInstance(){}
     }
+
+    override fun openFragPlayWithPicturesInterface(mainArray: ArrayList<Bitmap>) {
+            dataModel.listBitmapForAdapterFragPWP.value = mainArray
+            findNavController().navigate(R.id.action_fragGroupImageOffline_to_fragmentPlayingWithPictures)
+
+    }
+
+    fun chekPermission() {
+        when {
+            ContextCompat.checkSelfPermission(
+                activity as AppCompatActivity,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+                    == PackageManager.PERMISSION_GRANTED -> {
+                Toast.makeText(activity as AppCompatActivity, "Разрешение получено", Toast.LENGTH_LONG).show()
+            }
+            shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)->{
+                Toast.makeText(activity as AppCompatActivity, "Разрешение небыло получено", Toast.LENGTH_LONG).show()
+            }
+            else -> {
+                pLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            }
+        }
+    }
+
+    fun registerPermissionListener(){
+        pLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()){
+            if(it){
+                Toast.makeText(activity as AppCompatActivity, "Разрешение было получено", Toast.LENGTH_LONG).show()
+            }else{
+                Toast.makeText(activity as AppCompatActivity, "Не получено разрешение", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
 
 }
