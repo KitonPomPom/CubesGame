@@ -30,6 +30,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+//3 Фрагмент добовления картинок с камеры
 class FragmentAddImage() : Fragment(), AdapterAddFragment.CallbackArrayImageSizeInterface {
 
     lateinit var binding: FragmentAddImageBinding

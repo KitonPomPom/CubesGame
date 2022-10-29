@@ -9,6 +9,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="grey">#717171</color>
     <color name="green_main">#417143</color>
+    <color name="linear_PWP_item_view">#7C8C8A8A</color>
 
     <color name="video_counter_color_pix">#E53935</color>
     <color name="primary_color_pix">#075e54</color>

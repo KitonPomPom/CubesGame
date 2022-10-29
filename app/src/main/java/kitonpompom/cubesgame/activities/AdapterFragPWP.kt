@@ -14,9 +14,10 @@ import androidx.recyclerview.widget.RecyclerView
 import kitonpompom.cubesgame.R
 import kitonpompom.cubesgame.activities.data.dataArrayBitmap
 import kitonpompom.cubesgame.activities.utils.CubeAnimation
+import kitonpompom.cubesgame.activities.utils.ItemTouchMoveAndSwipe
 import kotlin.math.abs
 
-class AdapterFragPWP(val clickScaleItemInterface: ClickScaleItemInterface): RecyclerView.Adapter<AdapterFragPWP.ImageHolder>(){
+class AdapterFragPWP(val clickScaleItemInterface: ClickScaleItemInterface): RecyclerView.Adapter<AdapterFragPWP.ImageHolder>(), ItemTouchMoveAndSwipe.ItemTouchDragAdapterPWP{
     var mainArrayView = ArrayList<dataArrayBitmap>()
     var arrayListBitmap = ArrayList<ArrayList<Bitmap>>()
     var duration = 0
@@ -33,6 +34,13 @@ class AdapterFragPWP(val clickScaleItemInterface: ClickScaleItemInterface): Recy
 
     override fun getItemCount(): Int {
         return mainArrayView.size
+    }
+
+    override fun onMove(startPos: Int, targetPos: Int) {
+        val targetItem = mainArrayView[targetPos]
+        mainArrayView[targetPos] = mainArrayView[startPos]
+        mainArrayView[targetPos] = targetItem
+        notifyItemMoved(startPos, targetPos)
     }
 
 
@@ -54,11 +62,12 @@ class AdapterFragPWP(val clickScaleItemInterface: ClickScaleItemInterface): Recy
             imItemOne.setImageBitmap(item.arrayBitmap[0])
 
             imItemOne.setOnClickListener{
-                itemView.visibility = View.INVISIBLE
+                //itemView.visibility = View.INVISIBLE
+
                 clickScaleItemInterface.clickScaleItem(item.arrayBitmap[0], item.arrayBitmap[1],
                     item.arrayBitmap[2], item.arrayBitmap[3],
                     item.arrayBitmap[4], item.arrayBitmap[5],
-                    adapterPosition)
+                    adapterPosition, itemView, imItemOne)
             }
 
             //imItemTwo = itemView.findViewById(R.id.id_item_play_with_pictures_two)
@@ -336,10 +345,9 @@ class AdapterFragPWP(val clickScaleItemInterface: ClickScaleItemInterface): Recy
 
 
     interface ClickScaleItemInterface{
-        fun clickScaleItem( b0 : Bitmap, b1 : Bitmap, b2 : Bitmap, b3 : Bitmap, b4 : Bitmap, b5 : Bitmap, position: Int)
+        fun clickScaleItem( b0 : Bitmap, b1 : Bitmap, b2 : Bitmap, b3 : Bitmap, b4 : Bitmap, b5 : Bitmap, position: Int, itemView: View, imItem: ImageView)
 
     }
-
 
 
 
