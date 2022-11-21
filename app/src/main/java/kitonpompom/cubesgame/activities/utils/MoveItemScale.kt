@@ -1,5 +1,6 @@
 package kitonpompom.cubesgame.activities.utils
 
+import android.util.Log
 import android.view.View
 
 object MoveItemScale {
@@ -831,6 +832,301 @@ object MoveItemScale {
             }
         }
         return arrayTemp
+    }
+
+    fun moveItemRc(x2:Float, y2:Float, viewRc: View): Int{
+        var tempPos = 0
+
+        if(x2 < viewRc.width/9f && y2 < viewRc.height/16f){
+            tempPos = 0
+        }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/16f){
+            tempPos = 1
+        }else if (x2 > viewRc.width/(9f/2f) && x2 < viewRc.width/(9f/3f) && y2 < viewRc.height/16f){
+            tempPos = 2
+        }else if (x2 > viewRc.width/(9f/3f) && x2 < viewRc.width/(9f/4f) && y2 < viewRc.height/16f){
+            tempPos = 3
+        }else if (x2 > viewRc.width/(9f/4f) && x2 < viewRc.width/(9f/5f) && y2 < viewRc.height/16f){
+            tempPos = 4
+        }else if (x2 > viewRc.width/(9f/5f) && x2 < viewRc.width/(9f/6f) && y2 < viewRc.height/16f){
+            tempPos = 5
+        }else if (x2 > viewRc.width/(9f/6f) && x2 < viewRc.width/(9f/7f) && y2 < viewRc.height/16f){
+            tempPos = 6
+        }else if (x2 > viewRc.width/(9f/7f) && x2 < viewRc.width/(9f/8f) && y2 < viewRc.height/16f){
+            tempPos = 7
+        }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/16f){
+            tempPos = 8
+        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/2f) && y2 > viewRc.height/(16f) ){
+            tempPos = 9
+        }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/(16f/2f) && y2 > viewRc.height/16f) {
+            tempPos = 10
+        }else if (x2 > viewRc.width/(9f/2f) && x2 < viewRc.width/(9f/3f) && y2 < viewRc.height/(16f/2f) && y2 > viewRc.height/16f) {
+            tempPos = 11
+        }else if (x2 > viewRc.width/(9f/3f) && x2 < viewRc.width/(9f/4f) && y2 < viewRc.height/(16f/2f) && y2 > viewRc.height/16f) {
+            tempPos = 12
+        }else if (x2 > viewRc.width/(9f/4f) && x2 < viewRc.width/(9f/5f) && y2 < viewRc.height/(16f/2f) && y2 > viewRc.height/16f) {
+            tempPos = 13
+        }else if (x2 > viewRc.width/(9f/5f) && x2 < viewRc.width/(9f/6f) && y2 < viewRc.height/(16f/2f) && y2 > viewRc.height/16f) {
+            tempPos = 14
+        }else if (x2 > viewRc.width/(9f/6f) && x2 < viewRc.width/(9f/7f) && y2 < viewRc.height/(16f/2f) && y2 > viewRc.height/16f) {
+            tempPos = 15
+        }else if (x2 > viewRc.width/(9f/7f) && x2 < viewRc.width/(9f/8f) && y2 < viewRc.height/(16f/2f) && y2 > viewRc.height/16f) {
+            tempPos = 16
+        }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/(16f/2f) && y2 > viewRc.height/16f){
+            tempPos = 17
+        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/3f) && y2 > viewRc.height/(16f/2f)){
+            tempPos = 18
+        }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/(16f/3f) && y2 > viewRc.height/(16f/2)) {
+            tempPos = 19
+        }else if (x2 > viewRc.width/(9f/2f) && x2 < viewRc.width/(9f/3f) && y2 < viewRc.height/(16f/3f) && y2 > viewRc.height/(16f/2)) {
+            tempPos = 20
+        }else if (x2 > viewRc.width/(9f/3f) && x2 < viewRc.width/(9f/4f) && y2 < viewRc.height/(16f/3f) && y2 > viewRc.height/(16f/2)) {
+            tempPos = 21
+        }else if (x2 > viewRc.width/(9f/4f) && x2 < viewRc.width/(9f/5f) && y2 < viewRc.height/(16f/3f) && y2 > viewRc.height/(16f/2)) {
+            tempPos = 22
+        }else if (x2 > viewRc.width/(9f/5f) && x2 < viewRc.width/(9f/6f) && y2 < viewRc.height/(16f/3f) && y2 > viewRc.height/(16f/2)) {
+            tempPos = 23
+        }else if (x2 > viewRc.width/(9f/6f) && x2 < viewRc.width/(9f/7f) && y2 < viewRc.height/(16f/3f) && y2 > viewRc.height/(16f/2)) {
+            tempPos = 24
+        }else if (x2 > viewRc.width/(9f/7f) && x2 < viewRc.width/(9f/8f) && y2 < viewRc.height/(16f/3f) && y2 > viewRc.height/(16f/2)) {
+            tempPos = 25
+        }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/(16f/3f) && y2 > viewRc.height/(16f/2)){
+            tempPos = 26
+        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/4f) && y2 > viewRc.height/(16f/3f)){
+            tempPos = 27
+        }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/(16f/4f) && y2 > viewRc.height/(16f/3)) {
+            tempPos = 28
+        }else if (x2 > viewRc.width/(9f/2f) && x2 < viewRc.width/(9f/3f) && y2 < viewRc.height/(16f/4f) && y2 > viewRc.height/(16f/3)) {
+            tempPos = 29
+        }else if (x2 > viewRc.width/(9f/3f) && x2 < viewRc.width/(9f/4f) && y2 < viewRc.height/(16f/4f) && y2 > viewRc.height/(16f/3)) {
+            tempPos = 30
+        }else if (x2 > viewRc.width/(9f/4f) && x2 < viewRc.width/(9f/5f) && y2 < viewRc.height/(16f/4f) && y2 > viewRc.height/(16f/3)) {
+            tempPos = 31
+        }else if (x2 > viewRc.width/(9f/5f) && x2 < viewRc.width/(9f/6f) && y2 < viewRc.height/(16f/4f) && y2 > viewRc.height/(16f/3)) {
+            tempPos = 32
+        }else if (x2 > viewRc.width/(9f/6f) && x2 < viewRc.width/(9f/7f) && y2 < viewRc.height/(16f/4f) && y2 > viewRc.height/(16f/3)) {
+            tempPos = 33
+        }else if (x2 > viewRc.width/(9f/7f) && x2 < viewRc.width/(9f/8f) && y2 < viewRc.height/(16f/4f) && y2 > viewRc.height/(16f/3)) {
+            tempPos = 34
+        }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/(16f/4f) && y2 > viewRc.height/(16f/3f)){
+            tempPos = 35
+        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/5f) && y2 > viewRc.height/(16f/4f)){
+            tempPos = 36
+        }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/(16f/5f) && y2 > viewRc.height/(16f/4)) {
+            tempPos = 37
+        }else if (x2 > viewRc.width/(9f/2f) && x2 < viewRc.width/(9f/3f) && y2 < viewRc.height/(16f/5f) && y2 > viewRc.height/(16f/4)) {
+            tempPos = 38
+        }else if (x2 > viewRc.width/(9f/3f) && x2 < viewRc.width/(9f/4f) && y2 < viewRc.height/(16f/5f) && y2 > viewRc.height/(16f/4)) {
+            tempPos = 39
+        }else if (x2 > viewRc.width/(9f/4f) && x2 < viewRc.width/(9f/5f) && y2 < viewRc.height/(16f/5f) && y2 > viewRc.height/(16f/4)) {
+            tempPos = 40
+        }else if (x2 > viewRc.width/(9f/5f) && x2 < viewRc.width/(9f/6f) && y2 < viewRc.height/(16f/5f) && y2 > viewRc.height/(16f/4)) {
+            tempPos = 41
+        }else if (x2 > viewRc.width/(9f/6f) && x2 < viewRc.width/(9f/7f) && y2 < viewRc.height/(16f/5f) && y2 > viewRc.height/(16f/4)) {
+            tempPos = 42
+        }else if (x2 > viewRc.width/(9f/7f) && x2 < viewRc.width/(9f/8f) && y2 < viewRc.height/(16f/5f) && y2 > viewRc.height/(16f/4)) {
+            tempPos = 43
+        }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/(16f/5f) && y2 > viewRc.height/(16f/4)){
+            tempPos = 44
+        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/6f) && y2 > viewRc.height/(16f/5f)){
+            tempPos = 45
+        }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/(16f/6f) && y2 > viewRc.height/(16f/5)) {
+            tempPos = 46
+        }else if (x2 > viewRc.width/(9f/2f) && x2 < viewRc.width/(9f/3f) && y2 < viewRc.height/(16f/6f) && y2 > viewRc.height/(16f/5)) {
+            tempPos = 47
+        }else if (x2 > viewRc.width/(9f/3f) && x2 < viewRc.width/(9f/4f) && y2 < viewRc.height/(16f/6f) && y2 > viewRc.height/(16f/5)) {
+            tempPos = 48
+        }else if (x2 > viewRc.width/(9f/4f) && x2 < viewRc.width/(9f/5f) && y2 < viewRc.height/(16f/6f) && y2 > viewRc.height/(16f/5)) {
+            tempPos = 49
+        }else if (x2 > viewRc.width/(9f/5f) && x2 < viewRc.width/(9f/6f) && y2 < viewRc.height/(16f/6f) && y2 > viewRc.height/(16f/5)) {
+            tempPos = 50
+        }else if (x2 > viewRc.width/(9f/6f) && x2 < viewRc.width/(9f/7f) && y2 < viewRc.height/(16f/6f) && y2 > viewRc.height/(16f/5)) {
+            tempPos = 51
+        }else if (x2 > viewRc.width/(9f/7f) && x2 < viewRc.width/(9f/8f) && y2 < viewRc.height/(16f/6f) && y2 > viewRc.height/(16f/5)) {
+            tempPos = 52
+        }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/(16f/6f) && y2 > viewRc.height/(16f/5)){
+            tempPos = 53
+        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/7f) && y2 > viewRc.height/(16f/6f)){
+            tempPos = 54
+        }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/(16f/7) && y2 > viewRc.height/(16f/6)) {
+            tempPos = 55
+        }else if (x2 > viewRc.width/(9f/2f) && x2 < viewRc.width/(9f/3f) && y2 < viewRc.height/(16f/7) && y2 > viewRc.height/(16f/6)) {
+            tempPos = 56
+        }else if (x2 > viewRc.width/(9f/3f) && x2 < viewRc.width/(9f/4f) && y2 < viewRc.height/(16f/7) && y2 > viewRc.height/(16f/6)) {
+            tempPos = 57
+        }else if (x2 > viewRc.width/(9f/4f) && x2 < viewRc.width/(9f/5f) && y2 < viewRc.height/(16f/7) && y2 > viewRc.height/(16f/6)) {
+            tempPos = 58
+        }else if (x2 > viewRc.width/(9f/5f) && x2 < viewRc.width/(9f/6f) && y2 < viewRc.height/(16f/7) && y2 > viewRc.height/(16f/6)) {
+            tempPos = 59
+        }else if (x2 > viewRc.width/(9f/6f) && x2 < viewRc.width/(9f/7f) && y2 < viewRc.height/(16f/7) && y2 > viewRc.height/(16f/6)) {
+            tempPos = 60
+        }else if (x2 > viewRc.width/(9f/7f) && x2 < viewRc.width/(9f/8f) && y2 < viewRc.height/(16f/7) && y2 > viewRc.height/(16f/6)) {
+            tempPos = 61
+        }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/(16f/7) && y2 > viewRc.height/(16f/6)){
+            tempPos = 62
+        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/8) && y2 > viewRc.height/(16f/7)){
+            tempPos = 63
+        }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/(16f/8) && y2 > viewRc.height/(16f/7)) {
+            tempPos = 64
+        }else if (x2 > viewRc.width/(9f/2f) && x2 < viewRc.width/(9f/3f) && y2 < viewRc.height/(16f/8) && y2 > viewRc.height/(16f/7)) {
+            tempPos = 65
+        }else if (x2 > viewRc.width/(9f/3f) && x2 < viewRc.width/(9f/4f) && y2 < viewRc.height/(16f/8) && y2 > viewRc.height/(16f/7)) {
+            tempPos = 66
+        }else if (x2 > viewRc.width/(9f/4f) && x2 < viewRc.width/(9f/5f) && y2 < viewRc.height/(16f/8) && y2 > viewRc.height/(16f/7)) {
+            tempPos = 67
+        }else if (x2 > viewRc.width/(9f/5f) && x2 < viewRc.width/(9f/6f) && y2 < viewRc.height/(16f/8) && y2 > viewRc.height/(16f/7)) {
+            tempPos = 68
+        }else if (x2 > viewRc.width/(9f/6f) && x2 < viewRc.width/(9f/7f) && y2 < viewRc.height/(16f/8) && y2 > viewRc.height/(16f/7)) {
+            tempPos = 69
+        }else if (x2 > viewRc.width/(9f/7f) && x2 < viewRc.width/(9f/8f) && y2 < viewRc.height/(16f/8) && y2 > viewRc.height/(16f/7)) {
+            tempPos = 70
+        }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/(16f/8) && y2 > viewRc.height/(16f/7)){
+            tempPos = 71
+        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/9f) && y2 > viewRc.height/(16f/8f)){
+            tempPos = 72
+        }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/(16f/9) && y2 > viewRc.height/(16f/8)) {
+            tempPos = 73
+        }else if (x2 > viewRc.width/(9f/2f) && x2 < viewRc.width/(9f/3f) && y2 < viewRc.height/(16f/9) && y2 > viewRc.height/(16f/8)) {
+            tempPos = 74
+        }else if (x2 > viewRc.width/(9f/3f) && x2 < viewRc.width/(9f/4f) && y2 < viewRc.height/(16f/9) && y2 > viewRc.height/(16f/8)) {
+            tempPos = 75
+        }else if (x2 > viewRc.width/(9f/4f) && x2 < viewRc.width/(9f/5f) && y2 < viewRc.height/(16f/9) && y2 > viewRc.height/(16f/8)) {
+            tempPos = 76
+        }else if (x2 > viewRc.width/(9f/5f) && x2 < viewRc.width/(9f/6f) && y2 < viewRc.height/(16f/9) && y2 > viewRc.height/(16f/8)) {
+            tempPos = 77
+        }else if (x2 > viewRc.width/(9f/6f) && x2 < viewRc.width/(9f/7f) && y2 < viewRc.height/(16f/9) && y2 > viewRc.height/(16f/8)) {
+            tempPos = 78
+        }else if (x2 > viewRc.width/(9f/7f) && x2 < viewRc.width/(9f/8f) && y2 < viewRc.height/(16f/9) && y2 > viewRc.height/(16f/8)) {
+            tempPos = 79
+        }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/(16f/9) && y2 > viewRc.height/(16f/8)){
+            tempPos = 80
+        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/10) && y2 > viewRc.height/(16f/9)){
+            tempPos = 81
+        }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/(16f/10) && y2 > viewRc.height/(16f/9)) {
+            tempPos = 82
+        }else if (x2 > viewRc.width/(9f/2f) && x2 < viewRc.width/(9f/3f) && y2 < viewRc.height/(16f/10) && y2 > viewRc.height/(16f/9)) {
+            tempPos = 83
+        }else if (x2 > viewRc.width/(9f/3f) && x2 < viewRc.width/(9f/4f) && y2 < viewRc.height/(16f/10) && y2 > viewRc.height/(16f/9)) {
+            tempPos = 84
+        }else if (x2 > viewRc.width/(9f/4f) && x2 < viewRc.width/(9f/5f) && y2 < viewRc.height/(16f/10) && y2 > viewRc.height/(16f/9)) {
+            tempPos = 85
+        }else if (x2 > viewRc.width/(9f/5f) && x2 < viewRc.width/(9f/6f) && y2 < viewRc.height/(16f/10) && y2 > viewRc.height/(16f/9)) {
+            tempPos = 86
+        }else if (x2 > viewRc.width/(9f/6f) && x2 < viewRc.width/(9f/7f) && y2 < viewRc.height/(16f/10) && y2 > viewRc.height/(16f/9)) {
+            tempPos = 87
+        }else if (x2 > viewRc.width/(9f/7f) && x2 < viewRc.width/(9f/8f) && y2 < viewRc.height/(16f/10) && y2 > viewRc.height/(16f/9)) {
+            tempPos = 88
+        }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/(16f/10) && y2 > viewRc.height/(16f/9)){
+            tempPos = 89
+        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/11) && y2 > viewRc.height/(16f/10)){
+            tempPos = 90
+        }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/(16f/11) && y2 > viewRc.height/(16f/10)) {
+            tempPos = 91
+        }else if (x2 > viewRc.width/(9f/2f) && x2 < viewRc.width/(9f/3f) && y2 < viewRc.height/(16f/11) && y2 > viewRc.height/(16f/10)) {
+            tempPos = 92
+        }else if (x2 > viewRc.width/(9f/3f) && x2 < viewRc.width/(9f/4f) && y2 < viewRc.height/(16f/11) && y2 > viewRc.height/(16f/10)) {
+            tempPos = 93
+        }else if (x2 > viewRc.width/(9f/4f) && x2 < viewRc.width/(9f/5f) && y2 < viewRc.height/(16f/11) && y2 > viewRc.height/(16f/10)) {
+            tempPos = 94
+        }else if (x2 > viewRc.width/(9f/5f) && x2 < viewRc.width/(9f/6f) && y2 < viewRc.height/(16f/11) && y2 > viewRc.height/(16f/10)) {
+            tempPos = 95
+        }else if (x2 > viewRc.width/(9f/6f) && x2 < viewRc.width/(9f/7f) && y2 < viewRc.height/(16f/11) && y2 > viewRc.height/(16f/10)) {
+            tempPos = 96
+        }else if (x2 > viewRc.width/(9f/7f) && x2 < viewRc.width/(9f/8f) && y2 < viewRc.height/(16f/11) && y2 > viewRc.height/(16f/10)) {
+            tempPos = 97
+        }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/(16f/11) && y2 > viewRc.height/(16f/10)){
+            tempPos = 98
+        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/12) && y2 > viewRc.height/(16f/11)){
+            tempPos = 99
+        }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/(16f/12) && y2 > viewRc.height/(16f/11)) {
+            tempPos = 100
+        }else if (x2 > viewRc.width/(9f/2f) && x2 < viewRc.width/(9f/3f) && y2 < viewRc.height/(16f/12) && y2 > viewRc.height/(16f/11)) {
+            tempPos = 101
+        }else if (x2 > viewRc.width/(9f/3f) && x2 < viewRc.width/(9f/4f) && y2 < viewRc.height/(16f/12) && y2 > viewRc.height/(16f/11)) {
+            tempPos = 102
+        }else if (x2 > viewRc.width/(9f/4f) && x2 < viewRc.width/(9f/5f) && y2 < viewRc.height/(16f/12) && y2 > viewRc.height/(16f/11)) {
+            tempPos = 103
+        }else if (x2 > viewRc.width/(9f/5f) && x2 < viewRc.width/(9f/6f) && y2 < viewRc.height/(16f/12) && y2 > viewRc.height/(16f/11)) {
+            tempPos = 104
+        }else if (x2 > viewRc.width/(9f/6f) && x2 < viewRc.width/(9f/7f) && y2 < viewRc.height/(16f/12) && y2 > viewRc.height/(16f/11)) {
+            tempPos = 105
+        }else if (x2 > viewRc.width/(9f/7f) && x2 < viewRc.width/(9f/8f) && y2 < viewRc.height/(16f/12) && y2 > viewRc.height/(16f/11)) {
+            tempPos = 106
+        }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/(16f/12) && y2 > viewRc.height/(16f/11)){
+            tempPos = 107
+        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/13) && y2 > viewRc.height/(16f/12)){
+            tempPos = 108
+        }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/(16f/13f) && y2 > viewRc.height/(16f/12)) {
+            tempPos = 109
+        }else if (x2 > viewRc.width/(9f/2f) && x2 < viewRc.width/(9f/3f) && y2 < viewRc.height/(16f/13f) && y2 > viewRc.height/(16f/12)) {
+            tempPos = 110
+        }else if (x2 > viewRc.width/(9f/3f) && x2 < viewRc.width/(9f/4f) && y2 < viewRc.height/(16f/13f) && y2 > viewRc.height/(16f/12)) {
+            tempPos = 111
+        }else if (x2 > viewRc.width/(9f/4f) && x2 < viewRc.width/(9f/5f) && y2 < viewRc.height/(16f/13f) && y2 > viewRc.height/(16f/12)) {
+            tempPos = 112
+        }else if (x2 > viewRc.width/(9f/5f) && x2 < viewRc.width/(9f/6f) && y2 < viewRc.height/(16f/13f) && y2 > viewRc.height/(16f/12)) {
+            tempPos = 113
+        }else if (x2 > viewRc.width/(9f/6f) && x2 < viewRc.width/(9f/7f) && y2 < viewRc.height/(16f/13f) && y2 > viewRc.height/(16f/12)) {
+            tempPos = 114
+        }else if (x2 > viewRc.width/(9f/7f) && x2 < viewRc.width/(9f/8f) && y2 < viewRc.height/(16f/13f) && y2 > viewRc.height/(16f/12)) {
+            tempPos = 115
+        }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/(16f/13f) && y2 > viewRc.height/(16f/12)){
+            tempPos = 116
+        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/14) && y2 > viewRc.height/(16f/13)){
+            tempPos = 117
+        }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/(16f/14) && y2 > viewRc.height/(16f/13)) {
+            tempPos = 118
+        }else if (x2 > viewRc.width/(9f/2f) && x2 < viewRc.width/(9f/3f) && y2 < viewRc.height/(16f/14) && y2 > viewRc.height/(16f/13)) {
+            tempPos = 119
+        }else if (x2 > viewRc.width/(9f/3f) && x2 < viewRc.width/(9f/4f) && y2 < viewRc.height/(16f/14) && y2 > viewRc.height/(16f/13)) {
+            tempPos = 120
+        }else if (x2 > viewRc.width/(9f/4f) && x2 < viewRc.width/(9f/5f) && y2 < viewRc.height/(16f/14) && y2 > viewRc.height/(16f/13)) {
+            tempPos = 121
+        }else if (x2 > viewRc.width/(9f/5f) && x2 < viewRc.width/(9f/6f) && y2 < viewRc.height/(16f/14) && y2 > viewRc.height/(16f/13)) {
+            tempPos = 122
+        }else if (x2 > viewRc.width/(9f/6f) && x2 < viewRc.width/(9f/7f) && y2 < viewRc.height/(16f/14) && y2 > viewRc.height/(16f/13)) {
+            tempPos = 123
+        }else if (x2 > viewRc.width/(9f/7f) && x2 < viewRc.width/(9f/8f) && y2 < viewRc.height/(16f/14) && y2 > viewRc.height/(16f/13)) {
+            tempPos = 124
+        }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/(16f/14) && y2 > viewRc.height/(16f/13)){
+            tempPos = 125
+        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/15) && y2 > viewRc.height/(16f/14)){
+            tempPos = 126
+        }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/(16f/15) && y2 > viewRc.height/(16f/14)) {
+            tempPos = 127
+        }else if (x2 > viewRc.width/(9f/2f) && x2 < viewRc.width/(9f/3f) && y2 < viewRc.height/(16f/15) && y2 > viewRc.height/(16f/14)) {
+            tempPos = 128
+        }else if (x2 > viewRc.width/(9f/3f) && x2 < viewRc.width/(9f/4f) && y2 < viewRc.height/(16f/15) && y2 > viewRc.height/(16f/14)) {
+            tempPos = 129
+        }else if (x2 > viewRc.width/(9f/4f) && x2 < viewRc.width/(9f/5f) && y2 < viewRc.height/(16f/15) && y2 > viewRc.height/(16f/14)) {
+            tempPos = 130
+        }else if (x2 > viewRc.width/(9f/5f) && x2 < viewRc.width/(9f/6f) && y2 < viewRc.height/(16f/15) && y2 > viewRc.height/(16f/14)) {
+            tempPos = 131
+        }else if (x2 > viewRc.width/(9f/6f) && x2 < viewRc.width/(9f/7f) && y2 < viewRc.height/(16f/15) && y2 > viewRc.height/(16f/14)) {
+            tempPos = 132
+        }else if (x2 > viewRc.width/(9f/7f) && x2 < viewRc.width/(9f/8f) && y2 < viewRc.height/(16f/15) && y2 > viewRc.height/(16f/14)) {
+            tempPos = 133
+        }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/(16f/15) && y2 > viewRc.height/(16f/14)){
+            tempPos = 134
+        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height && y2 > viewRc.height/(16f/15)){
+            tempPos = 135
+        }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height && y2 > viewRc.height/(16f/15)) {
+            tempPos = 136
+        }else if (x2 > viewRc.width/(9f/2f) && x2 < viewRc.width/(9f/3f) && y2 < viewRc.height && y2 > viewRc.height/(16f/15)) {
+            tempPos = 137
+        }else if (x2 > viewRc.width/(9f/3f) && x2 < viewRc.width/(9f/4f) && y2 < viewRc.height && y2 > viewRc.height/(16f/15)) {
+            tempPos = 138
+        }else if (x2 > viewRc.width/(9f/4f) && x2 < viewRc.width/(9f/5f) && y2 < viewRc.height && y2 > viewRc.height/(16f/15)) {
+            tempPos = 139
+        }else if (x2 > viewRc.width/(9f/5f) && x2 < viewRc.width/(9f/6f) && y2 < viewRc.height && y2 > viewRc.height/(16f/15)) {
+            tempPos = 140
+        }else if (x2 > viewRc.width/(9f/6f) && x2 < viewRc.width/(9f/7f) && y2 < viewRc.height && y2 > viewRc.height/(16f/15)) {
+            tempPos = 141
+        }else if (x2 > viewRc.width/(9f/7f) && x2 < viewRc.width/(9f/8f) && y2 < viewRc.height && y2 > viewRc.height/(16f/15)) {
+            tempPos = 142
+        }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height && y2 > viewRc.height/(16f/15)){
+            tempPos = 143
+        }
+        return tempPos
     }
 
 }

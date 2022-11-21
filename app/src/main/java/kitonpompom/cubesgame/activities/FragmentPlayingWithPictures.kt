@@ -3,6 +3,7 @@ package kitonpompom.cubesgame.activities
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
@@ -11,21 +12,18 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.appcompat.view.menu.MenuView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LifecycleOwner
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import kitonpompom.cubesgame.activities.data.DataModel
 import kitonpompom.cubesgame.activities.data.dataArrayBitmap
-import kitonpompom.cubesgame.activities.utils.CubeAnimation
-import kitonpompom.cubesgame.activities.utils.ImageManager
-import kitonpompom.cubesgame.activities.utils.ItemTouchMoveAndSwipe
-import kitonpompom.cubesgame.activities.utils.MoveItemScale
+import kitonpompom.cubesgame.activities.utils.*
 import kitonpompom.cubesgame.databinding.FragmentPlayingWithPicturesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -45,7 +43,7 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
     var arrayBitmap = ArrayList<Bitmap>()
     var positionClickOpen = 0
     var positionClick = 0
-    var openItemScale = false
+    var openItemScale = false //true - Открыт\увеличен itemScale
     lateinit var itemViewGlobal: View
     lateinit var imItemGlobal: ImageView
 
@@ -55,6 +53,7 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
     private var y2: Float = 0.0f
     var noReplaySwipe = true
     var noClickItemScale = true
+    var clickMoveAdapter = false //проверка - сработал ли мув в адаптере, если да, разрешать перетягивать
 
 
     override fun onCreateView(
@@ -105,50 +104,47 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
         }
 
         binding.idRcViewFragPWP.setOnTouchListener(){ viewRc, eventRc ->
-            Log.d("MyLog", "idRcViewFragPWP.setOnTouchListener")
-            val minDistance = 15
-            val minDistanceUpDown = 7
+            Log.d("MyLog", "idRcViewFragPWP.setOnTouchListener $clickMoveAdapter")
             when (eventRc.action) {
                 MotionEvent.ACTION_DOWN -> { //Срабатывает когда коснулись экрана
+                    Log.d("MyLog", "ACTION_DOWN")
 
-                    x1 = eventRc.x //Позиция по оси Х куда нажали
-                    y1 = eventRc.y //Позиция по оси Y куда нажали
-                    noReplaySwipe = true
+                    //x1 = eventRc.x //Позиция по оси Х куда нажали
+                    //y1 = eventRc.y //Позиция по оси Y куда нажали
+                    //noReplaySwipe = true
                 }
                 MotionEvent.ACTION_MOVE -> {
-                    x2 = eventRc.x
-                    y2 = eventRc.y
-                    var deltaX: Float = x2 - x1
-                    var deltaY: Float = y2 - y1
-                    if (abs(deltaX) > minDistance && noReplaySwipe){
-                        if(x2 > x1){
-                            Log.d("MyLog", "right")
-                            noReplaySwipe = false
-                        }else {
-                            Log.d("MyLog", "left")
-                            noReplaySwipe = false
-                        }
+
+                    if(clickMoveAdapter && arrayBitmap.isNotEmpty()) { //проверка на то, сработал ли в адаптере onTouch и пустой ли масс. с битмапами
+                        Log.d("MyLog", "ACTION_MOVE $clickMoveAdapter")
+                        binding.idImViewMove.elevation = 1.0f
+                        binding.idImViewMove.visibility = View.VISIBLE
+                        binding.idImViewMove.x = eventRc.x - imItemGlobal.width / 2f
+                        binding.idImViewMove.y = eventRc.y
                     }
-                    if (abs(deltaY) > minDistanceUpDown && noReplaySwipe){
-                        if(y2 > y1){
-                            Log.d("MyLog", "down")
-                            noReplaySwipe = false
-                        }else {
-                            Log.d("MyLog", "up")
-                            noReplaySwipe = false
-                        }
-                    }
+
                 }
                 MotionEvent.ACTION_UP -> {
-                    x2 = eventRc.x
-                    y2 = eventRc.y
-                    var deltaX: Float = x2 - x1
-                    var deltaY: Float = y2 - y1
-                    if (abs(deltaX) < minDistance && abs(deltaY) < minDistanceUpDown){
-                        openItemScale = false
-                        Log.d("MyLog", "Click")
+
+                    if (clickMoveAdapter && arrayBitmap.isNotEmpty()) {
+
+                        x2 = eventRc.x
+                        y2 = eventRc.y
+                        adapter?.updateAdapterPosition(
+                            arrayBitmap,
+                            MoveItemScale.moveItemRc(x2, y2, viewRc)
+                        )
+                        binding.idImViewMove.visibility = View.GONE
                     }
+                    clickMoveAdapter = false
+                    Log.d("MyLog", "OpenItemScale: $openItemScale")
+                    if (!openItemScale) {//Чистим только когда итемScale закрыт
+                        arrayBitmap.clear()
+                    }
+                    Log.d("MyLog", "Position move: ${MoveItemScale.moveItemRc(x2,y2,viewRc)}")
                 }
+
+
             }
             return@setOnTouchListener false
         }
@@ -226,6 +222,7 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
                         noReplaySwipe = true
                     }
                     MotionEvent.ACTION_MOVE -> {
+
                         x2 = event.x
                         y2 = event.y
                         var deltaX: Float = x2 - x1
@@ -259,6 +256,7 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
                             openItemScale = false
                             animObjectMinus(positionClickOpen, arrayBitmap[0], arrayBitmap[1], arrayBitmap[2], arrayBitmap[3],
                                 arrayBitmap[4], arrayBitmap[5],positionClick, itemViewGlobal)
+
                         }
                     }
 
@@ -272,7 +270,9 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
     @SuppressLint("ClickableViewAccessibility")
     fun initRcView(){
         //touchHelper.attachToRecyclerView(binding.idRcViewFragPWP) // Привязывваем touchHelper к RcView
-        binding.idRcViewFragPWP.layoutManager = StaggeredGridLayoutManager(9, LinearLayoutManager.VERTICAL)
+        binding.idRcViewFragPWP.layoutManager = CustomGridLayoutManager(activity as AppCompatActivity)
+        //binding.idRcViewFragPWP.isNestedScrollingEnabled = false
+        //binding.idRcViewFragPWP.layoutManager = GridLayoutManager(activity,9, LinearLayoutManager.VERTICAL, false)
         binding.idRcViewFragPWP.adapter = adapter
     }
 
@@ -281,10 +281,7 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
         job?.cancel()
     }
 
-
-
     companion object {
-
         fun newInstance(){}
     }
     //Нажатие в адапетере на итем
@@ -300,7 +297,7 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
         imItem: ImageView
     ) {
         Log.d("MyLog", "clickScaleItem")
-        binding.idImViewScale.elevation = 1.0f
+        binding.idImViewScale.elevation = 1f
         itemViewGlobal = itemView
         imItemGlobal = imItem
         positionClick = position
@@ -336,6 +333,7 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
             binding.idImViewScale.setImageBitmap(b0)
             animObjectPlus(position)
             openItemScale = true
+            adapter?.noMove?.noMoveIfOpenScale = false
             arrayBitmap.clear()
             arrayBitmap.add(b0)
             arrayBitmap.add(b1)
@@ -369,9 +367,21 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
         itemView: View,
         imItem: ImageView
     ) {
+        //binding.idImViewMove.elevation = 1f
+        clickMoveAdapter = true
+        itemViewGlobal = itemView
+        imItemGlobal = imItem
+        itemView.visibility = View.GONE
         binding.idImViewMove.setImageBitmap(b0)
+        arrayBitmap.clear()
+        arrayBitmap.add(b0)
+        arrayBitmap.add(b1)
+        arrayBitmap.add(b2)
+        arrayBitmap.add(b3)
+        arrayBitmap.add(b4)
+        arrayBitmap.add(b5)
+        Log.d("MyLog", "MoveItem $clickMoveAdapter")
     }
-
 
     fun animObjectPlus(position: Int){
 
@@ -467,13 +477,13 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
                 ObjectAnimator.ofPropertyValuesHolder(binding.idImViewScale, scaleX, scaleY).apply {
                     duration = 400
                     doOnStart {
-                        //Log.d("MyLog", "start animation minus scale")
+                        Log.d("MyLog", "start animation minus scale")
                         adapter?.click?.clickable = false
                         noClickItemScale = false
                     }
                     start()
                     doOnEnd {
-                        //Log.d("MyLog", "end animation minus scale")
+                        Log.d("MyLog", "end animation minus scale")
                         binding.idImViewScale.visibility = View.GONE
                         adapter?.click?.clickable = true
                         //touchHelper.attachToRecyclerView(binding.idRcViewFragPWP)
@@ -513,10 +523,11 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
                             arrayBitmap.add(b3)
                             arrayBitmap.add(b4)
                             arrayBitmap.add(b5)
-
                             //touchHelper.attachToRecyclerView(binding.idRcViewFragPWP)
                             //adapter?.click?.clickable = true
                             //noClickItemScale = true
+                        }else{
+                            adapter?.noMove?.noMoveIfOpenScale = true
                         }
                     }
                 }
@@ -574,6 +585,8 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
                             //touchHelper.attachToRecyclerView(binding.idRcViewFragPWP)
                             //adapter?.click?.clickable = true
                             //noClickItemScale = true
+                        }else{
+                            adapter?.noMove?.noMoveIfOpenScale = true
                         }
                     }
                 }
@@ -581,29 +594,7 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
 
     }
 
-    /*if(x2 < viewRc.width/9f && y2 < viewRc.height/16f){
-                           Log.d("MyLog", "click 0")
-                       }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/16f){
-                           Log.d("MyLog", "click 1")
-                       }else if (x2 > viewRc.width/(9f/2f) && x2 < viewRc.width/(9f/3f) && y2 < viewRc.height/16f){
-                           Log.d("MyLog", "click 2")
-                       }else if (x2 > viewRc.width/(9f/3f) && x2 < viewRc.width/(9f/4f) && y2 < viewRc.height/16f){
-                           Log.d("MyLog", "click 3")
-                       }else if (x2 > viewRc.width/(9f/4f) && x2 < viewRc.width/(9f/5f) && y2 < viewRc.height/16f){
-                           Log.d("MyLog", "click 4")
-                       }else if (x2 > viewRc.width/(9f/5f) && x2 < viewRc.width/(9f/6f) && y2 < viewRc.height/16f){
-                           Log.d("MyLog", "click 5")
-                       }else if (x2 > viewRc.width/(9f/6f) && x2 < viewRc.width/(9f/7f) && y2 < viewRc.height/16f){
-                           Log.d("MyLog", "click 6")
-                       }else if (x2 > viewRc.width/(9f/7f) && x2 < viewRc.width/(9f/8f) && y2 < viewRc.height/16f){
-                           Log.d("MyLog", "click 7")
-                       }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/16f){
-                           Log.d("MyLog", "click 8")
-                       }else if (x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/2f) && y2 > viewRc.height/16f){
-                           Log.d("MyLog", "click 9")
-                       }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/(16f/2f) && y2 > viewRc.height/16f) {
-                           Log.d("MyLog", "click 10")
-                       }*/
+
 
     fun up(){
         var tempBitmap = arrayBitmap[0]

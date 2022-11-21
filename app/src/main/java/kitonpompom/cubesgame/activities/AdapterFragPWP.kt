@@ -16,6 +16,7 @@ import kitonpompom.cubesgame.activities.data.dataArrayBitmap
 import kitonpompom.cubesgame.activities.utils.ClickableState
 import kitonpompom.cubesgame.activities.utils.CubeAnimation
 import kitonpompom.cubesgame.activities.utils.ItemTouchMoveAndSwipe
+import kitonpompom.cubesgame.activities.utils.NoMoveIfOpenScale
 import kotlin.math.abs
 
 class AdapterFragPWP(val clickScaleItemInterface: ClickScaleItemInterface): RecyclerView.Adapter<AdapterFragPWP.ImageHolder>(), ItemTouchMoveAndSwipe.ItemTouchDragAdapterPWP{
@@ -23,12 +24,13 @@ class AdapterFragPWP(val clickScaleItemInterface: ClickScaleItemInterface): Recy
     var arrayListBitmap = ArrayList<ArrayList<Bitmap>>()
     var duration = 0
     var click =  ClickableState()
+    var noMove = NoMoveIfOpenScale()
 
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_rc_playing_with_pictures, parent,false)
-        return AdapterFragPWP.ImageHolder(view, this, parent.id, click)
+        return AdapterFragPWP.ImageHolder(view, this, parent.id, click, noMove)
     }
 
     override fun onBindViewHolder(holder: ImageHolder, position: Int) {
@@ -47,7 +49,7 @@ class AdapterFragPWP(val clickScaleItemInterface: ClickScaleItemInterface): Recy
     }
 
 
-    class ImageHolder (itemView : View, val adapter: AdapterFragPWP, id: Int, var clickk: ClickableState) : RecyclerView.ViewHolder(itemView)  {
+    class ImageHolder (itemView : View, val adapter: AdapterFragPWP, id: Int, var clickk: ClickableState, var noMovee: NoMoveIfOpenScale) : RecyclerView.ViewHolder(itemView)  {
         lateinit var imItemOne : ImageView
         lateinit var imItemTwo : ImageView
 
@@ -88,69 +90,76 @@ class AdapterFragPWP(val clickScaleItemInterface: ClickScaleItemInterface): Recy
                 }
             }*/
 
-                imItemOne.setOnTouchListener(){viewRc, eventRc ->
-                    Log.d("MyLog", "imItemOne.setOnTouchListener Adapter")
-                    val minDistance = 15
-                    val minDistanceUpDown = 7
-                    when (eventRc.action) {
-                        MotionEvent.ACTION_DOWN -> { //Срабатывает когда коснулись экрана
+                imItemOne.setOnTouchListener(){ viewRc, eventRc ->
+                    Log.d("MyLog", "imItemOne.setOnTouchListener Adapter ${noMovee.noMoveIfOpenScale}")
+                    if (noMovee.noMoveIfOpenScale){ //Не запускаем если открыт увеличеный Итем
+                        if (clickk.clickable) {// Не запускаем пока идет анимация
+                            val minDistance = 15
+                            val minDistanceUpDown = 7
+                            when (eventRc.action) {
+                                MotionEvent.ACTION_DOWN -> { //Срабатывает когда коснулись экрана
 
-                            x1 = eventRc.x //Позиция по оси Х куда нажали
-                            y1 = eventRc.y //Позиция по оси Y куда нажали
-                            noReplaySwipe = true
-                        }MotionEvent.ACTION_MOVE -> {
-                        x2 = eventRc.x
-                        y2 = eventRc.y
-                        var deltaX: Float = x2 - x1
-                        var deltaY: Float = y2 - y1
-                        if (Math.abs(deltaX) > minDistance && noReplaySwipe){
-                            if(x2 > x1){
-                                Log.d("MyLog", "rightAdapter")
-                                clickScaleItemInterface.moveItem(item.arrayBitmap[0], item.arrayBitmap[1],
-                                    item.arrayBitmap[2], item.arrayBitmap[3],
-                                    item.arrayBitmap[4], item.arrayBitmap[5],
-                                    adapterPosition, itemView, imItemOne)
-                                noReplaySwipe = false
-                            }else {
-                                Log.d("MyLog", "leftAdapter")
-                                clickScaleItemInterface.moveItem(item.arrayBitmap[0], item.arrayBitmap[1],
-                                    item.arrayBitmap[2], item.arrayBitmap[3],
-                                    item.arrayBitmap[4], item.arrayBitmap[5],
-                                    adapterPosition, itemView, imItemOne)
-                                noReplaySwipe = false
+                                    x1 = eventRc.x //Позиция по оси Х куда нажали
+                                    y1 = eventRc.y //Позиция по оси Y куда нажали
+                                    noReplaySwipe = true
+                                }MotionEvent.ACTION_MOVE -> {
+                                x2 = eventRc.x
+                                y2 = eventRc.y
+                                var deltaX: Float = x2 - x1
+                                var deltaY: Float = y2 - y1
+                                if (Math.abs(deltaX) > minDistance && noReplaySwipe){
+                                    if(x2 > x1){
+                                        Log.d("MyLog", "rightAdapter")
+                                        clickScaleItemInterface.moveItem(item.arrayBitmap[0], item.arrayBitmap[1],
+                                            item.arrayBitmap[2], item.arrayBitmap[3],
+                                            item.arrayBitmap[4], item.arrayBitmap[5],
+                                            adapterPosition, itemView, imItemOne)
+                                        noReplaySwipe = false
+                                    }else {
+                                        Log.d("MyLog", "leftAdapter")
+                                        clickScaleItemInterface.moveItem(item.arrayBitmap[0], item.arrayBitmap[1],
+                                            item.arrayBitmap[2], item.arrayBitmap[3],
+                                            item.arrayBitmap[4], item.arrayBitmap[5],
+                                            adapterPosition, itemView, imItemOne)
+                                        noReplaySwipe = false
+                                    }
+                                }
+                                if (Math.abs(deltaY) > minDistanceUpDown && noReplaySwipe){
+                                    if(y2 > y1){
+                                        Log.d("MyLog", "downAdapter")
+                                        clickScaleItemInterface.moveItem(item.arrayBitmap[0], item.arrayBitmap[1],
+                                            item.arrayBitmap[2], item.arrayBitmap[3],
+                                            item.arrayBitmap[4], item.arrayBitmap[5],
+                                            adapterPosition, itemView, imItemOne)
+                                        noReplaySwipe = false
+                                    }else {
+                                        Log.d("MyLog", "upAdapter")
+                                        clickScaleItemInterface.moveItem(item.arrayBitmap[0], item.arrayBitmap[1],
+                                            item.arrayBitmap[2], item.arrayBitmap[3],
+                                            item.arrayBitmap[4], item.arrayBitmap[5],
+                                            adapterPosition, itemView, imItemOne)
+                                        noReplaySwipe = false
+                                    }
+                                }
                             }
-                        }
-                        if (Math.abs(deltaY) > minDistanceUpDown && noReplaySwipe){
-                            if(y2 > y1){
-                                Log.d("MyLog", "downAdapter")
-                                clickScaleItemInterface.moveItem(item.arrayBitmap[0], item.arrayBitmap[1],
-                                    item.arrayBitmap[2], item.arrayBitmap[3],
-                                    item.arrayBitmap[4], item.arrayBitmap[5],
-                                    adapterPosition, itemView, imItemOne)
-                                noReplaySwipe = false
-                            }else {
-                                Log.d("MyLog", "upAdapter")
-                                clickScaleItemInterface.moveItem(item.arrayBitmap[0], item.arrayBitmap[1],
-                                    item.arrayBitmap[2], item.arrayBitmap[3],
-                                    item.arrayBitmap[4], item.arrayBitmap[5],
-                                    adapterPosition, itemView, imItemOne)
-                                noReplaySwipe = false
-                            }
-                        }
-                    }
-                        MotionEvent.ACTION_UP -> {
-                            x2 = eventRc.x
-                            y2 = eventRc.y
-                            var deltaX: Float = x2 - x1
-                            var deltaY: Float = y2 - y1
-                            if (Math.abs(deltaX) < minDistance && Math.abs(deltaY) < minDistanceUpDown){
-                                Log.d("MyLog", "Click Adapter")
+                                MotionEvent.ACTION_UP -> {
+                                    x2 = eventRc.x
+                                    y2 = eventRc.y
+                                    noReplaySwipe = false
+                                    var deltaX: Float = x2 - x1
+                                    var deltaY: Float = y2 - y1
+                                    if (Math.abs(deltaX) < minDistance && Math.abs(deltaY) < minDistanceUpDown){
+                                        Log.d("MyLog", "Click Adapter")
+                                    }
+                                }
                             }
                         }
                     }
                     return@setOnTouchListener false
                 }
         }
+
+
     }
 
 
