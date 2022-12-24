@@ -3,7 +3,7 @@ package kitonpompom.cubesgame.activities.utils
 import android.view.animation.Transformation
 import androidx.annotation.IntDef
 
-
+//Класс анимации вращения кубика
 open class CubeAnimation(direction: Int, enter: Boolean, duration: Long) : ViewPropertyAnimation() {
     @IntDef(UP, DOWN, LEFT, RIGHT)
     @Retention(AnnotationRetention.SOURCE)

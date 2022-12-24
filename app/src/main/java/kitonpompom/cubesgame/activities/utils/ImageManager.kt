@@ -14,7 +14,7 @@ import androidx.exifinterface.media.ExifInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-
+//Класс для обрезки\преобразования фото по нужному размеру
 object ImageManager {
 
     private const val MAX_IMAGE_SIZE_H = 1920

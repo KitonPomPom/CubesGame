@@ -8,6 +8,7 @@ import android.view.MotionEvent
 import android.view.translation.ViewTranslationResponse
 import androidx.recyclerview.widget.RecyclerView
 
+//Кастомный рцВью (не пригодился, остается как пример)
 class CustomRecycleView(context: Context, attr: AttributeSet) : RecyclerView(context, attr) {
     override fun onTouchEvent(e: MotionEvent?): Boolean {
         //Log.d("MyLog", "onTouchEvent")

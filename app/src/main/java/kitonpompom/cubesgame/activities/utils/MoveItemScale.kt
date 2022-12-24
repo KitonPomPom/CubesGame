@@ -3,6 +3,7 @@ package kitonpompom.cubesgame.activities.utils
 import android.util.Log
 import android.view.View
 
+//Координаты перемещения картинок и рисования анимации
 object MoveItemScale {
     fun movingItemScale(position: Int, withRc: Int, heightRc: Int, withIm: Int, heightIm: Int): ArrayList<Int> {
         val arrayTemp = ArrayList<Int>()
@@ -835,27 +836,27 @@ object MoveItemScale {
     }
 
     fun moveItemRc(x2:Float, y2:Float, viewRc: View): Int{
-        var tempPos = 0
+        var tempPos = 144
 
-        if(x2 < viewRc.width/9f && y2 < viewRc.height/16f){
+        if(x2 > 0f && x2 < viewRc.width/9f && y2 > 0f && y2 < viewRc.height/16f){
             tempPos = 0
-        }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/16f){
+        }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 > 0f && y2 < viewRc.height/16f){
             tempPos = 1
-        }else if (x2 > viewRc.width/(9f/2f) && x2 < viewRc.width/(9f/3f) && y2 < viewRc.height/16f){
+        }else if (x2 > viewRc.width/(9f/2f) && x2 < viewRc.width/(9f/3f) && y2 > 0f && y2 < viewRc.height/16f){
             tempPos = 2
-        }else if (x2 > viewRc.width/(9f/3f) && x2 < viewRc.width/(9f/4f) && y2 < viewRc.height/16f){
+        }else if (x2 > viewRc.width/(9f/3f) && x2 < viewRc.width/(9f/4f) && y2 > 0f && y2 < viewRc.height/16f){
             tempPos = 3
-        }else if (x2 > viewRc.width/(9f/4f) && x2 < viewRc.width/(9f/5f) && y2 < viewRc.height/16f){
+        }else if (x2 > viewRc.width/(9f/4f) && x2 < viewRc.width/(9f/5f) && y2 > 0f && y2 < viewRc.height/16f){
             tempPos = 4
-        }else if (x2 > viewRc.width/(9f/5f) && x2 < viewRc.width/(9f/6f) && y2 < viewRc.height/16f){
+        }else if (x2 > viewRc.width/(9f/5f) && x2 < viewRc.width/(9f/6f) && y2 > 0f && y2 < viewRc.height/16f){
             tempPos = 5
-        }else if (x2 > viewRc.width/(9f/6f) && x2 < viewRc.width/(9f/7f) && y2 < viewRc.height/16f){
+        }else if (x2 > viewRc.width/(9f/6f) && x2 < viewRc.width/(9f/7f) && y2 > 0f && y2 < viewRc.height/16f){
             tempPos = 6
-        }else if (x2 > viewRc.width/(9f/7f) && x2 < viewRc.width/(9f/8f) && y2 < viewRc.height/16f){
+        }else if (x2 > viewRc.width/(9f/7f) && x2 < viewRc.width/(9f/8f) && y2 > 0f && y2 < viewRc.height/16f){
             tempPos = 7
-        }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/16f){
+        }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 > 0f && y2 < viewRc.height/16f){
             tempPos = 8
-        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/2f) && y2 > viewRc.height/(16f) ){
+        }else if (x2 > 0f && x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/2f) && y2 > viewRc.height/(16f) ){
             tempPos = 9
         }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/(16f/2f) && y2 > viewRc.height/16f) {
             tempPos = 10
@@ -873,7 +874,7 @@ object MoveItemScale {
             tempPos = 16
         }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/(16f/2f) && y2 > viewRc.height/16f){
             tempPos = 17
-        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/3f) && y2 > viewRc.height/(16f/2f)){
+        }else if (x2 > 0f && x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/3f) && y2 > viewRc.height/(16f/2f)){
             tempPos = 18
         }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/(16f/3f) && y2 > viewRc.height/(16f/2)) {
             tempPos = 19
@@ -891,7 +892,7 @@ object MoveItemScale {
             tempPos = 25
         }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/(16f/3f) && y2 > viewRc.height/(16f/2)){
             tempPos = 26
-        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/4f) && y2 > viewRc.height/(16f/3f)){
+        }else if (x2 > 0f && x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/4f) && y2 > viewRc.height/(16f/3f)){
             tempPos = 27
         }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/(16f/4f) && y2 > viewRc.height/(16f/3)) {
             tempPos = 28
@@ -909,7 +910,7 @@ object MoveItemScale {
             tempPos = 34
         }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/(16f/4f) && y2 > viewRc.height/(16f/3f)){
             tempPos = 35
-        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/5f) && y2 > viewRc.height/(16f/4f)){
+        }else if (x2 > 0f && x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/5f) && y2 > viewRc.height/(16f/4f)){
             tempPos = 36
         }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/(16f/5f) && y2 > viewRc.height/(16f/4)) {
             tempPos = 37
@@ -927,7 +928,7 @@ object MoveItemScale {
             tempPos = 43
         }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/(16f/5f) && y2 > viewRc.height/(16f/4)){
             tempPos = 44
-        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/6f) && y2 > viewRc.height/(16f/5f)){
+        }else if (x2 > 0f && x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/6f) && y2 > viewRc.height/(16f/5f)){
             tempPos = 45
         }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/(16f/6f) && y2 > viewRc.height/(16f/5)) {
             tempPos = 46
@@ -945,7 +946,7 @@ object MoveItemScale {
             tempPos = 52
         }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/(16f/6f) && y2 > viewRc.height/(16f/5)){
             tempPos = 53
-        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/7f) && y2 > viewRc.height/(16f/6f)){
+        }else if (x2 > 0f && x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/7f) && y2 > viewRc.height/(16f/6f)){
             tempPos = 54
         }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/(16f/7) && y2 > viewRc.height/(16f/6)) {
             tempPos = 55
@@ -963,7 +964,7 @@ object MoveItemScale {
             tempPos = 61
         }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/(16f/7) && y2 > viewRc.height/(16f/6)){
             tempPos = 62
-        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/8) && y2 > viewRc.height/(16f/7)){
+        }else if (x2 > 0f && x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/8) && y2 > viewRc.height/(16f/7)){
             tempPos = 63
         }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/(16f/8) && y2 > viewRc.height/(16f/7)) {
             tempPos = 64
@@ -981,7 +982,7 @@ object MoveItemScale {
             tempPos = 70
         }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/(16f/8) && y2 > viewRc.height/(16f/7)){
             tempPos = 71
-        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/9f) && y2 > viewRc.height/(16f/8f)){
+        }else if (x2 > 0f && x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/9f) && y2 > viewRc.height/(16f/8f)){
             tempPos = 72
         }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/(16f/9) && y2 > viewRc.height/(16f/8)) {
             tempPos = 73
@@ -999,7 +1000,7 @@ object MoveItemScale {
             tempPos = 79
         }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/(16f/9) && y2 > viewRc.height/(16f/8)){
             tempPos = 80
-        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/10) && y2 > viewRc.height/(16f/9)){
+        }else if (x2 > 0f && x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/10) && y2 > viewRc.height/(16f/9)){
             tempPos = 81
         }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/(16f/10) && y2 > viewRc.height/(16f/9)) {
             tempPos = 82
@@ -1017,7 +1018,7 @@ object MoveItemScale {
             tempPos = 88
         }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/(16f/10) && y2 > viewRc.height/(16f/9)){
             tempPos = 89
-        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/11) && y2 > viewRc.height/(16f/10)){
+        }else if (x2 > 0f && x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/11) && y2 > viewRc.height/(16f/10)){
             tempPos = 90
         }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/(16f/11) && y2 > viewRc.height/(16f/10)) {
             tempPos = 91
@@ -1035,7 +1036,7 @@ object MoveItemScale {
             tempPos = 97
         }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/(16f/11) && y2 > viewRc.height/(16f/10)){
             tempPos = 98
-        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/12) && y2 > viewRc.height/(16f/11)){
+        }else if (x2 > 0f && x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/12) && y2 > viewRc.height/(16f/11)){
             tempPos = 99
         }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/(16f/12) && y2 > viewRc.height/(16f/11)) {
             tempPos = 100
@@ -1053,7 +1054,7 @@ object MoveItemScale {
             tempPos = 106
         }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/(16f/12) && y2 > viewRc.height/(16f/11)){
             tempPos = 107
-        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/13) && y2 > viewRc.height/(16f/12)){
+        }else if (x2 > 0f && x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/13) && y2 > viewRc.height/(16f/12)){
             tempPos = 108
         }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/(16f/13f) && y2 > viewRc.height/(16f/12)) {
             tempPos = 109
@@ -1071,7 +1072,7 @@ object MoveItemScale {
             tempPos = 115
         }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/(16f/13f) && y2 > viewRc.height/(16f/12)){
             tempPos = 116
-        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/14) && y2 > viewRc.height/(16f/13)){
+        }else if (x2 > 0f && x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/14) && y2 > viewRc.height/(16f/13)){
             tempPos = 117
         }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/(16f/14) && y2 > viewRc.height/(16f/13)) {
             tempPos = 118
@@ -1089,7 +1090,7 @@ object MoveItemScale {
             tempPos = 124
         }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/(16f/14) && y2 > viewRc.height/(16f/13)){
             tempPos = 125
-        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/15) && y2 > viewRc.height/(16f/14)){
+        }else if (x2 > 0f && x2 < viewRc.width / 9f && y2 < viewRc.height/(16f/15) && y2 > viewRc.height/(16f/14)){
             tempPos = 126
         }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height/(16f/15) && y2 > viewRc.height/(16f/14)) {
             tempPos = 127
@@ -1107,7 +1108,7 @@ object MoveItemScale {
             tempPos = 133
         }else if (x2 > viewRc.width/(9f/8f) && x2 < viewRc.width && y2 < viewRc.height/(16f/15) && y2 > viewRc.height/(16f/14)){
             tempPos = 134
-        }else if (x2 < viewRc.width / 9f && y2 < viewRc.height && y2 > viewRc.height/(16f/15)){
+        }else if (x2 > 0f && x2 < viewRc.width / 9f && y2 < viewRc.height && y2 > viewRc.height/(16f/15)){
             tempPos = 135
         }else if (x2 > viewRc.width/9f && x2 < viewRc.width/(9f/2f) && y2 < viewRc.height && y2 > viewRc.height/(16f/15)) {
             tempPos = 136

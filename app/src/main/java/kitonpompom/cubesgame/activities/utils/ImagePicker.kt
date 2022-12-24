@@ -9,6 +9,8 @@ import io.ak1.pix.models.Options
 import io.ak1.pix.models.Ratio
 import io.ak1.pix.utility.ARG_PARAM_PIX
 
+
+//Класс для открытия камеры и добавления фото. Устанавливаем тут параметры камеры и загружаемых фото.
 object ImagePicker {
 
     fun getOptions(cont:Int): Options {

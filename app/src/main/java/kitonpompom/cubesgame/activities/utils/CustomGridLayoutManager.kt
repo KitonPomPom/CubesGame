@@ -6,6 +6,8 @@ import android.util.Log
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 
+//Кастомный гридлайоут менеджер, создан что бы убрать блокировку перетаскивания по оси Х,
+// блокировка из за встроеного скрола.
 open class CustomGridLayoutManager(context: Context)  : GridLayoutManager(context,9, LinearLayoutManager.VERTICAL, false) {
     private var isScrollEnabled = true
     fun setScrollEnabled(flag: Boolean) {
