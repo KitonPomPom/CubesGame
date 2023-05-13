@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.util.Log
 import com.squareup.picasso.Transformation
 
+//Не используется
 public class TransformationImage: Transformation {
     override fun transform(source: Bitmap?): Bitmap {
         var result: Bitmap? = null

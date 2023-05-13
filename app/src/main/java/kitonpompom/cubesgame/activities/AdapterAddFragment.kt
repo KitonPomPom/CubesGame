@@ -58,7 +58,7 @@ class AdapterAddFragment(var callbackArrayImageSizeInterface : CallbackArrayImag
     }
 
     fun updateAdapter(newList : List<Bitmap>){ // функция обновляет адаптер
-        mainArray.clear()
+        //mainArray.clear()
         //Log.d("MyLog", "newList: ${newList.size}")
                 mainArray.addAll(newList)
         //Log.d("MyLog", "mainArraySize: ${mainArray.size}")

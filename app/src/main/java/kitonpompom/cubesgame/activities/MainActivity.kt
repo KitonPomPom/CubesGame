@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         //При открытии фрагмента с игрой прячем Navigation View Bottom
             navController.addOnDestinationChangedListener { _, destination, _ ->
                 when (destination.id) {
-                    R.id.fragmentPlayingWithPictures -> binding.idBotNavView.visibility = View.GONE
+                    R.id.fragmentPlayingWithPicturesTwo -> binding.idBotNavView.visibility = View.GONE
                 else -> binding.idBotNavView.visibility = View.VISIBLE
                 }
             }

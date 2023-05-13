@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/grey_black"
+    tools:context=".activities.FragmentPlayingWithPicturesTwo">
+
+    <!-- TODO: Update blank fragment layout -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/id_constLayPwP"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="#5C5B5B"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/id_rcView_FragPWP"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <ImageButton
+                android:id="@+id/id_bt_open_drawer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="340dp"
+                android:layout_weight="1"
+                android:src="@drawable/open_drawer_layout" />
+        </LinearLayout>
+
+        <kitonpompom.cubesgame.activities.utils.CustomRecycleView
+            android:id="@+id/id_rcView_FragPWP"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="100dp"
+            android:layout_marginEnd="100dp"
+            android:layout_marginBottom="8dp"
+            android:nestedScrollingEnabled="false"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </kitonpompom.cubesgame.activities.utils.CustomRecycleView>
+
+        <ImageView
+            android:id="@+id/id_imView_scale"
+            android:layout_width="89dp"
+            android:layout_height="89dp"
+            android:elevation="-1dp"
+            android:visibility="visible"
+            app:layout_constraintStart_toStartOf="@+id/id_rcView_FragPWP"
+            app:layout_constraintTop_toTopOf="@+id/id_rcView_FragPWP"
+            tools:src="@tools:sample/avatars" />
+
+
+        <ImageView
+            android:id="@+id/id_imView_scale2"
+            android:layout_width="89dp"
+            android:layout_height="89dp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="@+id/id_rcView_FragPWP"
+            app:layout_constraintTop_toTopOf="@+id/id_rcView_FragPWP"
+            tools:src="@tools:sample/avatars" />
+
+        <ImageView
+            android:id="@+id/id_imView_move"
+            android:layout_width="74dp"
+            android:layout_height="74dp"
+            android:elevation="-1dp"
+            android:visibility="visible"
+            app:layout_constraintStart_toStartOf="@+id/id_rcView_FragPWP"
+            app:layout_constraintTop_toTopOf="@+id/id_rcView_FragPWP"
+            tools:src="@tools:sample/avatars" />
+
+        <ImageView
+            android:id="@+id/id_imView_move2"
+            android:layout_width="59dp"
+            android:layout_height="59dp"
+            android:elevation="-1dp"
+            android:visibility="visible"
+            app:layout_constraintStart_toStartOf="@+id/id_rcView_FragPWP"
+            app:layout_constraintTop_toTopOf="@+id/id_rcView_FragPWP"
+            tools:src="@tools:sample/avatars" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

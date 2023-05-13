@@ -14,6 +14,7 @@ import androidx.viewpager2.widget.ViewPager2
 import kitonpompom.cubesgame.R
 import kitonpompom.cubesgame.activities.data.DataModel
 import kitonpompom.cubesgame.activities.utils.CubeTransformer
+import kitonpompom.cubesgame.activities.utils.SliderTransformer
 import kitonpompom.cubesgame.databinding.ItemRcOfflineGroupImageAdapterBinding
 import kitonpompom.cubesgame.databinding.ItemRcOfflineImageAdapterBinding
 
@@ -49,7 +50,9 @@ class AdapterFragOfflineGroupImage(var openFragPlayWithPictures: OpenFragPlayInt
             binding.tvNumberCubsImage.text = dataLetter
             val adapterFragOfflineImage = AdapterFragOfflineImage(openFragPlayInterface)
             binding.idViewPager2.adapter = adapterFragOfflineImage
-            binding.idViewPager2.setPageTransformer(CubeTransformer())
+            //binding.idViewPager2.setPageTransformer(CubeTransformer())
+            binding.idViewPager2.offscreenPageLimit = 4
+            binding.idViewPager2.setPageTransformer(SliderTransformer(4))
             adapterFragOfflineImage.updateAdapter(arrayListBitmap)
             //Log.d("MyLog", "Размер массива битмап: ${arrayListBitmap.size}")
 

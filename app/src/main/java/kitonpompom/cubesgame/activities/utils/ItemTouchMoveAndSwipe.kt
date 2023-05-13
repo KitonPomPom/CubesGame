@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import kitonpompom.cubesgame.activities.AdapterFragPWP
 
-//Класс для перемещения\удаления итемов в рцвью путем смахивания и перетаскивания
+//Класс для перемещения\удаления итемов в рцвью путем смахивания и перетаскивания(Не используем)
 class ItemTouchMoveAndSwipe(private val itemTouchInterface: ItemTouchDragAdapterPWP?) : ItemTouchHelper.Callback() {
     override fun getMovementFlags(
         recyclerView: RecyclerView,

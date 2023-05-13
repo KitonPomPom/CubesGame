@@ -1,7 +1,9 @@
 package kitonpompom.cubesgame.activities
 
 
+import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -21,6 +23,10 @@ import io.ak1.pix.helpers.PixEventCallback
 import io.ak1.pix.utility.ARG_PARAM_PIX
 import kitonpompom.cubesgame.R
 import kitonpompom.cubesgame.activities.data.DataModel
+import kitonpompom.cubesgame.activities.dialogs.DifficultyOptionDialog
+import kitonpompom.cubesgame.activities.dialogs.InterfaceDifficultyOptionDialog
+import kitonpompom.cubesgame.activities.dialogs.ProgressDialog
+import kitonpompom.cubesgame.activities.utils.Constans
 import kitonpompom.cubesgame.activities.utils.ImageManager
 import kitonpompom.cubesgame.activities.utils.ImagePicker
 import kitonpompom.cubesgame.activities.utils.Interface
@@ -31,7 +37,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 //3 Фрагмент добовления картинок с камеры
-class FragmentAddImage() : Fragment(), AdapterAddFragment.CallbackArrayImageSizeInterface {
+class FragmentAddImage() : Fragment(), AdapterAddFragment.CallbackArrayImageSizeInterface, InterfaceDifficultyOptionDialog {
 
     lateinit var binding: FragmentAddImageBinding
     private var tempStart = 0 //Переменная для одноразового запуска камеры с NavigationView
@@ -41,18 +47,22 @@ class FragmentAddImage() : Fragment(), AdapterAddFragment.CallbackArrayImageSize
     val mainArray = ArrayList<Uri>()
     private val dataModel: DataModel by activityViewModels()
     lateinit var addValueListBitmap: Interface.AddValueListBitmap
+    val mainArrayBitmap = ArrayList<Bitmap>()
+    val difficultyOptionDialog = DifficultyOptionDialog(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //Принимаем фото с фрагмента с камерой и галереей
         PixBus.results(coroutineScope = CoroutineScope(Dispatchers.Main)) {
-            //Log.d("MyLog", "Результ")
+
             when (it.status) {
                 PixEventCallback.Status.SUCCESS -> {
-                    //Log.d("MyLog", "Кол-во приходящще в ит: ${it.data.size}")
+                    delay(300L)
+                    val dialog = ProgressDialog.createProgressDialog(context as Activity, Constans.FRAGMENT_ADD_IMAGE)// Запускаем диалог с прогрес баром загрузки
                     if(pixUpdateAdapter == 1) {
                         delay(150L)
                         adapter?.updateAdapter(ImageManager.imageResize(activity as AppCompatActivity, it.data))
+                        dialog.dismiss()// Выключаем диалог с прогрес баром загрузки
                         mainArray.addAll(it.data)
 
                     }
@@ -92,7 +102,8 @@ class FragmentAddImage() : Fragment(), AdapterAddFragment.CallbackArrayImageSize
             if(arrayImageSize == 6){
                 addValueListBitmap.addValueViewModelListBitmap(dataModel)//Интер. через который
                 //мы передаем в адаптер dataModel - в который передаются 6 bitmap из адаптера.
-                findNavController().navigate(R.id.action_fragment_add_image_to_fragmentPlayingWithPictures)
+                difficultyOptionDialog.createDifficultyOptionDialogAddImage(activity as AppCompatActivity)
+                //findNavController().navigate(R.id.action_fragment_add_image_to_fragmentPlayingWithPicturesTwo)
             }else{
                 Toast.makeText(activity, "Загрузите шесть изображений", Toast.LENGTH_LONG).show()
             }
@@ -134,6 +145,20 @@ class FragmentAddImage() : Fragment(), AdapterAddFragment.CallbackArrayImageSize
         }
     }
 
+    override fun interfaceDifficultyOptionDialog(
+        optionDifficulty: Int,
+        mainArray: ArrayList<Bitmap>
+    ) {
+        //Заглушка, спользуется в FragOffline
+    }
+
+    override fun interfaceDifficultyOptionDialogAddImage(optionDifficulty: Int) {
+        when (optionDifficulty) {
+            Constans.EASY -> findNavController().navigate(R.id.action_fragment_add_image_to_fragmentPlayingWithPicturesEasy)
+            Constans.MEDIUM -> findNavController().navigate(R.id.action_fragment_add_image_to_fragmentPlayingWithPicturesMedium)
+            Constans.HARD -> findNavController().navigate(R.id.action_fragment_add_image_to_fragmentPlayingWithPicturesTwo)
+        }
+    }
 
 
 }

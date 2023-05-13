@@ -13,6 +13,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
@@ -20,11 +21,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.ItemTouchHelper
+import kitonpompom.cubesgame.R
 import kitonpompom.cubesgame.activities.data.DataModel
 import kitonpompom.cubesgame.activities.data.dataArrayBitmap
 import kitonpompom.cubesgame.activities.data.dataArrayPositionAndNumberBitmap
 import kitonpompom.cubesgame.activities.data.dataPosNumBit
 import kitonpompom.cubesgame.activities.utils.*
+import kitonpompom.cubesgame.databinding.DrawerLayoutPwpBinding
 import kitonpompom.cubesgame.databinding.FragmentPlayingWithPicturesBinding
 import kotlinx.coroutines.*
 import java.lang.Math.abs
@@ -35,15 +38,28 @@ import kotlin.random.Random
 
 class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInterface {
 
-    lateinit var binding: FragmentPlayingWithPicturesBinding
+    lateinit var binding: DrawerLayoutPwpBinding
     private val dataModel: DataModel by activityViewModels()
     private var job: Job? = null
     private val adapter: AdapterFragPWP? = AdapterFragPWP(this)
     private val swipeCallback = ItemTouchMoveAndSwipe(adapter!!)
     private val touchHelper = ItemTouchHelper(swipeCallback)
+    lateinit var image1: ImageView
+    lateinit var image2: ImageView
+    lateinit var image3: ImageView
+    lateinit var image4: ImageView
+    lateinit var image5: ImageView
+    lateinit var image6: ImageView
+    lateinit var linLayImage1: LinearLayout
+    lateinit var linLayImage2: LinearLayout
+    lateinit var linLayImage3: LinearLayout
+    lateinit var linLayImage4: LinearLayout
+    lateinit var linLayImage5: LinearLayout
+    lateinit var linLayImage6: LinearLayout
     var arrayBitmap = ArrayList<Bitmap>()//Массив с картинками
     var arrayNumber = ArrayList<Int>()//Массив с номерами картинок на кубике
     var arrayPosition = ArrayList<Int>()//Массив с изночальными позициями картинок на кубике
+    var arrayCollectedImage = ArrayList<Int>()//Массив с значениями картинок которые собрали, для отображения в драйвер лэоут
     var arrayBitmapMoveReturn = ArrayList<Bitmap>()//Массив с картинками
     var arrayNumberMoveReturn = ArrayList<Int>()//Массив с номерами на кубике
     var arrayPositionMoveReturn = ArrayList<Int>()//Массив с изночальными позициями картинок на кубике
@@ -51,13 +67,13 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
     var positionClick = 0// Записываем позицию на которую нажали
     var positionMove = 0// Записываем позицию которую потянули
     var openItemScale = false //true - Открыт\увеличен itemScale
-    var arrayInt = arrayOf(0,1,2,3,4,5)
-    lateinit var itemViewGlobal: View
-    lateinit var imItemGlobal: ImageView
+    //var arrayInt = arrayOf(0,1,2,3,4,5)
+    lateinit var itemViewGlobal: View //педаем сюда вью, что бы была возможность использовать по всему классу
+    lateinit var imItemGlobal: ImageView //педаем сюда имадж вью, что бы была возможность использовать по всему классу
     val noClick = ClickableState() //Объект для блокировки ActionUp в Move
     val noClickBack = ClickableStateBack() //Объект для блокировки ActionUp в Move для обратного движения
-    var imMoveHeight by Delegates.notNull<Int>()
-    var imMoveWidth by Delegates.notNull<Int>()
+    //var imMoveHeight by Delegates.notNull<Int>()
+    //var imMoveWidth by Delegates.notNull<Int>()
 
     private var x1: Float = 0.0f
     private var x2: Float = 0.0f
@@ -72,22 +88,44 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentPlayingWithPicturesBinding.inflate(inflater, container, false)
+        binding = DrawerLayoutPwpBinding.inflate(inflater, container, false)
         return binding.root
     }
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initRcView()
+        initRcView() //инициализируем адаптер и рцВью
+        initHeaderDrawerLayout() //инициализируем хидер в драйвер лайоуте
 
+        //получаем картинки и пилим их на куски, потом перемешиваем и отправляем в адаптер
         dataModel.listBitmapForAdapterFragPWP.observe(activity as LifecycleOwner) {
             job = CoroutineScope(Dispatchers.Main).launch {
+                //Создаем массивы с нарезаными картинками
                 val arrayCroppedImage1 = (ImageManager.croppedImage(it[0]))
                 val arrayCroppedImage2 = (ImageManager.croppedImage(it[1]))
                 val arrayCroppedImage3 = (ImageManager.croppedImage(it[2]))
                 val arrayCroppedImage4 = (ImageManager.croppedImage(it[3]))
                 val arrayCroppedImage5 = (ImageManager.croppedImage(it[4]))
                 val arrayCroppedImage6 = (ImageManager.croppedImage(it[5]))
+
+                //Если при первом запуске массив arrayCollectedImage пустой, то заполняем нулями
+                //А Если не пустой то заполняем резултаты из сохранений
+                if(arrayCollectedImage.isEmpty()) {
+                    for (i in 0..6) {
+                        arrayCollectedImage.add(0)
+                    }
+                }
+
+                //Отрисовываем рамки в зависимости от значений массива arrayCollectedImage
+                //collectedImageVisible(arrayCollectedImage)
+
+                //Загружаем картинки в драйвер лайоут
+                image1.setImageBitmap(it[0])
+                image2.setImageBitmap(it[1])
+                image3.setImageBitmap(it[2])
+                image4.setImageBitmap(it[3])
+                image5.setImageBitmap(it[4])
+                image6.setImageBitmap(it[5])
 
                 val tempList = ArrayList<List<Bitmap>>()
                 var tempListBitmap = ArrayList<dataArrayBitmap>()
@@ -177,6 +215,7 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
                         //arrayBitmap.add(tempListBitmap[arrayPositionAndNumberBitmap[i][index].arrayPosition].arrayBitmap[arrayShuffleArrayPositionAndNumberBitmap[i][index].arrayNumber])
                     }
 
+
                     var num = shuffleIntArray(arrayNumber)
                     val arrayPositionTemp = ArrayList<Int>()
                     val arrayNumberTemp = ArrayList<Int>()
@@ -199,36 +238,39 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
 
                 //Log.d("MyLog", "arrayPositionAndNumber0 ${arrayShuffleArrayPositionAndNumberBitmap[0][0].arrayPosition}")
 
-                adapter?.updateAdapter(tempListBitmap)
-                //adapter?.updateAdapter(tempListBitmapFinish)
+                adapter?.updateAdapter(tempListBitmap) // не перемешеный
+                //adapter?.updateAdapter(tempListBitmapFinish) // перемешеный
             }
         }
 
-        binding.idRcViewFragPWP.setOnTouchListener(){ viewRc, eventRc ->
+        //слушатель нажатия на всю РцВью
+        binding.layFragPlayPwp.idRcViewFragPWP.setOnTouchListener(){ viewRc, eventRc ->
             //Log.d("MyLog", "idRcViewFragPWP.setOnTouchListener $clickMoveAdapter")
             when (eventRc.action) {
                 MotionEvent.ACTION_DOWN -> { //Срабатывает когда коснулись экрана
                     //Log.d("MyLog", "ACTION_DOWN")
-
                     //x1 = eventRc.x //Позиция по оси Х куда нажали
-                    //y1 = eventRc.y //Позиция по оси Y куда нажали
+                    //y1 = eventRgc.y //Позиция по оси Y куда нажали
                     //noReplaySwipe = true
                 }
-                MotionEvent.ACTION_MOVE -> {
 
+                MotionEvent.ACTION_MOVE -> {
                     if(clickMoveAdapter && arrayBitmap.isNotEmpty()) { //проверка на то, сработал ли в адаптере onTouch и пустой ли масс. с битмапами
-                        //Log.d("MyLog", "ACTION_MOVE $clickMoveAdapter")
-                        binding.idImViewMove2.visibility = View.GONE
-                        binding.idImViewMove.elevation = 1.0f
-                        binding.idImViewMove.visibility = View.VISIBLE
+                        //idImViewMove - кубик который тянем
+                        //idImViewMove2 - кубик который возращается на старое место
+                        binding.layFragPlayPwp.idImViewMove2.visibility = View.GONE
+                        binding.layFragPlayPwp.idImViewMove.elevation = 1.0f
+                        binding.layFragPlayPwp.idImViewMove.visibility = View.VISIBLE
                         val scaleX = PropertyValuesHolder.ofFloat(View.SCALE_X, 1.0f)
                         val scaleY = PropertyValuesHolder.ofFloat(View.SCALE_Y, 1.0f)
-                        ObjectAnimator.ofPropertyValuesHolder(binding.idImViewMove, scaleX, scaleY).apply {
+                        //анимация увелечения кубика когда начали тянуть и он появился в руке
+                        ObjectAnimator.ofPropertyValuesHolder(binding.layFragPlayPwp.idImViewMove, scaleX, scaleY).apply {
                             duration = 50
                             start()
                         }
-                        binding.idImViewMove.x = eventRc.x - imItemGlobal.width / 2f
-                        binding.idImViewMove.y = eventRc.y
+                        //передаем координаты кубику в зависимости где стоит палец на экране, что бы он тянулся за пальцем
+                        binding.layFragPlayPwp.idImViewMove.x = eventRc.x - imItemGlobal.width / 2f
+                        binding.layFragPlayPwp.idImViewMove.y = eventRc.y
                         //binding.idImViewMove2.visibility = View.GONE
                         //binding.idImViewMove2.x = eventRc.x - imItemGlobal.width / 2f
                         //binding.idImViewMove2.y = eventRc.y
@@ -240,29 +282,37 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
                     if (clickMoveAdapter && arrayBitmap.isNotEmpty() && noClick.clickable && noClickBack.clickable) {
                         x2 = eventRc.x
                         y2 = eventRc.y
-
+                        //Если позиция над которой отпустили кубик не равна 144 ???
                         if (MoveItemScale.moveItemRc(x2, y2, viewRc) != 144) {
                             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-                                val rcViewX = binding.idRcViewFragPWP.x
-                                val rcViewY = binding.idRcViewFragPWP.y
-                                val coordinateImMove = MoveItemScale.movingItemScale(MoveItemScale.moveItemRc(x2, y2, viewRc), binding.idRcViewFragPWP.width, binding.idRcViewFragPWP.height,
-                                    binding.idImViewMove.width, binding.idImViewMove.height)
-
-                                val coordinateImMove2 = MoveItemScale.movingItemScale(MoveItemScale.moveItemRc(x2, y2, viewRc), binding.idRcViewFragPWP.width, binding.idRcViewFragPWP.height,
-                                    binding.idImViewMove2.width, binding.idImViewMove2.height)
-                                val coordinatePositionBackImMove2 = MoveItemScale.movingItemScale(positionMove, binding.idRcViewFragPWP.width, binding.idRcViewFragPWP.height,
-                                    binding.idImViewMove2.width, binding.idImViewMove2.height)
+                                val rcViewX = binding.layFragPlayPwp.idRcViewFragPWP.x
+                                val rcViewY = binding.layFragPlayPwp.idRcViewFragPWP.y
+                                //массив с двумя координатами по x и y для кубика который тянем,
+                                // куда будет становится кубик перед тем как начать уменьшаться
+                                val coordinateImMove = MoveItemScale.movingItemScale(MoveItemScale.moveItemRc(x2, y2, viewRc),
+                                    binding.layFragPlayPwp.idRcViewFragPWP.width, binding.layFragPlayPwp.idRcViewFragPWP.height,
+                                    binding.layFragPlayPwp.idImViewMove.width, binding.layFragPlayPwp.idImViewMove.height)
+                                //массив с двумя координатами по x и y для кубика который возращается,
+                                // куда будет становится кубик перед тем как начать уменьшаться
+                                val coordinateImMove2 = MoveItemScale.movingItemScale(MoveItemScale.moveItemRc(x2, y2, viewRc),
+                                    binding.layFragPlayPwp.idRcViewFragPWP.width, binding.layFragPlayPwp.idRcViewFragPWP.height,
+                                    binding.layFragPlayPwp.idImViewMove2.width, binding.layFragPlayPwp.idImViewMove2.height)
+                                val coordinatePositionBackImMove2 = MoveItemScale.movingItemScale(positionMove,
+                                    binding.layFragPlayPwp.idRcViewFragPWP.width, binding.layFragPlayPwp.idRcViewFragPWP.height,
+                                    binding.layFragPlayPwp.idImViewMove2.width, binding.layFragPlayPwp.idImViewMove2.height)
                                 val coordinateBackImMove2 = listOf(coordinatePositionBackImMove2[0].toFloat()+rcViewX,
                                     coordinatePositionBackImMove2[1].toFloat()+rcViewY)
                                 val coordinateBackStartImMove2 = listOf(coordinateImMove2[0].toFloat()+rcViewX,coordinateImMove2[1].toFloat()+rcViewY)//координаты стартовой точки для обратного полета ImMove2
 
                                 adapter?.transferArrayAdapterToFrag(MoveItemScale.moveItemRc(x2, y2, viewRc),
                                     this, coordinateBackImMove2, coordinateBackStartImMove2, positionMove) // для возращения нового итема на старое место
+                                //патч с координатами для анимции движения кубика на центр перед уменьшением
                                 val path = Path().apply {
-                                    moveTo(binding.idImViewMove.x,binding.idImViewMove.y)
+                                    moveTo(binding.layFragPlayPwp.idImViewMove.x,binding.layFragPlayPwp.idImViewMove.y)
                                     lineTo(coordinateImMove[0].toFloat()+rcViewX,coordinateImMove[1].toFloat()+rcViewY)
                                 }
-                                ObjectAnimator.ofFloat(binding.idImViewMove, View.X, View.Y, path).apply {
+                                //анимация перемещения кубика которого тянули по координатам
+                                ObjectAnimator.ofFloat(binding.layFragPlayPwp.idImViewMove, View.X, View.Y, path).apply {
                                     doOnStart {
                                         adapter?.noMove?.noMoveIfOpenScale = false
                                         adapter?.click?.clickable = false
@@ -271,14 +321,16 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
                                     duration = 200
                                     start()
                                     doOnEnd {
-                                        adapter?.updateAdapterPosition(arrayBitmap, arrayNumber, arrayPosition, MoveItemScale.moveItemRc(x2, y2, viewRc))
-                                        val scaleX = PropertyValuesHolder.ofFloat(View.SCALE_X, (binding.idRcViewFragPWP.width/9f) / binding.idImViewMove.width)
-                                        val scaleY = PropertyValuesHolder.ofFloat(View.SCALE_Y, (binding.idRcViewFragPWP.width/9f) / binding.idImViewMove.width)
-                                        ObjectAnimator.ofPropertyValuesHolder(binding.idImViewMove, scaleX, scaleY).apply {
+                                        adapter?.updateAdapterPosition(arrayBitmap, arrayNumber, arrayPosition, MoveItemScale.moveItemRc(x2, y2, viewRc),positionMove)
+                                        val scaleX = PropertyValuesHolder.ofFloat(View.SCALE_X, (binding.layFragPlayPwp.idRcViewFragPWP.width/9f) / binding.layFragPlayPwp.idImViewMove.width)
+                                        val scaleY = PropertyValuesHolder.ofFloat(View.SCALE_Y, (binding.layFragPlayPwp.idRcViewFragPWP.width/9f) / binding.layFragPlayPwp.idImViewMove.width)
+                                        //Когда кубик стал на место для уменьшения, начинается
+                                        //анимация уменьшения кубика на свое место
+                                        ObjectAnimator.ofPropertyValuesHolder(binding.layFragPlayPwp.idImViewMove, scaleX, scaleY).apply {
                                             duration = 220
                                             start()
                                             doOnEnd {
-                                                binding.idImViewMove.visibility = View.GONE
+                                                binding.layFragPlayPwp.idImViewMove.visibility = View.GONE
                                                 arrayBitmap.clear()
                                                 arrayNumber.clear()
                                                 adapter?.noMove?.noMoveIfOpenScale = true
@@ -293,18 +345,19 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
                             }else{ // Без анимации, если версия андройд меньше заданой
                                 adapter?.updateAdapterPosition(
                                     arrayBitmap, arrayNumber, arrayPosition,
-                                    MoveItemScale.moveItemRc(x2, y2, viewRc)
+                                    MoveItemScale.moveItemRc(x2, y2, viewRc), positionMove
                                 )
-                                val coordinate = MoveItemScale.movingItemScale(MoveItemScale.moveItemRc(x2, y2, viewRc), binding.idRcViewFragPWP.width, binding.idRcViewFragPWP.height,
-                                    binding.idImViewMove.width, binding.idImViewMove.height)
-                                val rcViewX = binding.idRcViewFragPWP.x
-                                val rcViewY = binding.idRcViewFragPWP.y
+                                val coordinate = MoveItemScale.movingItemScale(MoveItemScale.moveItemRc(x2, y2, viewRc),
+                                    binding.layFragPlayPwp.idRcViewFragPWP.width, binding.layFragPlayPwp.idRcViewFragPWP.height,
+                                    binding.layFragPlayPwp.idImViewMove.width, binding.layFragPlayPwp.idImViewMove.height)
+                                val rcViewX = binding.layFragPlayPwp.idRcViewFragPWP.x
+                                val rcViewY = binding.layFragPlayPwp.idRcViewFragPWP.y
                                 val coordinateBack = listOf(coordinate[0].toFloat()+rcViewX, coordinate[1].toFloat()+rcViewY)
                                 val coordinateBackStart = listOf(coordinate[0].toFloat()+rcViewX,
                                     coordinate[1].toFloat()+rcViewY)//координаты стартовой точки для обратного полета ImMove2
                                 adapter?.transferArrayAdapterToFrag(MoveItemScale.moveItemRc(x2, y2, viewRc),
                                     this, coordinateBack, coordinateBackStart, positionMove)
-                                binding.idImViewMove.visibility = View.GONE
+                                binding.layFragPlayPwp.idImViewMove.visibility = View.GONE
                                 clickMoveAdapter = false
 
                                 if (!openItemScale) {//Чистим только когда итемScale закрыт
@@ -316,70 +369,75 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
                         } else{
                             //Анимация если вытянули кубик за приделы поля
                             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-                                val rcViewX = binding.idRcViewFragPWP.x
-                                val rcViewY = binding.idRcViewFragPWP.y
-                                val coordinate = MoveItemScale.movingItemScale(positionMove, binding.idRcViewFragPWP.width, binding.idRcViewFragPWP.height,
-                                    binding.idImViewMove.width, binding.idImViewMove.height)
-                                //Log.d("MyLog", "sred ${((binding.idConstLayPwP.height - binding.idRcViewFragPWP.height)/2f)}")
+                                val rcViewX = binding.layFragPlayPwp.idRcViewFragPWP.x
+                                val rcViewY = binding.layFragPlayPwp.idRcViewFragPWP.y
+                                //массив с координатами x и y, куда возращать кубик (старое место)
+                                val coordinate = MoveItemScale.movingItemScale(positionMove, binding.layFragPlayPwp.idRcViewFragPWP.width,
+                                    binding.layFragPlayPwp.idRcViewFragPWP.height,
+                                    binding.layFragPlayPwp.idImViewMove.width,
+                                    binding.layFragPlayPwp.idImViewMove.height)
+                                //патч с координатами для анимации перемещения
                                 val path = Path().apply {
-                                    moveTo(binding.idImViewMove.x, binding.idImViewMove.y)
-                                    lineTo(coordinate[0].toFloat()+rcViewX,coordinate[1].toFloat()+rcViewY)
+                                    moveTo(binding.layFragPlayPwp.idImViewMove.x, binding.layFragPlayPwp.idImViewMove.y) //откуда
+                                    lineTo(coordinate[0].toFloat()+rcViewX,coordinate[1].toFloat()+rcViewY) //куда
                                 }
-                                ObjectAnimator.ofFloat(binding.idImViewMove, View.X, View.Y, path).apply {
+                                //анимация перемещения кубика на старое место
+                                ObjectAnimator.ofFloat(binding.layFragPlayPwp.idImViewMove, View.X, View.Y, path).apply {
                                     doOnStart {
                                         adapter?.noMove?.noMoveIfOpenScale = false
                                         adapter?.click?.clickable = false
                                         noClick.clickable = false
                                     }
-                                    duration = 300
+                                duration = 300
                                 start()
                                     doOnEnd {
-                                        adapter?.updateAdapterPosition(arrayBitmap, arrayNumber, arrayPosition, positionMove)
-                                        val scaleX = PropertyValuesHolder.ofFloat(View.SCALE_X, (binding.idRcViewFragPWP.width/9f) / binding.idImViewMove.width)
-                                        val scaleY = PropertyValuesHolder.ofFloat(View.SCALE_Y, (binding.idRcViewFragPWP.width/9f) / binding.idImViewMove.width)
-                                            ObjectAnimator.ofPropertyValuesHolder(binding.idImViewMove, scaleX, scaleY).apply {
-                                                duration = 220
-                                                start()
-                                                doOnEnd {
-                                                    binding.idImViewMove.visibility = View.GONE
-                                                    arrayBitmap.clear()
-                                                    arrayNumber.clear()
-                                                    adapter?.noMove?.noMoveIfOpenScale = true
-                                                    adapter?.click?.clickable = true
-                                                    noClick.clickable = true
-                                                    clickMoveAdapter = false
-                                                }
+                                        adapter?.updateAdapterPosition(arrayBitmap, arrayNumber, arrayPosition, positionMove, Constans.NO_POSITION_MOVE)
+                                        val scaleX = PropertyValuesHolder.ofFloat(View.SCALE_X, (binding.layFragPlayPwp.idRcViewFragPWP.width/9f) / binding.layFragPlayPwp.idImViewMove.width)
+                                        val scaleY = PropertyValuesHolder.ofFloat(View.SCALE_Y, (binding.layFragPlayPwp.idRcViewFragPWP.width/9f) / binding.layFragPlayPwp.idImViewMove.width)
+                                        //анимация уменьшен кубика когда он прилетел на место
+                                        ObjectAnimator.ofPropertyValuesHolder(binding.layFragPlayPwp.idImViewMove, scaleX, scaleY).apply {
+                                            duration = 220
+                                            start()
+                                            doOnEnd {
+                                                binding.layFragPlayPwp.idImViewMove.visibility = View.GONE
+                                                arrayBitmap.clear()
+                                                arrayNumber.clear()
+                                                adapter?.noMove?.noMoveIfOpenScale = true
+                                                adapter?.click?.clickable = true
+                                                noClick.clickable = true
+                                                clickMoveAdapter = false
                                             }
+                                        }
                                     }
                                 }
                             }else{
-                                binding.idImViewMove.visibility = View.GONE
-                                adapter?.updateAdapterPosition(arrayBitmap, arrayNumber, arrayPosition, positionMove)
+                                //если версия андройд меньше, пез анимации перемещения(вытянули за пределы)
+                                binding.layFragPlayPwp.idImViewMove.visibility = View.GONE
+                                adapter?.updateAdapterPosition(arrayBitmap, arrayNumber, arrayPosition, positionMove, Constans.NO_POSITION_MOVE)
                                 clickMoveAdapter = false
                             }
                         }
                     }
                 }
-
-
             }
+            //передаем false для того что бы другие слушатели нажатий тоже срабатывали
             return@setOnTouchListener false
         }
 
-
-        binding.idImViewScale.setOnTouchListener(){ v, event ->
-            //Log.d("MyLog", "idImViewScale.setOnTouchListener")
+        //Слушатель нажатия на увеличеный итем, если на кубике первая картинка
+        binding.layFragPlayPwp.idImViewScale.setOnTouchListener(){ v, event ->
+            //Не давать нажимать пока идет анимация
             if(noClickItemScale){
                 val minDistance = 15
                 val minDistanceUpDown = 7
 
                 when (event.action) {
                     MotionEvent.ACTION_DOWN -> { //Срабатывает когда коснулись экрана
-
                         x1 = event.x //Позиция по оси Х куда нажали
                         y1 = event.y //Позиция по оси Y куда нажали
                         noReplaySwipe = true
                     }
+                    //Определеяем в каком направлении вращать кубик
                     MotionEvent.ACTION_MOVE -> {
                         x2 = event.x
                         y2 = event.y
@@ -403,7 +461,6 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
                                 noReplaySwipe = false
                             }
                         }
-
                     }
                     MotionEvent.ACTION_UP -> {
                         x2 = event.x
@@ -412,6 +469,7 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
                         var deltaY: Float = y2 - y1
                         if (abs(deltaX) < minDistance && abs(deltaY) < minDistanceUpDown){
                             openItemScale = false
+                            //Запуск анимации уменьшения
                             animObjectMinus(positionClickOpen, arrayBitmap[0], arrayBitmap[1], arrayBitmap[2], arrayBitmap[3],
                                 arrayBitmap[4], arrayBitmap[5], arrayNumber[0],  arrayNumber[1], arrayNumber[2], arrayNumber[3],
                                 arrayNumber[4], arrayNumber[5], arrayPosition[0],  arrayPosition[1], arrayPosition[2], arrayPosition[3],
@@ -423,11 +481,10 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
                 }
             }
             return@setOnTouchListener true
-
         }
 
-
-        binding.idImViewScale2.setOnTouchListener { v, event ->
+        //Слушатель нажатия на увеличеный итем, если на кубике вторая картинка
+        binding.layFragPlayPwp.idImViewScale2.setOnTouchListener { v, event ->
             //Log.d("MyLog", "idImViewScale2.setOnTouchListener")
             //Проверка, что бы нельзя нажать во время анимации
             if(noClickItemScale){
@@ -441,8 +498,8 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
                         y1 = event.y //Позиция по оси Y куда нажали
                         noReplaySwipe = true
                     }
+                    //Определеяем в каком направлении вращать кубик
                     MotionEvent.ACTION_MOVE -> {
-
                         x2 = event.x
                         y2 = event.y
                         var deltaX: Float = x2 - x1
@@ -474,33 +531,48 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
                         var deltaY: Float = y2 - y1
                         if (abs(deltaX) < minDistance && abs(deltaY) < minDistanceUpDown){
                             openItemScale = false
+                            //Заупуск анимации уменьшения кубика
                             animObjectMinus(positionClickOpen, arrayBitmap[0], arrayBitmap[1], arrayBitmap[2], arrayBitmap[3],
                                 arrayBitmap[4], arrayBitmap[5], arrayNumber[0],  arrayNumber[1], arrayNumber[2], arrayNumber[3],
                                 arrayNumber[4], arrayNumber[5], arrayPosition[0],  arrayPosition[1], arrayPosition[2], arrayPosition[3],
                                 arrayPosition[4], arrayPosition[5], positionClick, itemViewGlobal)
-
                         }
                     }
-
                 }
             }
             return@setOnTouchListener true
         }
     }
 
+    //Метод перемешивания позиций и номеров перед началом игры
     fun shuffleArrayDataArrayPositionAndNumberBitmap(arraylist: ArrayList<dataArrayPositionAndNumberBitmap>):ArrayList<dataArrayPositionAndNumberBitmap>{
         //val shuffleTemp: ArrayList<dataArrayPositionAndNumberBitmap> = Arraylist.shuffle()
         arraylist.shuffle()
         return arraylist
     }
 
+    //Метод перемешивая
     fun shuffleIntArray(num: ArrayList<Int>):ArrayList<Int>{
         val shuffleTemp: ArrayList<Int> = num.shuffled() as ArrayList<Int>
         //day.arrayBitmap.shuffle()
         return shuffleTemp
     }
 
-
+    fun initHeaderDrawerLayout(){
+        image1 = binding.headerForDrawerPwp.getHeaderView(0).findViewById(R.id.id_im_game_1)
+        image2 = binding.headerForDrawerPwp.getHeaderView(0).findViewById(R.id.id_im_game_2)
+        image3 = binding.headerForDrawerPwp.getHeaderView(0).findViewById(R.id.id_im_game_3)
+        image4 = binding.headerForDrawerPwp.getHeaderView(0).findViewById(R.id.id_im_game_4)
+        image5 = binding.headerForDrawerPwp.getHeaderView(0).findViewById(R.id.id_im_game_5)
+        image6 = binding.headerForDrawerPwp.getHeaderView(0).findViewById(R.id.id_im_game_6)
+        linLayImage1 = binding.headerForDrawerPwp.getHeaderView(0).findViewById(R.id.lin_im_1)
+        linLayImage2 = binding.headerForDrawerPwp.getHeaderView(0).findViewById(R.id.lin_im_2)
+        linLayImage3 = binding.headerForDrawerPwp.getHeaderView(0).findViewById(R.id.lin_im_3)
+        linLayImage4 = binding.headerForDrawerPwp.getHeaderView(0).findViewById(R.id.lin_im_4)
+        linLayImage5 = binding.headerForDrawerPwp.getHeaderView(0).findViewById(R.id.lin_im_5)
+        linLayImage6 = binding.headerForDrawerPwp.getHeaderView(0).findViewById(R.id.lin_im_6)
+    }
+    /*
     fun proverkaMassivaNaPovtor(arr: ArrayList<dataArrayPositionAndNumberBitmap>):Boolean{
         var re: Boolean = false
         for (i in arr.indices) {
@@ -512,15 +584,14 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
             }
         }
         return re
-    }
+    }*/
 
+    //Инициализация менеджера и присваивания рцвью адаптера
     @SuppressLint("ClickableViewAccessibility")
     fun initRcView(){
-        //touchHelper.attachToRecyclerView(binding.idRcViewFragPWP) // Привязывваем touchHelper к RcView
-        binding.idRcViewFragPWP.layoutManager = CustomGridLayoutManager(activity as AppCompatActivity)
-        //binding.idRcViewFragPWP.isNestedScrollingEnabled = false
-        //binding.idRcViewFragPWP.layoutManager = GridLayoutManager(activity,9, LinearLayoutManager.VERTICAL, false)
-        binding.idRcViewFragPWP.adapter = adapter
+        binding.layFragPlayPwp.idRcViewFragPWP.layoutManager = CustomGridLayoutManager(activity as AppCompatActivity)
+        //adapter?.setHasStableIds(true)
+        binding.layFragPlayPwp.idRcViewFragPWP.adapter = adapter
     }
 
     override fun onDetach() {
@@ -531,6 +602,7 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
     companion object {
         fun newInstance(){}
     }
+
     //Нажатие в адапетере на итем
     override fun clickScaleItem(
         b0: Bitmap,
@@ -556,7 +628,7 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
         imItem: ImageView
     ) {
         //Log.d("MyLog", "clickScaleItem")
-        binding.idImViewScale.elevation = 1f
+        binding.layFragPlayPwp.idImViewScale.elevation = 1f
         itemViewGlobal = itemView
         imItemGlobal = imItem
         positionClick = position
@@ -564,32 +636,32 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
             //запускается когда итем уже увеличен, и закрывает предыдущий итем и запускает новый
             animObjectMinus(positionClickOpen, b0,b1,b2,b3,b4,b5,n0,n1,n2,n3,n4,n5, p0,p1,p2,p3,p4,p5, positionClick, itemView)
         }else {
-            binding.idImViewScale.visibility = View.VISIBLE
+            binding.layFragPlayPwp.idImViewScale.visibility = View.VISIBLE
             //Log.d("MyLog", "Запустили просто scale итем")
             //запускается если ничего небыло открыто
             itemView.visibility = View.INVISIBLE
             positionClickOpen = position
-            val withRc = binding.idRcViewFragPWP.width
-            val heightRc = binding.idRcViewFragPWP.height
-            val withIm = binding.idImViewScale.width
-            val heightIm = binding.idImViewScale.height
+            val withRc = binding.layFragPlayPwp.idRcViewFragPWP.width
+            val heightRc = binding.layFragPlayPwp.idRcViewFragPWP.height
+            val withIm = binding.layFragPlayPwp.idImViewScale.width
+            val heightIm = binding.layFragPlayPwp.idImViewScale.height
             //Log.d("MyLog", "position $position")
             //меняем координаты появления scaleView
-            var paramsScale = binding.idImViewScale.layoutParams as ViewGroup.MarginLayoutParams
-            var paramsScale2 = binding.idImViewScale2.layoutParams as ViewGroup.MarginLayoutParams
+            var paramsScale = binding.layFragPlayPwp.idImViewScale.layoutParams as ViewGroup.MarginLayoutParams
+            var paramsScale2 = binding.layFragPlayPwp.idImViewScale2.layoutParams as ViewGroup.MarginLayoutParams
             val coordinates =
                 MoveItemScale.movingItemScale(position, withRc, heightRc, withIm, heightIm)
             paramsScale.leftMargin = coordinates[0]
             paramsScale.topMargin = coordinates[1]
             paramsScale2.leftMargin = coordinates[0]
             paramsScale2.topMargin = coordinates[1]
-            binding.idImViewScale.layoutParams = paramsScale
-            binding.idImViewScale2.layoutParams = paramsScale2
+            binding.layFragPlayPwp.idImViewScale.layoutParams = paramsScale
+            binding.layFragPlayPwp.idImViewScale2.layoutParams = paramsScale2
 
-            binding.idImViewScale.visibility = View.VISIBLE
-            binding.idImViewScale2.visibility = View.GONE
+            binding.layFragPlayPwp.idImViewScale.visibility = View.VISIBLE
+            binding.layFragPlayPwp.idImViewScale2.visibility = View.GONE
 
-            binding.idImViewScale.setImageBitmap(b0)
+            binding.layFragPlayPwp.idImViewScale.setImageBitmap(b0)
             animObjectPlus(position)
             openItemScale = true //открыт/увеличен scaleItem
             adapter?.noMove?.noMoveIfOpenScale = false
@@ -630,6 +702,7 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
 
     }
 
+    //Если начинаем тянуть кубик
     override fun moveItem(
         b0: Bitmap,
         b1: Bitmap,
@@ -659,7 +732,7 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
         imItemGlobal = imItem
         positionMove = position
         itemView.visibility = View.GONE
-        binding.idImViewMove.setImageBitmap(b0)
+        binding.layFragPlayPwp.idImViewMove.setImageBitmap(b0)
         arrayBitmap.clear()
         arrayBitmap.add(b0)
         arrayBitmap.add(b1)
@@ -684,6 +757,7 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
         //Log.d("MyLog", "MoveItem $clickMoveAdapter")
     }
 
+    //Запускается когда нужно на место вернуть старый кубик
     override fun transferMoveArray(
         b0: Bitmap,
         b1: Bitmap,
@@ -708,6 +782,7 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
         coordinateBackStart: List<Float>,
         positionMove: Int
     ) {
+        //Проверяем, опускаем ли мы кубик на новое место
         if(position != positionMove) {
             arrayBitmapMoveReturn.clear()
             arrayBitmapMoveReturn.add(b0)
@@ -730,75 +805,77 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
             arrayPositionMoveReturn.add(p3)
             arrayPositionMoveReturn.add(p4)
             arrayPositionMoveReturn.add(p5)
-            binding.idImViewMove2.visibility = View.VISIBLE
+            binding.layFragPlayPwp.idImViewMove2.visibility = View.VISIBLE
+            //Возращаем к маленькому размеру возращающийся кубик
             val scaleX = PropertyValuesHolder.ofFloat(View.SCALE_X, 1.0f)
             val scaleY = PropertyValuesHolder.ofFloat(View.SCALE_Y, 1.0f)
-            ObjectAnimator.ofPropertyValuesHolder(binding.idImViewMove2, scaleX, scaleY).apply {
+            //Анимация уменьшения
+            ObjectAnimator.ofPropertyValuesHolder(binding.layFragPlayPwp.idImViewMove2, scaleX, scaleY).apply {
                 duration = 10
                 start()
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                binding.idImViewMove2.setImageBitmap(b0)
-                //Вводим координаты откуда и куда будет перемещение view
+                binding.layFragPlayPwp.idImViewMove2.setImageBitmap(b0)
+                //Вводим координаты откуда и куда будет возвращаться кубик
                 val path = Path().apply {
                     moveTo(coordinateBackStart[0], coordinateBackStart[1])
                     //Log.d("MyLog", "position $position")
                     when (positionMove) {
                         0 -> {
                             lineTo(
-                                coordinate[0] + (binding.idRcViewFragPWP.width / 9f - binding.idImViewMove2.width) / 2f,
-                                coordinate[1] + (binding.idRcViewFragPWP.height / 16f - binding.idImViewMove2.height) / 2
+                                coordinate[0] + (binding.layFragPlayPwp.idRcViewFragPWP.width / 9f - binding.layFragPlayPwp.idImViewMove2.width) / 2f,
+                                coordinate[1] + (binding.layFragPlayPwp.idRcViewFragPWP.height / 16f - binding.layFragPlayPwp.idImViewMove2.height) / 2
                             )
                         }
                         1, 2, 3, 4, 5, 6, 7 -> {
                             lineTo(
                                 coordinate[0],
-                                coordinate[1] + (binding.idRcViewFragPWP.height / 16f - binding.idImViewMove2.height) / 2
+                                coordinate[1] + (binding.layFragPlayPwp.idRcViewFragPWP.height / 16f - binding.layFragPlayPwp.idImViewMove2.height) / 2
                             )
                         }
                         8 -> {
                             lineTo(
-                                coordinate[0] - (binding.idRcViewFragPWP.width / 9f - binding.idImViewMove2.width) / 2f,
-                                coordinate[1] + (binding.idRcViewFragPWP.height / 16f - binding.idImViewMove2.height) / 2
+                                coordinate[0] - (binding.layFragPlayPwp.idRcViewFragPWP.width / 9f - binding.layFragPlayPwp.idImViewMove2.width) / 2f,
+                                coordinate[1] + (binding.layFragPlayPwp.idRcViewFragPWP.height / 16f - binding.layFragPlayPwp.idImViewMove2.height) / 2
                             )
                         }
                         9, 18, 27, 36, 45, 54, 63, 72, 81, 90, 99, 108, 117, 126 -> {
                             lineTo(
-                                coordinate[0] + (binding.idRcViewFragPWP.width / 9f - binding.idImViewMove2.width) / 2f,
+                                coordinate[0] + (binding.layFragPlayPwp.idRcViewFragPWP.width / 9f - binding.layFragPlayPwp.idImViewMove2.width) / 2f,
                                 coordinate[1]
                             )
                         }
                         17, 26, 35, 44, 53, 62, 71, 80, 89, 98, 107, 116, 125, 134 -> {
                             lineTo(
-                                coordinate[0] - (binding.idRcViewFragPWP.width / 9f - binding.idImViewMove2.width) / 2f,
+                                coordinate[0] - (binding.layFragPlayPwp.idRcViewFragPWP.width / 9f - binding.layFragPlayPwp.idImViewMove2.width) / 2f,
                                 coordinate[1]
                             )
                         }
                         135 -> {
                             lineTo(
-                                coordinate[0] + (binding.idRcViewFragPWP.width / 9f - binding.idImViewMove2.width) / 2f,
-                                coordinate[1] - (binding.idRcViewFragPWP.height / 16f - binding.idImViewMove2.height) / 2
+                                coordinate[0] + (binding.layFragPlayPwp.idRcViewFragPWP.width / 9f - binding.layFragPlayPwp.idImViewMove2.width) / 2f,
+                                coordinate[1] - (binding.layFragPlayPwp.idRcViewFragPWP.height / 16f - binding.layFragPlayPwp.idImViewMove2.height) / 2
                             )
                         }
                         136, 137, 138, 139, 140, 141, 142 -> {
                             lineTo(
                                 coordinate[0],
-                                coordinate[1] - (binding.idRcViewFragPWP.height / 16f - binding.idImViewMove2.height) / 2
+                                coordinate[1] - (binding.layFragPlayPwp.idRcViewFragPWP.height / 16f - binding.layFragPlayPwp.idImViewMove2.height) / 2
                             )
                         }
                         143 -> {
                             lineTo(
-                                coordinate[0] - (binding.idRcViewFragPWP.width / 9f - binding.idImViewMove2.width) / 2f,
-                                coordinate[1] - (binding.idRcViewFragPWP.height / 16f - binding.idImViewMove2.height) / 2
+                                coordinate[0] - (binding.layFragPlayPwp.idRcViewFragPWP.width / 9f - binding.layFragPlayPwp.idImViewMove2.width) / 2f,
+                                coordinate[1] - (binding.layFragPlayPwp.idRcViewFragPWP.height / 16f - binding.layFragPlayPwp.idImViewMove2.height) / 2
                             )
                         }
                         else -> {
                             lineTo(coordinate[0], coordinate[1])
                         }
                     }
-
                 }
-                ObjectAnimator.ofFloat(binding.idImViewMove2, View.X, View.Y, path).apply {
+                //Анимация перемещения возврата кубика
+                ObjectAnimator.ofFloat(binding.layFragPlayPwp.idImViewMove2, View.X, View.Y, path).apply {
                     duration = 450
                     doOnStart {
                         adapter?.noMoveBack?.noMoveIfOpenScale = false
@@ -809,21 +886,21 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
                     doOnEnd {
                         val scaleX = PropertyValuesHolder.ofFloat(
                             View.SCALE_X,
-                            (binding.idRcViewFragPWP.width / 9f) / binding.idImViewMove2.width
+                            (binding.layFragPlayPwp.idRcViewFragPWP.width / 9f) / binding.layFragPlayPwp.idImViewMove2.width
                         )
                         val scaleY = PropertyValuesHolder.ofFloat(
                             View.SCALE_Y,
-                            (binding.idRcViewFragPWP.height / 16f) / binding.idImViewMove2.height
+                            (binding.layFragPlayPwp.idRcViewFragPWP.height / 16f) / binding.layFragPlayPwp.idImViewMove2.height
                         )
-                        ObjectAnimator.ofPropertyValuesHolder(binding.idImViewMove2, scaleX, scaleY)
+                        //Анимация увелечения кубика который вернулся
+                        ObjectAnimator.ofPropertyValuesHolder(binding.layFragPlayPwp.idImViewMove2, scaleX, scaleY)
                             .apply {
                                 duration = 350
                                 start()
                                 doOnEnd {
                                     adapter?.updateAdapterPosition(
                                         arrayBitmapMoveReturn, arrayNumberMoveReturn, arrayPositionMoveReturn,
-                                        positionMove
-                                    )
+                                        positionMove, 999)
                                     adapter?.noMoveBack?.noMoveIfOpenScale = true
                                     adapter?.clickBack?.clickable = true
                                     noClickBack.clickable = true
@@ -833,98 +910,110 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
                             }
                     }
                 }
+                //Если версия сдк меньше, без анимации возращения
             } else {
                 adapter?.updateAdapterPosition(arrayBitmapMoveReturn, arrayNumberMoveReturn,
-                    arrayPositionMoveReturn, positionMove)
+                    arrayPositionMoveReturn, positionMove, Constans.NO_POSITION_MOVE)
             }
         }
     }
 
-    //После обновления позиции в адаптере происходит проверка какие линии потушить
-    override fun updateLine(positionAdapterUpdate: Int) {
-        //adapter?.updateLinePosition(positionAdapterUpdate)
+    //После обновления позиции в адаптере происходит проверка собрана картинка, если да то сюда приходит позиция, какую картинку собрали
+    override fun imageIsCollected(positionImageCollected: Int) {
+        arrayCollectedImage[positionImageCollected] = 1
+        collectedImageVisible(arrayCollectedImage)
+        Log.d("MyLog", "Finish $positionImageCollected")
     }
-
+    //Не используется
     override fun countPlus(count: Int) {
-
         //adapter?.countStart?.count?.plus(2)
     }
 
-    fun animObjectPlus(position: Int){
+    fun collectedImageVisible(arrayCollected: ArrayList<Int>){
+        if (arrayCollectedImage[0] == 1) linLayImage1.setBackgroundColor(R.color.green_main) else linLayImage1.setBackgroundColor(R.color.grey)
+        if (arrayCollectedImage[1] == 1) linLayImage2.setBackgroundColor(R.color.green_main) else linLayImage1.setBackgroundColor(R.color.grey)
+        if (arrayCollectedImage[2] == 1) linLayImage3.setBackgroundColor(R.color.green_main) else linLayImage1.setBackgroundColor(R.color.grey)
+        if (arrayCollectedImage[3] == 1) linLayImage4.setBackgroundColor(R.color.green_main) else linLayImage1.setBackgroundColor(R.color.grey)
+        if (arrayCollectedImage[4] == 1) linLayImage5.setBackgroundColor(R.color.green_main) else linLayImage1.setBackgroundColor(R.color.grey)
+        if (arrayCollectedImage[5] == 1) linLayImage6.setBackgroundColor(R.color.green_main) else linLayImage1.setBackgroundColor(R.color.grey)
+    }
 
+    //Метод анимации увелечения кубика если просто нажали
+    fun animObjectPlus(position: Int){
+        //Определяем координаты начала увелечения в зависимости от позиции на которую нажали
         when(position) {
             0 -> {
-                binding.idImViewScale.pivotX = 0f
-                binding.idImViewScale.pivotY = 0f
-                binding.idImViewScale2.pivotX = 0f
-                binding.idImViewScale2.pivotY = 0f
+                binding.layFragPlayPwp.idImViewScale.pivotX = 0f
+                binding.layFragPlayPwp.idImViewScale.pivotY = 0f
+                binding.layFragPlayPwp.idImViewScale2.pivotX = 0f
+                binding.layFragPlayPwp.idImViewScale2.pivotY = 0f
             }
             1,2,3,4,5,6,7 ->{
-                binding.idImViewScale.pivotX = (binding.idImViewScale.width) / 2f
-                binding.idImViewScale.pivotY = 0f
-                binding.idImViewScale2.pivotX = (binding.idImViewScale.width) / 2f
-                binding.idImViewScale2.pivotY = 0f
+                binding.layFragPlayPwp.idImViewScale.pivotX = (binding.layFragPlayPwp.idImViewScale.width) / 2f
+                binding.layFragPlayPwp.idImViewScale.pivotY = 0f
+                binding.layFragPlayPwp.idImViewScale2.pivotX = (binding.layFragPlayPwp.idImViewScale.width) / 2f
+                binding.layFragPlayPwp.idImViewScale2.pivotY = 0f
             }
             8 -> {
-                binding.idImViewScale.pivotX = (binding.idImViewScale.width.toFloat())
-                binding.idImViewScale.pivotY = 0f
-                binding.idImViewScale2.pivotX = (binding.idImViewScale.width.toFloat())
-                binding.idImViewScale2.pivotY = 0f
+                binding.layFragPlayPwp.idImViewScale.pivotX = (binding.layFragPlayPwp.idImViewScale.width.toFloat())
+                binding.layFragPlayPwp.idImViewScale.pivotY = 0f
+                binding.layFragPlayPwp.idImViewScale2.pivotX = (binding.layFragPlayPwp.idImViewScale.width.toFloat())
+                binding.layFragPlayPwp.idImViewScale2.pivotY = 0f
             }
             9,18,27,36,45,54,63,72,81,90,99,108,117,126 ->{
-                binding.idImViewScale.pivotX = 0f
-                binding.idImViewScale.pivotY = (binding.idImViewScale.width) / 2f
-                binding.idImViewScale2.pivotX = 0f
-                binding.idImViewScale2.pivotY = (binding.idImViewScale.width) / 2f
+                binding.layFragPlayPwp.idImViewScale.pivotX = 0f
+                binding.layFragPlayPwp.idImViewScale.pivotY = (binding.layFragPlayPwp.idImViewScale.width) / 2f
+                binding.layFragPlayPwp.idImViewScale2.pivotX = 0f
+                binding.layFragPlayPwp.idImViewScale2.pivotY = (binding.layFragPlayPwp.idImViewScale.width) / 2f
             }
             17,26,35,44,53,62,71,80,89,98,107,116,125,134 ->{
-                binding.idImViewScale.pivotX = (binding.idImViewScale.width.toFloat())
-                binding.idImViewScale.pivotY = (binding.idImViewScale.width) / 2f
-                binding.idImViewScale2.pivotX = (binding.idImViewScale.width.toFloat())
-                binding.idImViewScale2.pivotY = (binding.idImViewScale.width) / 2f
+                binding.layFragPlayPwp.idImViewScale.pivotX = (binding.layFragPlayPwp.idImViewScale.width.toFloat())
+                binding.layFragPlayPwp.idImViewScale.pivotY = (binding.layFragPlayPwp.idImViewScale.width) / 2f
+                binding.layFragPlayPwp.idImViewScale2.pivotX = (binding.layFragPlayPwp.idImViewScale.width.toFloat())
+                binding.layFragPlayPwp.idImViewScale2.pivotY = (binding.layFragPlayPwp.idImViewScale.width) / 2f
             }
             135 -> {
-                binding.idImViewScale.pivotX = 0f
-                binding.idImViewScale.pivotY = (binding.idImViewScale.width.toFloat())
-                binding.idImViewScale2.pivotX = 0f
-                binding.idImViewScale2.pivotY = (binding.idImViewScale.width.toFloat())
+                binding.layFragPlayPwp.idImViewScale.pivotX = 0f
+                binding.layFragPlayPwp.idImViewScale.pivotY = (binding.layFragPlayPwp.idImViewScale.width.toFloat())
+                binding.layFragPlayPwp.idImViewScale2.pivotX = 0f
+                binding.layFragPlayPwp.idImViewScale2.pivotY = (binding.layFragPlayPwp.idImViewScale.width.toFloat())
             }
             136,137,138,139,140,141,142 ->{
-                binding.idImViewScale.pivotX = (binding.idImViewScale.width) / 2f
-                binding.idImViewScale.pivotY = (binding.idImViewScale.width.toFloat())
-                binding.idImViewScale2.pivotX = (binding.idImViewScale.width) / 2f
-                binding.idImViewScale2.pivotY = (binding.idImViewScale.width.toFloat())
+                binding.layFragPlayPwp.idImViewScale.pivotX = (binding.layFragPlayPwp.idImViewScale.width) / 2f
+                binding.layFragPlayPwp.idImViewScale.pivotY = (binding.layFragPlayPwp.idImViewScale.width.toFloat())
+                binding.layFragPlayPwp.idImViewScale2.pivotX = (binding.layFragPlayPwp.idImViewScale.width) / 2f
+                binding.layFragPlayPwp.idImViewScale2.pivotY = (binding.layFragPlayPwp.idImViewScale.width.toFloat())
             }
             143 ->{
-                binding.idImViewScale.pivotX = (binding.idImViewScale.width.toFloat())
-                binding.idImViewScale.pivotY = (binding.idImViewScale.width.toFloat())
-                binding.idImViewScale2.pivotX = (binding.idImViewScale.width.toFloat())
-                binding.idImViewScale2.pivotY = (binding.idImViewScale.width.toFloat())
+                binding.layFragPlayPwp.idImViewScale.pivotX = (binding.layFragPlayPwp.idImViewScale.width.toFloat())
+                binding.layFragPlayPwp.idImViewScale.pivotY = (binding.layFragPlayPwp.idImViewScale.width.toFloat())
+                binding.layFragPlayPwp.idImViewScale2.pivotX = (binding.layFragPlayPwp.idImViewScale.width.toFloat())
+                binding.layFragPlayPwp.idImViewScale2.pivotY = (binding.layFragPlayPwp.idImViewScale.width.toFloat())
             }else -> {
-            binding.idImViewScale.pivotX = binding.idImViewScale.width / 2f
-            binding.idImViewScale.pivotY = binding.idImViewScale.width / 2f
-            binding.idImViewScale2.pivotX = binding.idImViewScale.width / 2f
-            binding.idImViewScale2.pivotY = binding.idImViewScale.width / 2f
+            binding.layFragPlayPwp.idImViewScale.pivotX = binding.layFragPlayPwp.idImViewScale.width / 2f
+            binding.layFragPlayPwp.idImViewScale.pivotY = binding.layFragPlayPwp.idImViewScale.width / 2f
+            binding.layFragPlayPwp.idImViewScale2.pivotX = binding.layFragPlayPwp.idImViewScale.width / 2f
+            binding.layFragPlayPwp.idImViewScale2.pivotY = binding.layFragPlayPwp.idImViewScale.width / 2f
             }
         }
 
-        binding.idImViewScale.scaleX = (binding.idRcViewFragPWP.width/9f) / binding.idImViewScale.width
-        binding.idImViewScale.scaleY = (binding.idRcViewFragPWP.width/9f) / binding.idImViewScale.width
-        binding.idImViewScale2.scaleX = (binding.idRcViewFragPWP.width/9f) / binding.idImViewScale.width
-        binding.idImViewScale2.scaleY = (binding.idRcViewFragPWP.width/9f) / binding.idImViewScale.width
+        binding.layFragPlayPwp.idImViewScale.scaleX = (binding.layFragPlayPwp.idRcViewFragPWP.width/9f) / binding.layFragPlayPwp.idImViewScale.width
+        binding.layFragPlayPwp.idImViewScale.scaleY = (binding.layFragPlayPwp.idRcViewFragPWP.width/9f) / binding.layFragPlayPwp.idImViewScale.width
+        binding.layFragPlayPwp.idImViewScale2.scaleX = (binding.layFragPlayPwp.idRcViewFragPWP.width/9f) / binding.layFragPlayPwp.idImViewScale.width
+        binding.layFragPlayPwp.idImViewScale2.scaleY = (binding.layFragPlayPwp.idRcViewFragPWP.width/9f) / binding.layFragPlayPwp.idImViewScale.width
         val scaleX = PropertyValuesHolder.ofFloat(View.SCALE_X, 1.0f)
         val scaleY = PropertyValuesHolder.ofFloat(View.SCALE_Y, 1.0f)
-        val alpha = PropertyValuesHolder.ofFloat(View.ALPHA, 1.0f)
-        val allAnim =  ObjectAnimator.ofPropertyValuesHolder(binding.idImViewScale, scaleX, scaleY).apply {
+        //val alpha = PropertyValuesHolder.ofFloat(View.ALPHA, 1.0f)
+        //Анимация увелечения кубика для вращения
+        ObjectAnimator.ofPropertyValuesHolder(binding.layFragPlayPwp.idImViewScale, scaleX, scaleY).apply {
             duration = 400
             doOnStart {
-                //Log.d("MyLog", "start animation plus")
+                //Начало анимации
                 //touchHelper.attachToRecyclerView(null)
                 adapter?.click?.clickable = false
                 noClickItemScale = false
             }
             start()
-
            doOnEnd {
                //Log.d("MyLog", "end animation plus")
                adapter?.click?.clickable = true
@@ -935,15 +1024,18 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
         }
     }
 
+    //Метод уменьшения анимации
     fun animObjectMinus(positionClickOp: Int, b0 : Bitmap, b1 : Bitmap, b2 : Bitmap,
                         b3 : Bitmap, b4 : Bitmap, b5 : Bitmap, n0: Int , n1: Int, n2: Int, n3: Int, n4: Int, n5: Int,
                         p0: Int , p1: Int, p2: Int, p3: Int, p4: Int, p5: Int,
                         positionClick: Int, itemView: View){
-        adapter?.updateAdapterPosition(arrayBitmap, arrayNumber, arrayPosition, positionClickOp)
-        val scaleX = PropertyValuesHolder.ofFloat(View.SCALE_X, (binding.idRcViewFragPWP.width/9f) / binding.idImViewScale.width)
-        val scaleY = PropertyValuesHolder.ofFloat(View.SCALE_Y, (binding.idRcViewFragPWP.width/9f) / binding.idImViewScale.width)
-        if (binding.idImViewScale.visibility == View.VISIBLE) {
-                ObjectAnimator.ofPropertyValuesHolder(binding.idImViewScale, scaleX, scaleY).apply {
+        adapter?.updateAdapterPosition(arrayBitmap, arrayNumber, arrayPosition, positionClickOp, Constans.NO_POSITION_MOVE)
+        val scaleX = PropertyValuesHolder.ofFloat(View.SCALE_X, (binding.layFragPlayPwp.idRcViewFragPWP.width/9f) / binding.layFragPlayPwp.idImViewScale.width)
+        val scaleY = PropertyValuesHolder.ofFloat(View.SCALE_Y, (binding.layFragPlayPwp.idRcViewFragPWP.width/9f) / binding.layFragPlayPwp.idImViewScale.width)
+        //Определяем какую из двух картинок уменьшать, в зависимости от того какая картинка видна
+        if (binding.layFragPlayPwp.idImViewScale.visibility == View.VISIBLE) {
+            //Анимация уменьшения кубика который крутили
+                ObjectAnimator.ofPropertyValuesHolder(binding.layFragPlayPwp.idImViewScale, scaleX, scaleY).apply {
                     duration = 400
                     doOnStart {
                         //Log.d("MyLog", "start animation minus scale")
@@ -953,7 +1045,7 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
                     start()
                     doOnEnd {
                         //Log.d("MyLog", "end animation minus scale")
-                        binding.idImViewScale.visibility = View.GONE
+                        binding.layFragPlayPwp.idImViewScale.visibility = View.GONE
                         adapter?.click?.clickable = true
                         //touchHelper.attachToRecyclerView(binding.idRcViewFragPWP)
                         noClickItemScale = true
@@ -962,27 +1054,27 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
                             //Log.d("MyLog", "2end animation minus scale")
                             itemView.visibility = View.INVISIBLE
                             positionClickOpen = positionClick
-                            val withRc = binding.idRcViewFragPWP.width
-                            val heightRc = binding.idRcViewFragPWP.height
-                            val withIm = binding.idImViewScale.width
-                            val heightIm = binding.idImViewScale.height
+                            val withRc = binding.layFragPlayPwp.idRcViewFragPWP.width
+                            val heightRc = binding.layFragPlayPwp.idRcViewFragPWP.height
+                            val withIm = binding.layFragPlayPwp.idImViewScale.width
+                            val heightIm = binding.layFragPlayPwp.idImViewScale.height
                             //Log.d("MyLog", "position $position")
                             //меняем координаты появления scaleView
-                            var paramsScale = binding.idImViewScale.layoutParams as ViewGroup.MarginLayoutParams
-                            var paramsScale2 = binding.idImViewScale2.layoutParams as ViewGroup.MarginLayoutParams
+                            var paramsScale = binding.layFragPlayPwp.idImViewScale.layoutParams as ViewGroup.MarginLayoutParams
+                            var paramsScale2 = binding.layFragPlayPwp.idImViewScale2.layoutParams as ViewGroup.MarginLayoutParams
                             val coordinates =
                                 MoveItemScale.movingItemScale(positionClick, withRc, heightRc, withIm, heightIm)
                             paramsScale.leftMargin = coordinates[0]
                             paramsScale.topMargin = coordinates[1]
                             paramsScale2.leftMargin = coordinates[0]
                             paramsScale2.topMargin = coordinates[1]
-                            binding.idImViewScale.layoutParams = paramsScale
-                            binding.idImViewScale2.layoutParams = paramsScale2
+                            binding.layFragPlayPwp.idImViewScale.layoutParams = paramsScale
+                            binding.layFragPlayPwp.idImViewScale2.layoutParams = paramsScale2
 
-                            binding.idImViewScale.visibility = View.VISIBLE
-                            binding.idImViewScale2.visibility = View.GONE
+                            binding.layFragPlayPwp.idImViewScale.visibility = View.VISIBLE
+                            binding.layFragPlayPwp.idImViewScale2.visibility = View.GONE
 
-                            binding.idImViewScale.setImageBitmap(b0)
+                            binding.layFragPlayPwp.idImViewScale.setImageBitmap(b0)
                             animObjectPlus(positionClickOpen)
                             openItemScale = true
                             arrayBitmap.clear()
@@ -1015,7 +1107,8 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
                     }
                 }
         }else{
-                ObjectAnimator.ofPropertyValuesHolder(binding.idImViewScale2, scaleX, scaleY).apply {
+            //Анимация уменьшения второй картинки если она на кубике видна в данный мемент
+                ObjectAnimator.ofPropertyValuesHolder(binding.layFragPlayPwp.idImViewScale2, scaleX, scaleY).apply {
                     duration = 400
                     doOnStart {
                         //Log.d("MyLog", "start animation minus scale2")
@@ -1025,7 +1118,7 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
                     start()
                     doOnEnd {
                         //Log.d("MyLog", "end animation minus scale2")
-                        binding.idImViewScale2.visibility = View.GONE
+                        binding.layFragPlayPwp.idImViewScale2.visibility = View.GONE
                         adapter?.click?.clickable = true
                         //touchHelper.attachToRecyclerView(binding.idRcViewFragPWP)
                         noClickItemScale = true
@@ -1034,27 +1127,27 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
                             //Log.d("MyLog", "2end animation minus scale2")
                             itemView.visibility = View.INVISIBLE
                             positionClickOpen = positionClick
-                            val withRc = binding.idRcViewFragPWP.width
-                            val heightRc = binding.idRcViewFragPWP.height
-                            val withIm = binding.idImViewScale.width
-                            val heightIm = binding.idImViewScale.height
+                            val withRc = binding.layFragPlayPwp.idRcViewFragPWP.width
+                            val heightRc = binding.layFragPlayPwp.idRcViewFragPWP.height
+                            val withIm = binding.layFragPlayPwp.idImViewScale.width
+                            val heightIm = binding.layFragPlayPwp.idImViewScale.height
                             //Log.d("MyLog", "position $position")
                             //меняем координаты появления scaleView
-                            var paramsScale = binding.idImViewScale.layoutParams as ViewGroup.MarginLayoutParams
-                            var paramsScale2 = binding.idImViewScale2.layoutParams as ViewGroup.MarginLayoutParams
+                            var paramsScale = binding.layFragPlayPwp.idImViewScale.layoutParams as ViewGroup.MarginLayoutParams
+                            var paramsScale2 = binding.layFragPlayPwp.idImViewScale2.layoutParams as ViewGroup.MarginLayoutParams
                             val coordinates =
                                 MoveItemScale.movingItemScale(positionClick, withRc, heightRc, withIm, heightIm)
                             paramsScale.leftMargin = coordinates[0]
                             paramsScale.topMargin = coordinates[1]
                             paramsScale2.leftMargin = coordinates[0]
                             paramsScale2.topMargin = coordinates[1]
-                            binding.idImViewScale.layoutParams = paramsScale
-                            binding.idImViewScale2.layoutParams = paramsScale2
+                            binding.layFragPlayPwp.idImViewScale.layoutParams = paramsScale
+                            binding.layFragPlayPwp.idImViewScale2.layoutParams = paramsScale2
 
-                            binding.idImViewScale.visibility = View.VISIBLE
-                            binding.idImViewScale2.visibility = View.GONE
+                            binding.layFragPlayPwp.idImViewScale.visibility = View.VISIBLE
+                            binding.layFragPlayPwp.idImViewScale2.visibility = View.GONE
 
-                            binding.idImViewScale.setImageBitmap(b0)
+                            binding.layFragPlayPwp.idImViewScale.setImageBitmap(b0)
                             animObjectPlus(positionClickOpen)
                             openItemScale = true
                             arrayBitmap.clear()
@@ -1088,7 +1181,6 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
                     }
                 }
         }
-
     }
 
 
@@ -1109,22 +1201,22 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
         arrayPosition[4] = arrayPosition[5]
         arrayPosition[5] = arrayPosition[3]
         arrayPosition[3] = tempPosition
-        binding.idImViewScale.scaleX = 1.0f
-        binding.idImViewScale.scaleY = 1.0f
-        binding.idImViewScale2.scaleX = 1.0f
-        binding.idImViewScale2.scaleY = 1.0f
-        if(binding.idImViewScale.visibility == View.VISIBLE) {
-            binding.idImViewScale2.setImageBitmap(arrayBitmap[0])
-            binding.idImViewScale2.visibility = View.VISIBLE
-            binding.idImViewScale.startAnimation(CubeAnimation.create(1, false, 400))
-            binding.idImViewScale2.startAnimation(CubeAnimation.create(1, true, 400))
-            binding.idImViewScale.visibility = View.GONE
+        binding.layFragPlayPwp.idImViewScale.scaleX = 1.0f
+        binding.layFragPlayPwp.idImViewScale.scaleY = 1.0f
+        binding.layFragPlayPwp.idImViewScale2.scaleX = 1.0f
+        binding.layFragPlayPwp.idImViewScale2.scaleY = 1.0f
+        if(binding.layFragPlayPwp.idImViewScale.visibility == View.VISIBLE) {
+            binding.layFragPlayPwp.idImViewScale2.setImageBitmap(arrayBitmap[0])
+            binding.layFragPlayPwp.idImViewScale2.visibility = View.VISIBLE
+            binding.layFragPlayPwp.idImViewScale.startAnimation(CubeAnimation.create(1, false, 400))
+            binding.layFragPlayPwp.idImViewScale2.startAnimation(CubeAnimation.create(1, true, 400))
+            binding.layFragPlayPwp.idImViewScale.visibility = View.GONE
         }else{
-            binding.idImViewScale.setImageBitmap(arrayBitmap[0])
-            binding.idImViewScale.visibility = View.VISIBLE
-            binding.idImViewScale2.startAnimation(CubeAnimation.create(1, false, 400))
-            binding.idImViewScale.startAnimation(CubeAnimation.create(1, true, 400))
-            binding.idImViewScale2.visibility = View.GONE
+            binding.layFragPlayPwp.idImViewScale.setImageBitmap(arrayBitmap[0])
+            binding.layFragPlayPwp.idImViewScale.visibility = View.VISIBLE
+            binding.layFragPlayPwp.idImViewScale2.startAnimation(CubeAnimation.create(1, false, 400))
+            binding.layFragPlayPwp.idImViewScale.startAnimation(CubeAnimation.create(1, true, 400))
+            binding.layFragPlayPwp.idImViewScale2.visibility = View.GONE
         }
     }
 
@@ -1144,22 +1236,22 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
         arrayPosition[3] = arrayPosition[5]
         arrayPosition[5] = arrayPosition[4]
         arrayPosition[4] = tempPosition
-        binding.idImViewScale.scaleX = 1.0f
-        binding.idImViewScale.scaleY = 1.0f
-        binding.idImViewScale2.scaleX = 1.0f
-        binding.idImViewScale2.scaleY = 1.0f
-        if(binding.idImViewScale.visibility == View.VISIBLE) {
-            binding.idImViewScale2.setImageBitmap(arrayBitmap[0])
-            binding.idImViewScale2.visibility = View.VISIBLE
-            binding.idImViewScale.startAnimation(CubeAnimation.create(2, false, 400))
-            binding.idImViewScale2.startAnimation(CubeAnimation.create(2, true, 400))
-            binding.idImViewScale.visibility = View.GONE
+        binding.layFragPlayPwp.idImViewScale.scaleX = 1.0f
+        binding.layFragPlayPwp.idImViewScale.scaleY = 1.0f
+        binding.layFragPlayPwp.idImViewScale2.scaleX = 1.0f
+        binding.layFragPlayPwp.idImViewScale2.scaleY = 1.0f
+        if(binding.layFragPlayPwp.idImViewScale.visibility == View.VISIBLE) {
+            binding.layFragPlayPwp.idImViewScale2.setImageBitmap(arrayBitmap[0])
+            binding.layFragPlayPwp.idImViewScale2.visibility = View.VISIBLE
+            binding.layFragPlayPwp.idImViewScale.startAnimation(CubeAnimation.create(2, false, 400))
+            binding.layFragPlayPwp.idImViewScale2.startAnimation(CubeAnimation.create(2, true, 400))
+            binding.layFragPlayPwp.idImViewScale.visibility = View.GONE
         }else{
-            binding.idImViewScale.setImageBitmap(arrayBitmap[0])
-            binding.idImViewScale.visibility = View.VISIBLE
-            binding.idImViewScale2.startAnimation(CubeAnimation.create(2, false, 400))
-            binding.idImViewScale.startAnimation(CubeAnimation.create(2, true, 400))
-            binding.idImViewScale2.visibility = View.GONE
+            binding.layFragPlayPwp.idImViewScale.setImageBitmap(arrayBitmap[0])
+            binding.layFragPlayPwp.idImViewScale.visibility = View.VISIBLE
+            binding.layFragPlayPwp.idImViewScale2.startAnimation(CubeAnimation.create(2, false, 400))
+            binding.layFragPlayPwp.idImViewScale.startAnimation(CubeAnimation.create(2, true, 400))
+            binding.layFragPlayPwp.idImViewScale2.visibility = View.GONE
         }
     }
 
@@ -1179,22 +1271,22 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
         arrayPosition[1] = arrayPosition[5]
         arrayPosition[5] = arrayPosition[2]
         arrayPosition[2] = tempPosition
-        binding.idImViewScale.scaleX = 1.0f
-        binding.idImViewScale.scaleY = 1.0f
-        binding.idImViewScale2.scaleX = 1.0f
-        binding.idImViewScale2.scaleY = 1.0f
-        if(binding.idImViewScale.visibility == View.VISIBLE) {
-            binding.idImViewScale2.setImageBitmap(arrayBitmap[0])
-            binding.idImViewScale2.visibility = View.VISIBLE
-            binding.idImViewScale.startAnimation(CubeAnimation.create(4, false, 400))
-            binding.idImViewScale2.startAnimation(CubeAnimation.create(4, true, 400))
-            binding.idImViewScale.visibility = View.GONE
+        binding.layFragPlayPwp.idImViewScale.scaleX = 1.0f
+        binding.layFragPlayPwp.idImViewScale.scaleY = 1.0f
+        binding.layFragPlayPwp.idImViewScale2.scaleX = 1.0f
+        binding.layFragPlayPwp.idImViewScale2.scaleY = 1.0f
+        if(binding.layFragPlayPwp.idImViewScale.visibility == View.VISIBLE) {
+            binding.layFragPlayPwp.idImViewScale2.setImageBitmap(arrayBitmap[0])
+            binding.layFragPlayPwp.idImViewScale2.visibility = View.VISIBLE
+            binding.layFragPlayPwp.idImViewScale.startAnimation(CubeAnimation.create(4, false, 400))
+            binding.layFragPlayPwp.idImViewScale2.startAnimation(CubeAnimation.create(4, true, 400))
+            binding.layFragPlayPwp.idImViewScale.visibility = View.GONE
         }else{
-            binding.idImViewScale.setImageBitmap(arrayBitmap[0])
-            binding.idImViewScale.visibility = View.VISIBLE
-            binding.idImViewScale2.startAnimation(CubeAnimation.create(4, false, 400))
-            binding.idImViewScale.startAnimation(CubeAnimation.create(4, true, 400))
-            binding.idImViewScale2.visibility = View.GONE
+            binding.layFragPlayPwp.idImViewScale.setImageBitmap(arrayBitmap[0])
+            binding.layFragPlayPwp.idImViewScale.visibility = View.VISIBLE
+            binding.layFragPlayPwp.idImViewScale2.startAnimation(CubeAnimation.create(4, false, 400))
+            binding.layFragPlayPwp.idImViewScale.startAnimation(CubeAnimation.create(4, true, 400))
+            binding.layFragPlayPwp.idImViewScale2.visibility = View.GONE
         }
     }
 
@@ -1214,26 +1306,22 @@ class FragmentPlayingWithPictures : Fragment(), AdapterFragPWP.ClickScaleItemInt
         arrayPosition[2] = arrayPosition[5]
         arrayPosition[5] = arrayPosition[1]
         arrayPosition[1] = tempPosition
-        binding.idImViewScale.scaleX = 1.0f
-        binding.idImViewScale.scaleY = 1.0f
-        binding.idImViewScale2.scaleX = 1.0f
-        binding.idImViewScale2.scaleY = 1.0f
-        if(binding.idImViewScale.visibility == View.VISIBLE) {
-            binding.idImViewScale2.setImageBitmap(arrayBitmap[0])
-            binding.idImViewScale2.visibility = View.VISIBLE
-            binding.idImViewScale.startAnimation(CubeAnimation.create(3, false, 400))
-            binding.idImViewScale2.startAnimation(CubeAnimation.create(3, true, 400))
-            binding.idImViewScale.visibility = View.GONE
+        binding.layFragPlayPwp.idImViewScale.scaleX = 1.0f
+        binding.layFragPlayPwp.idImViewScale.scaleY = 1.0f
+        binding.layFragPlayPwp.idImViewScale2.scaleX = 1.0f
+        binding.layFragPlayPwp.idImViewScale2.scaleY = 1.0f
+        if(binding.layFragPlayPwp.idImViewScale.visibility == View.VISIBLE) {
+            binding.layFragPlayPwp.idImViewScale2.setImageBitmap(arrayBitmap[0])
+            binding.layFragPlayPwp.idImViewScale2.visibility = View.VISIBLE
+            binding.layFragPlayPwp.idImViewScale.startAnimation(CubeAnimation.create(3, false, 400))
+            binding.layFragPlayPwp.idImViewScale2.startAnimation(CubeAnimation.create(3, true, 400))
+            binding.layFragPlayPwp.idImViewScale.visibility = View.GONE
         }else{
-            binding.idImViewScale.setImageBitmap(arrayBitmap[0])
-            binding.idImViewScale.visibility = View.VISIBLE
-            binding.idImViewScale2.startAnimation(CubeAnimation.create(3, false, 400))
-            binding.idImViewScale.startAnimation(CubeAnimation.create(3, true, 400))
-            binding.idImViewScale2.visibility = View.GONE
+            binding.layFragPlayPwp.idImViewScale.setImageBitmap(arrayBitmap[0])
+            binding.layFragPlayPwp.idImViewScale.visibility = View.VISIBLE
+            binding.layFragPlayPwp.idImViewScale2.startAnimation(CubeAnimation.create(3, false, 400))
+            binding.layFragPlayPwp.idImViewScale.startAnimation(CubeAnimation.create(3, true, 400))
+            binding.layFragPlayPwp.idImViewScale2.visibility = View.GONE
         }
     }
-
-
-
-
 }

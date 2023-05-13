@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/id_header_drawer_pwp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/grey_black">
+
+    <LinearLayout
+        android:id="@+id/lin_im_4"
+        android:layout_width="114dp"
+        android:layout_height="190dp"
+        android:layout_marginStart="16dp"
+        android:background="@color/grey_black"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toEndOf="@+id/lin_im_3"
+        app:layout_constraintTop_toTopOf="@+id/lin_im_3">
+
+        <ImageView
+            android:id="@+id/id_im_game_4"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="3dp"
+            tools:srcCompat="@tools:sample/avatars" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/lin_im_6"
+        android:layout_width="114dp"
+        android:layout_height="190dp"
+        android:layout_marginStart="16dp"
+        android:background="#BDBCBC"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toEndOf="@+id/lin_im_5"
+        app:layout_constraintTop_toTopOf="@+id/lin_im_5">
+
+        <ImageView
+            android:id="@+id/id_im_game_6"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="3dp"
+            tools:srcCompat="@tools:sample/avatars" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/lin_im_5"
+        android:layout_width="114dp"
+        android:layout_height="190dp"
+        android:layout_marginTop="16dp"
+        android:background="#B8B8B8"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/lin_im_3"
+        app:layout_constraintTop_toBottomOf="@+id/lin_im_3"
+        app:layout_constraintVertical_bias="0.0">
+
+        <ImageView
+            android:id="@+id/id_im_game_5"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="3dp"
+            tools:srcCompat="@tools:sample/avatars" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/lin_im_3"
+        android:layout_width="114dp"
+        android:layout_height="190dp"
+        android:layout_marginTop="16dp"
+        android:background="#B1B1B1"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="@+id/lin_im_1"
+        app:layout_constraintTop_toBottomOf="@+id/lin_im_1">
+
+        <ImageView
+            android:id="@+id/id_im_game_3"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="3dp"
+            tools:srcCompat="@tools:sample/avatars" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/lin_im_1"
+        android:layout_width="114dp"
+        android:layout_height="190dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="28dp"
+        android:background="#CAC8C8"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/id_im_game_1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="3dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@tools:sample/avatars" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/lin_im_2"
+        android:layout_width="114dp"
+        android:layout_height="190dp"
+        android:layout_marginStart="16dp"
+        android:background="#C5C4C4"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toEndOf="@+id/lin_im_1"
+        app:layout_constraintTop_toTopOf="@+id/lin_im_1">
+
+        <ImageView
+            android:id="@+id/id_im_game_2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="3dp"
+            tools:srcCompat="@tools:sample/avatars" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

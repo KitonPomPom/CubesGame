@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import kitonpompom.cubesgame.R
 import kitonpompom.cubesgame.activities.data.dataArrayBitmap
 import kitonpompom.cubesgame.activities.utils.*
+import kotlin.collections.ArrayList
 
 class AdapterFragPWP(val clickScaleItemInterface: ClickScaleItemInterface): RecyclerView.Adapter<AdapterFragPWP.ImageHolder>(), ItemTouchMoveAndSwipe.ItemTouchDragAdapterPWP{
     var mainArrayView = ArrayList<dataArrayBitmap>()
@@ -22,15 +23,12 @@ class AdapterFragPWP(val clickScaleItemInterface: ClickScaleItemInterface): Recy
     var clickBack =  ClickableStateBack()
     var noMove = NoMoveIfOpenScale()
     var noMoveBack = NoMoveIfOpenScaleBack()
-    var twoStartUpdateLineMinusOne = true
-    var twoStartUpdateLinePlusOne = true
-    var twoStartUpdateLineMinusNine = true
-    var twoStartUpdateLinePlusNine = true
+    var updateLineNoImage = UpdateLineNoImage()
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_rc_playing_with_pictures, parent,false)
-        return AdapterFragPWP.ImageHolder(view, this, parent.id, click, noMove, clickBack, noMoveBack, countStart)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_rc_playing_with_pictures_hard, parent,false)
+        return AdapterFragPWP.ImageHolder(view, this, parent.id, click, noMove, clickBack, noMoveBack, updateLineNoImage)
     }
 
     override fun onBindViewHolder(holder: ImageHolder, position: Int) {
@@ -50,7 +48,7 @@ class AdapterFragPWP(val clickScaleItemInterface: ClickScaleItemInterface): Recy
 
 
     class ImageHolder (itemView : View, val adapter: AdapterFragPWP, id: Int, var clickk: ClickableState, var noMovee: NoMoveIfOpenScale,
-                       var clickkBack: ClickableStateBack, var noMoveeBack: NoMoveIfOpenScaleBack, var countStartLinearVisible: CountStartLinearVisible) : RecyclerView.ViewHolder(itemView)  {
+                       var clickkBack: ClickableStateBack, var noMoveeBack: NoMoveIfOpenScaleBack, var updateLineNoImagee: UpdateLineNoImage ) : RecyclerView.ViewHolder(itemView)  {
         lateinit var imItemOne : ImageView
         lateinit var imItemTwo : ImageView
         lateinit var lineLeft :LinearLayout
@@ -68,7 +66,9 @@ class AdapterFragPWP(val clickScaleItemInterface: ClickScaleItemInterface): Recy
             lineRight = itemView.findViewById(R.id.linLayRight)
             lineBottom = itemView.findViewById(R.id.linLayBottom)
             itemView.visibility = View.VISIBLE
+
             imItemOne.setImageBitmap(item.arrayBitmap[0])
+
             var x1: Float = 0.0f
             var x2: Float = 0.0f
             var y1: Float = 0.0f
@@ -90,7 +90,7 @@ class AdapterFragPWP(val clickScaleItemInterface: ClickScaleItemInterface): Recy
             //}
 
                 //clickScaleItemInterface.countPlus(countStartLinearVisible.count)
-
+            //updateLineNoImagee.updateLineNoImage = true
 
                 imItemOne.setOnClickListener {
                     if (clickk.clickable && clickkBack.clickable) {
@@ -203,15 +203,27 @@ class AdapterFragPWP(val clickScaleItemInterface: ClickScaleItemInterface): Recy
         }
     }
 
+    /*
+    override fun getItemId(position: Int): Long {
+        //Log.d("MyLog", "Posit $position")
+        return (position.toLong())
+    }
+*/
 
+    //Обновляем адаптер когда первый раз рисуется
     fun updateAdapter(newList : ArrayList<dataArrayBitmap>){ // функция обновляет адаптер
         mainArrayView.clear()
         mainArrayView.addAll(newList)
+        for (i in 0 until mainArrayView.size) {
+            //START_UPDATE_LINE - означает что обновляется при первом запуске
+            //NO_POSITION_MOVE - заглушка что бы не проверять рядом стоящие элементы на совпадение
+            updateLinePosition(i, Constans.START_UPDATE_LINE, Constans.NO_POSITION_MOVE)
+        }
         notifyDataSetChanged()
-
     }
 
-    fun updateAdapterPosition(ListBitmap: ArrayList<Bitmap>, ListNumber: ArrayList<Int>, ListPosition: ArrayList<Int> , position: Int) {
+    //Обновление одного итема, а заним проверяется итемы на совпадения вокруг
+    fun updateAdapterPosition(ListBitmap: ArrayList<Bitmap>, ListNumber: ArrayList<Int>, ListPosition: ArrayList<Int> , position: Int, positionMoveFinish: Int) {
         mainArrayView[position].arrayBitmap[0] = ListBitmap[0]
         mainArrayView[position].arrayBitmap[1] = ListBitmap[1]
         mainArrayView[position].arrayBitmap[2] = ListBitmap[2]
@@ -230,119 +242,130 @@ class AdapterFragPWP(val clickScaleItemInterface: ClickScaleItemInterface): Recy
         mainArrayView[position].arrayPosition[3] = ListPosition[3]
         mainArrayView[position].arrayPosition[4] = ListPosition[4]
         mainArrayView[position].arrayPosition[5] = ListPosition[5]
-        notifyItemChanged(position)
+        notifyItemChanged(position, null)
         endGameCheck(position)
-        updateLinePosition(position)
+        //NO_START_UPDATE_LINE - означает что обновляется не при первом запуске
+        //positionMoveFinish - позиция куда нужно возращать итемc
+        updateLinePosition(position, Constans.NO_START_UPDATE_LINE, positionMoveFinish)
     }
 
-    fun updateLinePositionTwo(position: Int){
-        Log.d("MyLog", "Count $position")
+
+
+    fun updateLinePosition(position: Int, flagStartUpdateLine: Int, positionMoveFinish: Int){
+        //Log.d("MyLog", "positionMoveFinish $positionMoveFinish")
         when(position){
             0->{
-                plusOneTwo(position)
-                plusNineTwo(position)
+                plusOne(position, flagStartUpdateLine, positionMoveFinish)
+                plusNine(position, flagStartUpdateLine, positionMoveFinish)
             }
             1,2,3,4,5,6,7->{
-                plusOneTwo(position)
-                minusOneTwo(position)
-                plusNineTwo(position)
+                plusOne(position, flagStartUpdateLine, positionMoveFinish)
+                minusOne(position, flagStartUpdateLine, positionMoveFinish)
+                plusNine(position, flagStartUpdateLine, positionMoveFinish)
             }
             8->{
-                minusOneTwo(position)
-                plusNineTwo(position)
+                minusOne(position, flagStartUpdateLine, positionMoveFinish)
+                plusNine(position, flagStartUpdateLine, positionMoveFinish)
             }
             9, 18, 27, 36, 45, 54, 63, 72, 81, 90, 99, 108, 117, 126 -> {
-                minusNineTwo(position)
-                plusOneTwo(position)
-                plusNineTwo(position)
+                minusNine(position, flagStartUpdateLine, positionMoveFinish)
+                plusOne(position, flagStartUpdateLine, positionMoveFinish)
+                plusNine(position, flagStartUpdateLine, positionMoveFinish)
             }
             17, 26, 35, 44, 53, 62, 71, 80, 89, 98, 107, 116, 125, 134 -> {
-                minusNineTwo(position)
-                minusNineTwo(position)
-                plusNineTwo(position)
+                minusNine(position, flagStartUpdateLine, positionMoveFinish)
+                minusOne(position, flagStartUpdateLine, positionMoveFinish)
+                plusNine(position, flagStartUpdateLine, positionMoveFinish)
             }
             135 -> {
-                minusNineTwo(position)
-                plusOneTwo(position)
+                minusNine(position, flagStartUpdateLine, positionMoveFinish)
+                plusOne(position, flagStartUpdateLine, positionMoveFinish)
             }
             136, 137, 138, 139, 140, 141, 142 -> {
-                minusOneTwo(position)
-                minusNineTwo(position)
-                plusNineTwo(position)
+                minusOne(position, flagStartUpdateLine, positionMoveFinish)
+                minusNine(position, flagStartUpdateLine, positionMoveFinish)
+                plusOne(position, flagStartUpdateLine, positionMoveFinish)
             }
             143 -> {
-                minusOneTwo(position)
-                minusNineTwo(position)
+                minusOne(position, flagStartUpdateLine, positionMoveFinish)
+                minusNine(position, flagStartUpdateLine, positionMoveFinish)
             }else ->{
-                minusOneTwo(position)
-                plusNineTwo(position)
-                plusOneTwo(position)
-                minusNineTwo(position)
-            }
+            minusOne(position, flagStartUpdateLine, positionMoveFinish)
+            plusNine(position, flagStartUpdateLine, positionMoveFinish)
+            plusOne(position, flagStartUpdateLine, positionMoveFinish)
+            minusNine(position, flagStartUpdateLine, positionMoveFinish)
+        }
         }
     }
 
-    fun plusOneTwo(positionUpdate: Int){
-        if (mainArrayView[positionUpdate+1].arrayNumber == mainArrayView[positionUpdate].arrayNumber){
+    fun plusOne(positionUpdate: Int, flagStartUpdateLine: Int, positionMoveFinish: Int){
+        if (mainArrayView[positionUpdate+1].arrayNumber[0] == mainArrayView[positionUpdate].arrayNumber[0]){
             if(mainArrayView[positionUpdate+1].arrayPosition[0] == mainArrayView[positionUpdate].arrayPosition[0] + 1) {
-                updateLineRightPlusOneTwo(true, positionUpdate)
+                updateLineRightPlusOne(true, positionUpdate, flagStartUpdateLine, positionMoveFinish)
             }else {
-                updateLineRightPlusOneTwo(false, positionUpdate)
+                updateLineRightPlusOne(false, positionUpdate, flagStartUpdateLine, positionMoveFinish)
             }
         }else{
-            updateLineRightPlusOneTwo(false,positionUpdate)
+            updateLineRightPlusOne(false,positionUpdate, flagStartUpdateLine, positionMoveFinish)
         }
     }
 
-    fun minusOneTwo(positionUpdate: Int){
-        if (mainArrayView[positionUpdate-1].arrayNumber == mainArrayView[positionUpdate].arrayNumber){
+    fun minusOne(positionUpdate: Int, flagStartUpdateLine: Int, positionMoveFinish: Int){
+        if (mainArrayView[positionUpdate-1].arrayNumber[0] == mainArrayView[positionUpdate].arrayNumber[0]){
             if(mainArrayView[positionUpdate-1].arrayPosition[0] == mainArrayView[positionUpdate].arrayPosition[0] - 1) {
-                updateLineLeftMinusOneTwo(true, positionUpdate)
+                updateLineLeftMinusOne(true, positionUpdate, flagStartUpdateLine, positionMoveFinish)
             }else {
-                updateLineLeftMinusOneTwo(false, positionUpdate)
+                updateLineLeftMinusOne(false, positionUpdate, flagStartUpdateLine, positionMoveFinish)
             }
         }else{
-            updateLineLeftMinusOneTwo(false,positionUpdate)
+            updateLineLeftMinusOne(false,positionUpdate, flagStartUpdateLine, positionMoveFinish)
         }
     }
 
-    fun plusNineTwo(positionUpdate: Int){
-        if (mainArrayView[positionUpdate+9].arrayNumber == mainArrayView[positionUpdate].arrayNumber){
+    fun plusNine(positionUpdate: Int, flagStartUpdateLine: Int, positionMoveFinish: Int){
+        if (mainArrayView[positionUpdate+9].arrayNumber[0] == mainArrayView[positionUpdate].arrayNumber[0]){
             if(mainArrayView[positionUpdate+9].arrayPosition[0] == mainArrayView[positionUpdate].arrayPosition[0] + 9) {
-                updateLineBottomPlusNineTwo(true, positionUpdate)
+                updateLineBottomPlusNine(true, positionUpdate, flagStartUpdateLine, positionMoveFinish)
             }else {
-                updateLineBottomPlusNineTwo(false, positionUpdate)
+                updateLineBottomPlusNine(false, positionUpdate, flagStartUpdateLine, positionMoveFinish)
             }
         }else{
-            updateLineBottomPlusNineTwo(false,positionUpdate)
+            updateLineBottomPlusNine(false,positionUpdate, flagStartUpdateLine, positionMoveFinish)
         }
     }
 
-    fun minusNineTwo(positionUpdate: Int){
-        if (mainArrayView[positionUpdate-9].arrayNumber == mainArrayView[positionUpdate].arrayNumber){
+    fun minusNine(positionUpdate: Int, flagStartUpdateLine: Int, positionMoveFinish: Int){
+        if (mainArrayView[positionUpdate-9].arrayNumber[0] == mainArrayView[positionUpdate].arrayNumber[0]){
             if(mainArrayView[positionUpdate-9].arrayPosition[0] == mainArrayView[positionUpdate].arrayPosition[0] - 9) {
-                updateLineTopMinusNineTwo(true, positionUpdate)
+                updateLineTopMinusNine(true, positionUpdate, flagStartUpdateLine, positionMoveFinish)
             }else {
-                updateLineTopMinusNineTwo(false, positionUpdate)
+                updateLineTopMinusNine(false, positionUpdate, flagStartUpdateLine, positionMoveFinish)
             }
         }else{
-            updateLineTopMinusNineTwo(false,positionUpdate)
+            updateLineTopMinusNine(false,positionUpdate, flagStartUpdateLine, positionMoveFinish)
         }
     }
 
-    fun updateLineTopMinusNineTwo(plus: Boolean, positionUpdate: Int){
+    fun updateLineTopMinusNine(plus: Boolean, positionUpdate: Int, flagStartUpdateLine: Int, positionMoveFinish: Int){
+        //Если картинки совпадают то plus - false
         if (plus){
             mainArrayView[positionUpdate-9].arrayLine[3] = 0
             mainArrayView[positionUpdate].arrayLine[1]= 0
         } else {
             mainArrayView[positionUpdate-9].arrayLine[3] = 1
             mainArrayView[positionUpdate].arrayLine[1]= 1
-            Log.d("MyLog", "UpdateLineTop $positionUpdate")
+            //Log.d("MyLog", "UpdateLineTop $positionUpdate")
         }
-        notifyItemChanged(positionUpdate)
-        notifyItemChanged(positionUpdate-9)
+
+        if (flagStartUpdateLine == Constans.NO_START_UPDATE_LINE){
+            updateLineNoImage.updateLineNoImage = false
+            //Unit - Убирает анимацию мигания при обновлении итема
+            notifyItemChanged(positionUpdate, Unit)
+            if(positionUpdate-9 != positionMoveFinish) notifyItemChanged(positionUpdate-9, Unit)
+            updateLinePositionTwo(positionUpdate - 9, positionMoveFinish)
+        }
     }
-    fun updateLineLeftMinusOneTwo(plus: Boolean, positionUpdate: Int){
+    fun updateLineLeftMinusOne(plus: Boolean, positionUpdate: Int, flagStartUpdateLine: Int, positionMoveFinish: Int){
         if (plus){
             mainArrayView[positionUpdate-1].arrayLine[2] = 0
             mainArrayView[positionUpdate].arrayLine[0] = 0
@@ -350,25 +373,37 @@ class AdapterFragPWP(val clickScaleItemInterface: ClickScaleItemInterface): Recy
         } else {
             mainArrayView[positionUpdate-1].arrayLine[2] = 1
             mainArrayView[positionUpdate].arrayLine[0] = 1
-            Log.d("MyLog", "UpdateLineLeft $positionUpdate")
+            //Log.d("MyLog", "UpdateLineLeft $positionUpdate")
         }
-        notifyItemChanged(positionUpdate)
-        notifyItemChanged(positionUpdate-1)
+
+        if (flagStartUpdateLine == Constans.NO_START_UPDATE_LINE) {
+            updateLineNoImage.updateLineNoImage = false
+            notifyItemChanged(positionUpdate, Unit)
+            if(positionUpdate-1 != positionMoveFinish) notifyItemChanged(positionUpdate - 1, Unit)
+            updateLinePositionTwo(positionUpdate - 1, positionMoveFinish)
+        }
     }
-    fun updateLineRightPlusOneTwo(plus: Boolean, positionUpdate: Int){
+    fun updateLineRightPlusOne(plus: Boolean, positionUpdate: Int, flagStartUpdateLine: Int, positionMoveFinish: Int){
         if (plus){
             mainArrayView[positionUpdate+1].arrayLine[0] = 0
             mainArrayView[positionUpdate].arrayLine[2] = 0
         }else {
             mainArrayView[positionUpdate+1].arrayLine[0] = 1
             mainArrayView[positionUpdate].arrayLine[2] = 1
-            Log.d("MyLog", "UpdateLineRight $positionUpdate")
+            //Log.d("MyLog", "UpdateLineRight $positionUpdate")
         }
-        notifyItemChanged(positionUpdate)
-        notifyItemChanged(positionUpdate+1)
+
+        if (flagStartUpdateLine == Constans.NO_START_UPDATE_LINE) {
+            updateLineNoImage.updateLineNoImage = false
+            notifyItemChanged(positionUpdate, Unit)
+            if(positionUpdate+1 != positionMoveFinish) {
+                notifyItemChanged(positionUpdate + 1, Unit)
+            }
+            updateLinePositionTwo(positionUpdate + 1, positionMoveFinish)
+        }
     }
-    fun updateLineBottomPlusNineTwo(plus: Boolean, positionUpdate: Int){
-        Log.d("MyLog", "UpdateLineBottom $positionUpdate")
+    fun updateLineBottomPlusNine(plus: Boolean, positionUpdate: Int, flagStartUpdateLine: Int, positionMoveFinish: Int){
+        //Log.d("MyLog", "UpdateLineBottom $positionUpdate")
         if (plus){
             mainArrayView[positionUpdate+9].arrayLine[1] = 0
             mainArrayView[positionUpdate].arrayLine[3] = 0
@@ -376,119 +411,123 @@ class AdapterFragPWP(val clickScaleItemInterface: ClickScaleItemInterface): Recy
             mainArrayView[positionUpdate+9].arrayLine[1] = 1
             mainArrayView[positionUpdate].arrayLine[3] = 1
         }
-        notifyItemChanged(positionUpdate)
-        notifyItemChanged(positionUpdate+9)
+
+        if (flagStartUpdateLine == Constans.NO_START_UPDATE_LINE) {
+            updateLineNoImage.updateLineNoImage = false
+            notifyItemChanged(positionUpdate, Unit)
+            if(positionUpdate+9 != positionMoveFinish) notifyItemChanged(positionUpdate + 9, Unit)
+            updateLinePositionTwo(positionUpdate + 9, positionMoveFinish)
+        }
     }
 
-    fun updateLinePosition(position: Int){
-        Log.d("MyLog", "Count $position")
+    fun updateLinePositionTwo(position: Int, positionMoveFinish: Int){
+        //Log.d("MyLog", "Count $position")
         when(position){
             0->{
-                plusOne(position)
-                plusNine(position)
+                plusOneTwo(position, positionMoveFinish)
+                plusNineTwo(position, positionMoveFinish)
             }
             1,2,3,4,5,6,7->{
-                plusOne(position)
-                minusOne(position)
-                plusNine(position)
+                plusOneTwo(position, positionMoveFinish)
+                minusOneTwo(position, positionMoveFinish)
+                plusNineTwo(position, positionMoveFinish)
             }
             8->{
-                minusOne(position)
-                plusNine(position)
+                minusOneTwo(position, positionMoveFinish)
+                plusNineTwo(position, positionMoveFinish)
             }
             9, 18, 27, 36, 45, 54, 63, 72, 81, 90, 99, 108, 117, 126 -> {
-                minusNine(position)
-                plusOne(position)
-                plusNine(position)
+                minusNineTwo(position, positionMoveFinish)
+                plusOneTwo(position, positionMoveFinish)
+                plusNineTwo(position, positionMoveFinish)
             }
             17, 26, 35, 44, 53, 62, 71, 80, 89, 98, 107, 116, 125, 134 -> {
-                minusNine(position)
-                minusNine(position)
-                plusNine(position)
+                minusNineTwo(position, positionMoveFinish)
+                minusOneTwo(position, positionMoveFinish)
+                plusNineTwo(position, positionMoveFinish)
             }
             135 -> {
-                minusNine(position)
-                plusOne(position)
+                minusNineTwo(position, positionMoveFinish)
+                plusOneTwo(position, positionMoveFinish)
             }
             136, 137, 138, 139, 140, 141, 142 -> {
-                minusOne(position)
-                minusNine(position)
-                plusNine(position)
+                minusOneTwo(position, positionMoveFinish)
+                minusNineTwo(position, positionMoveFinish)
+                plusOneTwo(position, positionMoveFinish)
             }
             143 -> {
-                minusOne(position)
-                minusNine(position)
+                minusOneTwo(position, positionMoveFinish)
+                minusNineTwo(position, positionMoveFinish)
             }else ->{
-            minusOne(position)
-            plusNine(position)
-            plusOne(position)
-            minusNine(position)
+            minusOneTwo(position, positionMoveFinish)
+            plusNineTwo(position, positionMoveFinish)
+            plusOneTwo(position, positionMoveFinish)
+            minusNineTwo(position, positionMoveFinish)
         }
         }
     }
 
-    fun plusOne(positionUpdate: Int){
-        if (mainArrayView[positionUpdate+1].arrayNumber == mainArrayView[positionUpdate].arrayNumber){
+    fun plusOneTwo(positionUpdate: Int, positionMoveFinish: Int){
+        if (mainArrayView[positionUpdate+1].arrayNumber[0] == mainArrayView[positionUpdate].arrayNumber[0]){
             if(mainArrayView[positionUpdate+1].arrayPosition[0] == mainArrayView[positionUpdate].arrayPosition[0] + 1) {
-                updateLineRightPlusOne(true, positionUpdate)
+                updateLineRightPlusOneTwo(true, positionUpdate, positionMoveFinish)
             }else {
-                updateLineRightPlusOne(false, positionUpdate)
+                updateLineRightPlusOneTwo(false, positionUpdate, positionMoveFinish)
             }
         }else{
-            updateLineRightPlusOne(false,positionUpdate)
+            updateLineRightPlusOneTwo(false,positionUpdate, positionMoveFinish)
         }
     }
 
-    fun minusOne(positionUpdate: Int){
-        if (mainArrayView[positionUpdate-1].arrayNumber == mainArrayView[positionUpdate].arrayNumber){
+    fun minusOneTwo(positionUpdate: Int, positionMoveFinish: Int){
+        if (mainArrayView[positionUpdate-1].arrayNumber[0] == mainArrayView[positionUpdate].arrayNumber[0]){
             if(mainArrayView[positionUpdate-1].arrayPosition[0] == mainArrayView[positionUpdate].arrayPosition[0] - 1) {
-                updateLineLeftMinusOne(true, positionUpdate)
+                updateLineLeftMinusOneTwo(true, positionUpdate, positionMoveFinish)
             }else {
-                updateLineLeftMinusOne(false, positionUpdate)
+                updateLineLeftMinusOneTwo(false, positionUpdate, positionMoveFinish)
             }
         }else{
-            updateLineLeftMinusOne(false,positionUpdate)
+            updateLineLeftMinusOneTwo(false,positionUpdate, positionMoveFinish)
         }
     }
 
-    fun plusNine(positionUpdate: Int){
-        if (mainArrayView[positionUpdate+9].arrayNumber == mainArrayView[positionUpdate].arrayNumber){
+    fun plusNineTwo(positionUpdate: Int, positionMoveFinish: Int){
+        if (mainArrayView[positionUpdate+9].arrayNumber[0] == mainArrayView[positionUpdate].arrayNumber[0]){
             if(mainArrayView[positionUpdate+9].arrayPosition[0] == mainArrayView[positionUpdate].arrayPosition[0] + 9) {
-                updateLineBottomPlusNine(true, positionUpdate)
+                updateLineBottomPlusNineTwo(true, positionUpdate, positionMoveFinish)
             }else {
-                updateLineBottomPlusNine(false, positionUpdate)
+                updateLineBottomPlusNineTwo(false, positionUpdate, positionMoveFinish)
             }
         }else{
-            updateLineBottomPlusNine(false,positionUpdate)
+            updateLineBottomPlusNineTwo(false,positionUpdate, positionMoveFinish)
         }
     }
 
-    fun minusNine(positionUpdate: Int){
-        if (mainArrayView[positionUpdate-9].arrayNumber == mainArrayView[positionUpdate].arrayNumber){
+    fun minusNineTwo(positionUpdate: Int, positionMoveFinish: Int){
+        if (mainArrayView[positionUpdate-9].arrayNumber[0] == mainArrayView[positionUpdate].arrayNumber[0]){
             if(mainArrayView[positionUpdate-9].arrayPosition[0] == mainArrayView[positionUpdate].arrayPosition[0] - 9) {
-                updateLineTopMinusNine(true, positionUpdate)
+                updateLineTopMinusNineTwo(true, positionUpdate, positionMoveFinish)
             }else {
-                updateLineTopMinusNine(false, positionUpdate)
+                updateLineTopMinusNineTwo(false, positionUpdate, positionMoveFinish)
             }
         }else{
-            updateLineTopMinusNine(false,positionUpdate)
+            updateLineTopMinusNineTwo(false,positionUpdate, positionMoveFinish)
         }
     }
 
-    fun updateLineTopMinusNine(plus: Boolean, positionUpdate: Int){
+    fun updateLineTopMinusNineTwo(plus: Boolean, positionUpdate: Int, positionMoveFinish: Int){
         if (plus){
             mainArrayView[positionUpdate-9].arrayLine[3] = 0
             mainArrayView[positionUpdate].arrayLine[1]= 0
         } else {
             mainArrayView[positionUpdate-9].arrayLine[3] = 1
             mainArrayView[positionUpdate].arrayLine[1]= 1
-            Log.d("MyLog", "UpdateLineTop $positionUpdate")
+            //Log.d("MyLog", "UpdateLineTop $positionUpdate")
         }
-        notifyItemChanged(positionUpdate)
-        notifyItemChanged(positionUpdate-9)
-        updateLinePositionTwo(positionUpdate - 9)
+        if(positionUpdate != positionMoveFinish) notifyItemChanged(positionUpdate, Unit)
+        if(positionUpdate-9 != positionMoveFinish) notifyItemChanged(positionUpdate-9, Unit)
     }
-    fun updateLineLeftMinusOne(plus: Boolean, positionUpdate: Int){
+    fun updateLineLeftMinusOneTwo(plus: Boolean, positionUpdate: Int, positionMoveFinish: Int){
         if (plus){
             mainArrayView[positionUpdate-1].arrayLine[2] = 0
             mainArrayView[positionUpdate].arrayLine[0] = 0
@@ -496,27 +535,25 @@ class AdapterFragPWP(val clickScaleItemInterface: ClickScaleItemInterface): Recy
         } else {
             mainArrayView[positionUpdate-1].arrayLine[2] = 1
             mainArrayView[positionUpdate].arrayLine[0] = 1
-            Log.d("MyLog", "UpdateLineLeft $positionUpdate")
+            //Log.d("MyLog", "UpdateLineLeft $positionUpdate")
         }
-        notifyItemChanged(positionUpdate)
-        notifyItemChanged(positionUpdate-1)
-        updateLinePositionTwo(positionUpdate - 1)
+        if(positionUpdate != positionMoveFinish) notifyItemChanged(positionUpdate, Unit)
+        if(positionUpdate-1 != positionMoveFinish) notifyItemChanged(positionUpdate-1, Unit)
     }
-    fun updateLineRightPlusOne(plus: Boolean, positionUpdate: Int){
+    fun updateLineRightPlusOneTwo(plus: Boolean, positionUpdate: Int, positionMoveFinish: Int){
         if (plus){
             mainArrayView[positionUpdate+1].arrayLine[0] = 0
             mainArrayView[positionUpdate].arrayLine[2] = 0
         }else {
             mainArrayView[positionUpdate+1].arrayLine[0] = 1
             mainArrayView[positionUpdate].arrayLine[2] = 1
-            Log.d("MyLog", "UpdateLineRight $positionUpdate")
+           // Log.d("MyLog", "UpdateLineRight $positionUpdate")
         }
-        notifyItemChanged(positionUpdate)
-        notifyItemChanged(positionUpdate+1)
-        updateLinePositionTwo(positionUpdate +1)
+        if(positionUpdate != positionMoveFinish) notifyItemChanged(positionUpdate, Unit)
+        if(positionUpdate+1 != positionMoveFinish) notifyItemChanged(positionUpdate+1, Unit)
     }
-    fun updateLineBottomPlusNine(plus: Boolean, positionUpdate: Int){
-        Log.d("MyLog", "UpdateLineBottom $positionUpdate")
+    fun updateLineBottomPlusNineTwo(plus: Boolean, positionUpdate: Int, positionMoveFinish: Int){
+        //Log.d("MyLog", "UpdateLineBottom $positionUpdate")
         if (plus){
             mainArrayView[positionUpdate+9].arrayLine[1] = 0
             mainArrayView[positionUpdate].arrayLine[3] = 0
@@ -524,9 +561,8 @@ class AdapterFragPWP(val clickScaleItemInterface: ClickScaleItemInterface): Recy
             mainArrayView[positionUpdate+9].arrayLine[1] = 1
             mainArrayView[positionUpdate].arrayLine[3] = 1
         }
-        notifyItemChanged(positionUpdate)
-        notifyItemChanged(positionUpdate+9)
-        updateLinePositionTwo(positionUpdate +9)
+        if(positionUpdate != positionMoveFinish) notifyItemChanged(positionUpdate, Unit)
+        if(positionUpdate+9 != positionMoveFinish) notifyItemChanged(positionUpdate+9, Unit)
     }
 
     //Проверка на то, собрал ли полностью картинку
@@ -545,7 +581,10 @@ class AdapterFragPWP(val clickScaleItemInterface: ClickScaleItemInterface): Recy
                 break
             }
         }
-        if(count == mainArrayView.size) Log.d("MyLog", "Finish")
+        if(count == mainArrayView.size){
+
+            clickScaleItemInterface.imageIsCollected(mainArrayView[0].arrayNumber[0])
+        }
     }
 
     fun transferArrayAdapterToFrag(position: Int, clickScaleItemInterface: ClickScaleItemInterface,
@@ -592,16 +631,22 @@ class AdapterFragPWP(val clickScaleItemInterface: ClickScaleItemInterface): Recy
                             b5 : Bitmap, n0: Int, n1: Int, n2: Int, n3: Int, n4: Int, n5: Int,
                             p0 : Int, p1 : Int, p2 : Int, p3 : Int, p4 : Int, p5 : Int,
                             position: Int, itemView: View, imItem: ImageView)
+
         fun moveItem(b0 : Bitmap, b1 : Bitmap, b2 : Bitmap, b3 : Bitmap, b4 : Bitmap,
                      b5 : Bitmap, n0: Int, n1: Int, n2: Int, n3: Int, n4: Int, n5: Int,
                      p0 : Int, p1 : Int, p2 : Int, p3 : Int, p4 : Int, p5 : Int,
                      position: Int, itemView: View, imItem: ImageView)
+
         fun transferMoveArray(b0 : Bitmap, b1 : Bitmap, b2 : Bitmap, b3 : Bitmap, b4 : Bitmap,
                               b5 : Bitmap,  n0: Int, n1: Int, n2: Int, n3: Int, n4: Int, n5: Int,
                               p0 : Int, p1 : Int, p2 : Int, p3 : Int, p4 : Int, p5 : Int,
                               position: Int, coordinate: List<Float>,
                               coordinateBackStart: List<Float>, positionMove: Int)
-        fun updateLine (positionAdapterUpdate: Int)
+
+        // Если картинка собрана, отправляем с какой позиции кубика картинка собрана,
+        // что бы обновить в drawerLayout, и потом подсветить собраную картинку.
+        fun imageIsCollected (positionImageCollected: Int)
+
         fun countPlus (count:Int)
     }
 }

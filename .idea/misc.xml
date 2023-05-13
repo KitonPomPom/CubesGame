@@ -9,11 +9,38 @@
         <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/drawable-v24/ic_baseline_image_24.xml" value="0.106" />
         <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/drawable-v24/ic_delete_image.xml" value="0.108" />
         <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/drawable-v24/ic_drag.xml" value="0.106" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/drawable-v24/image_grey.xml" value="0.1115" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/drawable/bg_rounded_circle_drawable.xml" value="0.1115" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/drawable/circle_drawable.xml" value="0.1115" />
         <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/drawable/edit_image_bg.xml" value="0.108" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/drawable/ic_add_image.xml" value="0.1115" />
         <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/drawable/ic_baseline_image_24.xml" value="0.106" />
         <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/drawable/ic_drag.xml" value="0.1" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/drawable/image_grey.xml" value="0.1115" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout-sw300dp/fragment_playing_with_pictures_two.xml" value="0.1" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout-sw300dp/item_rc_playing_with_pictures.xml" value="0.1" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout-w1080dp/drawer_layout_pwp_two.xml" value="0.1" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout-w1080dp/fragment_playing_with_pictures_two.xml" value="0.1" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout-w1080dp/header_for_drawer_pwp.xml" value="0.1" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout-w1080dp/item_rc_playing_with_pictures.xml" value="0.1" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout-w315dp/fragment_playing_with_pictures_two.xml" value="0.1" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout-w315dp/item_rc_playing_with_pictures.xml" value="0.1" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout-w320dp/fragment_playing_with_pictures_two.xml" value="0.1" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout-w700dp/drawer_layout_pwp_two.xml" value="0.1" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout-w700dp/header_for_drawer_pwp.xml" value="0.1" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout-w700dp/item_rc_playing_with_pictures.xml" value="0.1" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout-w720dp/drawer_layout_pwp_two.xml" value="0.1" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout-w720dp/fragment_playing_with_pictures_two.xml" value="0.1" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout-w720dp/header_for_drawer_pwp.xml" value="0.1" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout-w720dp/item_rc_playing_with_pictures.xml" value="0.16666666666666666" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout-w720px/header_for_drawer_pwp.xml" value="0.175" />
         <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/activity_main.xml" value="0.22" />
         <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/activity_pwp.xml" value="0.125" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/difficulty_option_dialog.xml" value="0.3333333333333333" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/drawer_layout_pwp.xml" value="0.22" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/drawer_layout_pwp_easy.xml" value="0.1" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/drawer_layout_pwp_medium.xml" value="0.1" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/drawer_layout_pwp_two.xml" value="0.1640625" />
         <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/fragment_add_image.xml" value="0.3408239700374532" />
         <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/fragment_camera.xml" value="0.1640625" />
         <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/fragment_frag_group_image_offline.xml" value="0.21232876712328766" />
@@ -22,17 +49,29 @@
         <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/fragment_image_list.xml" value="0.1640625" />
         <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/fragment_my_page.xml" value="0.10885416666666667" />
         <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/fragment_playing_with_pictures.xml" value="0.22" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/fragment_playing_with_pictures_Two.xml" value="0.1640625" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/fragment_playing_with_pictures_easy.xml" value="0.1" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/fragment_playing_with_pictures_medium.xml" value="0.1" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/fragment_playing_with_pictures_two.xml" value="0.1" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/header_for_drawer_pwp.xml" value="0.16666666666666666" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/header_for_drawer_pwp_easy.xml" value="0.1" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/header_for_drawer_pwp_medium.xml" value="0.14713541666666666" />
         <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/item_rc_add_im_adapter.xml" value="0.1234375" />
         <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/item_rc_add_image_adapter.xml" value="0.5" />
         <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/item_rc_add_image_add_hor_adapter.xml" value="0.41042345276872966" />
-        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/item_rc_offline_group_image_adapter.xml" value="0.1" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/item_rc_offline_group_image_adapter.xml" value="0.16666666666666666" />
         <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/item_rc_offline_image_adapter.xml" value="0.16824644549763032" />
-        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/item_rc_playing_with_pictures.xml" value="0.3333333333333333" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/item_rc_playing_with_pictures.xml" value="0.6488095238095238" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/item_rc_playing_with_pictures_easy.xml" value="0.1" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/item_rc_playing_with_pictures_hard.xml" value="0.1" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/item_rc_playing_with_pictures_medium.xml" value="0.1" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/progress_dialog_layout.xml" value="0.17864583333333334" />
+        <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/layout/progress_dialog_layout_pwp.xml" value="0.22" />
         <entry key="..\:/Users/tyomi/AndroidStudioProjects/CubesGame/app/src/main/res/menu/bottom_menu.xml" value="0.1140625" />
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_17" project-jdk-name="jbr-17" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

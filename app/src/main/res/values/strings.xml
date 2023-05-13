@@ -2,9 +2,9 @@
     <string name="app_name">CubesGame</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="frag_group_image_offline">Image Offline</string>
-    <string name="frag_group_image_online">Image Online</string>
-    <string name="frag_friends">Friends</string>
-    <string name="frag_my_page">My Page</string>
+    <string name="frag_group_image_online">Image Online - Тут ещё ничего нет!</string>
+    <string name="frag_friends">Friends - Тут ещё ничего нет!</string>
+    <string name="frag_my_page">My Page - Тут ещё ничего нет!</string>
     <string name="my_page">Моя страница</string>
     <string name="groups_image_offline">Группы картинок оффлайн</string>
     <string name="group_image_online_all">Группы картинок онлайн</string>
@@ -12,6 +12,13 @@
     <string name="add_image">Добавить картинку</string>
     <string name="add_six_image">Добавьте шесть изоброжений</string>
     <string name="save">Сохранить</string>
+    <string name="openGame">Запустить игру</string>
+    <string name="loading">Загрузка...</string>
+    <string name="loading_pwp">Загрузка может занять около 20 секунд, пожалуйста подождите... Вращай и переставляй кубики что бы собрать картинку.</string>
+    <string name="easy">Легкий</string>
+    <string name="medium">Средний</string>
+    <string name="hard">Сложный</string>
+    <string name="choose_the_difficulty">Выбирите сложность</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

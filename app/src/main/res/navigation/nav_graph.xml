@@ -13,6 +13,15 @@
         <action
             android:id="@+id/action_fragGroupImageOffline_to_fragmentPlayingWithPictures"
             app:destination="@id/fragmentPlayingWithPictures" />
+        <action
+            android:id="@+id/action_fragGroupImageOffline_to_fragmentPlayingWithPicturesTwo"
+            app:destination="@id/fragmentPlayingWithPicturesTwo" />
+        <action
+            android:id="@+id/action_fragGroupImageOffline_to_fragmentPlayingWithPicturesMedium"
+            app:destination="@id/fragmentPlayingWithPicturesMedium" />
+        <action
+            android:id="@+id/action_fragGroupImageOffline_to_fragmentPlayingWithPicturesEasy"
+            app:destination="@id/fragmentPlayingWithPicturesEasy" />
     </fragment>
     <fragment
         android:id="@+id/fragGroupImageOnline"
@@ -33,6 +42,15 @@
         <action
             android:id="@+id/action_fragment_add_image_to_fragmentPlayingWithPictures"
             app:destination="@id/fragmentPlayingWithPictures" />
+        <action
+            android:id="@+id/action_fragment_add_image_to_fragmentPlayingWithPicturesTwo"
+            app:destination="@id/fragmentPlayingWithPicturesTwo" />
+        <action
+            android:id="@+id/action_fragment_add_image_to_fragmentPlayingWithPicturesMedium"
+            app:destination="@id/fragmentPlayingWithPicturesMedium" />
+        <action
+            android:id="@+id/action_fragment_add_image_to_fragmentPlayingWithPicturesEasy"
+            app:destination="@id/fragmentPlayingWithPicturesEasy" />
     </fragment>
     <fragment
         android:id="@+id/fragment_friends"
@@ -59,4 +77,18 @@
         android:name="kitonpompom.cubesgame.activities.FragmentImageList"
         android:label="fragment_image_list"
         tools:layout="@layout/fragment_image_list" />
+    <fragment
+        android:id="@+id/fragmentPlayingWithPicturesTwo"
+        android:name="kitonpompom.cubesgame.activities.FragmentPlayingWithPicturesTwo"
+        android:label="FragmentPlayingWithPicturesTwo" />
+    <fragment
+        android:id="@+id/fragmentPlayingWithPicturesMedium"
+        android:name="kitonpompom.cubesgame.activities.FragmentPlayingWithPicturesMedium"
+        android:label="fragment_playing_with_pictures_medium"
+        tools:layout="@layout/fragment_playing_with_pictures_medium" />
+    <fragment
+        android:id="@+id/fragmentPlayingWithPicturesEasy"
+        android:name="kitonpompom.cubesgame.activities.FragmentPlayingWithPicturesEasy"
+        android:label="fragment_playing_with_pictures_easy"
+        tools:layout="@layout/fragment_playing_with_pictures_easy" />
 </navigation>

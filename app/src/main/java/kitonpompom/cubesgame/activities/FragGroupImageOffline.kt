@@ -1,6 +1,7 @@
 package kitonpompom.cubesgame.activities
 
 import android.Manifest
+import android.app.Activity
 import android.content.ContentResolver
 import android.content.Context
 import android.content.pm.PackageManager
@@ -26,14 +27,19 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.tabs.TabLayout
 import kitonpompom.cubesgame.R
 import kitonpompom.cubesgame.activities.data.DataModel
+import kitonpompom.cubesgame.activities.dialogs.DifficultyOptionDialog
+import kitonpompom.cubesgame.activities.dialogs.InterfaceDifficultyOptionDialog
+import kitonpompom.cubesgame.activities.dialogs.ProgressDialog
+import kitonpompom.cubesgame.activities.utils.Constans
 import kitonpompom.cubesgame.activities.utils.ImageManager
+import kitonpompom.cubesgame.activities.utils.ImageManagerTwo
 import kitonpompom.cubesgame.databinding.FragmentFragGroupImageOfflineBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
-class FragGroupImageOffline : Fragment(), AdapterFragOfflineGroupImage.OpenFragPlayInterface {
+class FragGroupImageOffline : Fragment(), AdapterFragOfflineGroupImage.OpenFragPlayInterface, InterfaceDifficultyOptionDialog {
 
     lateinit var binding : FragmentFragGroupImageOfflineBinding
 
@@ -45,6 +51,8 @@ class FragGroupImageOffline : Fragment(), AdapterFragOfflineGroupImage.OpenFragP
     var arrayHeadAuto: ArrayList<String> = ArrayList()
     var arrayHeadFish: ArrayList<String> = ArrayList()
     var arrayHeadAnimal: ArrayList<String> = ArrayList()
+
+    val difficultyOptionDialog = DifficultyOptionDialog(this)
 
     private val dataModel: DataModel by activityViewModels()
 
@@ -61,11 +69,6 @@ class FragGroupImageOffline : Fragment(), AdapterFragOfflineGroupImage.OpenFragP
         super.onViewCreated(view, savedInstanceState)
         //registerPermissionListener()
         //chekPermission()
-
-
-
-
-
 
         arrayHeadCity.clear()
         arrayHeadAuto.clear()
@@ -181,39 +184,32 @@ class FragGroupImageOffline : Fragment(), AdapterFragOfflineGroupImage.OpenFragP
         val allCategoryAuto: MutableList<AllCategories> = ArrayList()
 
         CoroutineScope(Dispatchers.Main).launch {
+            val dialog = ProgressDialog.createProgressDialog(activity as Activity, Constans.FRAGMENT_ADD_IMAGE)
 
             allCategoryCity.clear()
-            allCategoryCity.add(AllCategories("Один",ImageManager.imageResize(activity as AppCompatActivity, listCity1)))
-            allCategoryCity.add(AllCategories("Два",ImageManager.imageResize(activity as AppCompatActivity, listCity2)))
+            allCategoryCity.add(AllCategories("Один",ImageManagerTwo.imageResize(activity as AppCompatActivity, listCity1)))
+            allCategoryCity.add(AllCategories("Два",ImageManagerTwo.imageResize(activity as AppCompatActivity, listCity2)))
 
+            allCategoryAnimal.add(AllCategories("Один",ImageManagerTwo.imageResize(activity as AppCompatActivity, listAnimal1)))
+            allCategoryAnimal.add(AllCategories("Два",ImageManagerTwo.imageResize(activity as AppCompatActivity, listAnimal2)))
 
-            allCategoryAnimal.add(AllCategories("Один",ImageManager.imageResize(activity as AppCompatActivity, listAnimal1)))
-            allCategoryAnimal.add(AllCategories("Два",ImageManager.imageResize(activity as AppCompatActivity, listAnimal2)))
+            allCategoryFish.add(AllCategories("Один",ImageManagerTwo.imageResize(activity as AppCompatActivity, listFish1)))
+            allCategoryFish.add(AllCategories("Два",ImageManagerTwo.imageResize(activity as AppCompatActivity, listFish2)))
 
+            allCategoryAuto.add(AllCategories("Один",ImageManagerTwo.imageResize(activity as AppCompatActivity, listAuto1)))
+            allCategoryAuto.add(AllCategories("Два",ImageManagerTwo.imageResize(activity as AppCompatActivity, listAuto2)))
 
-            allCategoryFish.add(AllCategories("Один",ImageManager.imageResize(activity as AppCompatActivity, listFish1)))
-            allCategoryFish.add(AllCategories("Два",ImageManager.imageResize(activity as AppCompatActivity, listFish2)))
-
-
-            allCategoryAuto.add(AllCategories("Один",ImageManager.imageResize(activity as AppCompatActivity, listAuto1)))
-            allCategoryAuto.add(AllCategories("Два",ImageManager.imageResize(activity as AppCompatActivity, listAuto2)))
             adapterFragOfflineGroupImage!!.updateAdapter(allCategoryCity)
+            dialog.dismiss()
         }
-
-
-
-
-
-
-
 
         binding.idTabeLayGroupOffline.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 when(tab?.position){
                     0 -> adapterFragOfflineGroupImage!!.updateAdapter(allCategoryCity)
-                    1 -> adapterFragOfflineGroupImage!!.updateAdapter(allCategoryAnimal)
-                    2 -> adapterFragOfflineGroupImage!!.updateAdapter(allCategoryFish)
-                    3 -> adapterFragOfflineGroupImage!!.updateAdapter(allCategoryAuto)
+                    1 -> /*Toast.makeText(activity, "Ничего нету", Toast.LENGTH_LONG).show()*/adapterFragOfflineGroupImage!!.updateAdapter(allCategoryAnimal)
+                    2 -> /*Toast.makeText(activity, "Ничего нету", Toast.LENGTH_LONG).show()*/adapterFragOfflineGroupImage!!.updateAdapter(allCategoryFish)
+                    3 -> /*Toast.makeText(activity, "Ничего нету", Toast.LENGTH_LONG).show()*/adapterFragOfflineGroupImage!!.updateAdapter(allCategoryAuto)
                 }
             }
 
@@ -232,8 +228,10 @@ class FragGroupImageOffline : Fragment(), AdapterFragOfflineGroupImage.OpenFragP
     }
 
     override fun openFragPlayWithPicturesInterface(mainArray: ArrayList<Bitmap>) {
-            dataModel.listBitmapForAdapterFragPWP.value = mainArray
-            findNavController().navigate(R.id.action_fragGroupImageOffline_to_fragmentPlayingWithPictures)
+
+        difficultyOptionDialog.createDifficultyOptionDialog(activity as AppCompatActivity, mainArray)
+             //dataModel.listBitmapForAdapterFragPWP.value = mainArray
+            //findNavController().navigate(R.id.action_fragGroupImageOffline_to_fragmentPlayingWithPicturesTwo)
 
     }
 
@@ -263,6 +261,22 @@ class FragGroupImageOffline : Fragment(), AdapterFragOfflineGroupImage.OpenFragP
                 Toast.makeText(activity as AppCompatActivity, "Не получено разрешение", Toast.LENGTH_LONG).show()
             }
         }
+    }
+
+    override fun interfaceDifficultyOptionDialog(
+        optionDifficulty: Int,
+        mainArray: ArrayList<Bitmap>
+    ) {
+        dataModel.listBitmapForAdapterFragPWP.value = mainArray
+        when (optionDifficulty) {
+        Constans.EASY -> findNavController().navigate(R.id.action_fragGroupImageOffline_to_fragmentPlayingWithPicturesEasy)
+        Constans.MEDIUM -> findNavController().navigate(R.id.action_fragGroupImageOffline_to_fragmentPlayingWithPicturesMedium)
+        Constans.HARD -> findNavController().navigate(R.id.action_fragGroupImageOffline_to_fragmentPlayingWithPicturesTwo)
+        }
+    }
+
+    override fun interfaceDifficultyOptionDialogAddImage(optionDifficulty: Int) {
+        //Заглушка используется в FragmentAddImage
     }
 
 

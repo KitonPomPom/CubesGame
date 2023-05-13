@@ -6,14 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.Toast
 
 import androidx.recyclerview.widget.RecyclerView
 import kitonpompom.cubesgame.R
-import kotlinx.coroutines.NonDisposableHandle.parent
-import java.util.*
 
-// Адаптер для игры
+// Адаптер для игры(Не используется)
 class AdapterFragPlayingWithPictures(private val context: Context, private val listBitmap: List <Bitmap>):
     RecyclerView.Adapter<AdapterFragPlayingWithPictures.CategoryItemViewHolder>() {
 
@@ -25,7 +22,7 @@ class AdapterFragPlayingWithPictures(private val context: Context, private val l
         }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryItemViewHolder {
-        return CategoryItemViewHolder(LayoutInflater.from(context).inflate(R.layout.item_rc_playing_with_pictures, parent, false))
+        return CategoryItemViewHolder(LayoutInflater.from(context).inflate(R.layout.item_rc_playing_with_pictures_hard, parent, false))
     }
 
     override fun onBindViewHolder(holder: CategoryItemViewHolder, position: Int) {
