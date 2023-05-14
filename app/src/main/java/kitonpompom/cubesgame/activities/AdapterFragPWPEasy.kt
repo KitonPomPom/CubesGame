@@ -178,11 +178,13 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
 
 
                 imItemOne.setOnClickListener {
+                    Log.d("MyLog", "setOnClickListener ItemOne actionNoClick $actionNoClickOnTouchIfTouchOnMove")
                     if (!actionNoClickOnTouchIfTouchOnMove) {
-                        //Log.d("MyLog", "clicker ${noMovee.noMoveIfOpenScale} ${noMoveeBack.noMoveIfOpenScale}")
+                        Log.d("MyLog", "clicker ${noMovee.noMoveIfOpenScale} ${noMoveeBack.noMoveIfOpenScale}")
                         if (!noMovee.noMoveIfOpenScale && noMoveeBack.noMoveIfOpenScale) {
+                            Log.d("MyLog", "Между")
                             if (clickk.clickable && clickkBack.clickable && clickkUpdateLine.clickable) {
-                                //Log.d("MyLog", "Слушатель ImItemOne1")
+                                Log.d("MyLog", "Слушатель ImItemOne1")
                                 clickScaleItemInterface.clickScaleItem(
                                     item.arrayBitmap[0], item.arrayBitmap[1],
                                     item.arrayBitmap[2], item.arrayBitmap[3],
@@ -202,9 +204,15 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
                 }
 
                 imItemOne.setOnTouchListener(){ viewRc, eventRc ->
+                    Log.d("MyLog", "setOnTouchListener imItemOne")
+                    Log.d("MyLog", "setOnTouchListener imItemOne noMovee ${noMovee.noMoveIfOpenScale}")
+                    Log.d("MyLog", "setOnTouchListener imItemOne noMoveeBack ${noMoveeBack.noMoveIfOpenScale}")
+                    Log.d("MyLog", "setOnTouchListener imItemOne clickk ${clickk.clickable}")
+                    Log.d("MyLog", "setOnTouchListener imItemOne clickkBack ${clickkBack.clickable}")
+                    Log.d("MyLog", "setOnTouchListener imItemOne clickkUpdateLine ${clickkUpdateLine.clickable}")
                     if (noMovee.noMoveIfOpenScale && noMoveeBack.noMoveIfOpenScale){ //Не запускаем если открыт увеличеный Итем
                         if (clickk.clickable && clickkBack.clickable && clickkUpdateLine.clickable) {// Не запускаем пока идет анимация
-                            //Log.d("MyLog", "Слушатель ImItemOne2")
+                            Log.d("MyLog", "Слушатель ImItemOne2")
                             val minDistance = 23
                             val minDistanceUpDown = 15
                             when (eventRc.action) {
@@ -441,50 +449,50 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
             0->{
                 // Constans.UPDATE_LINE_ONE  - в методе Edge обновляем итем
                 //после записи новых данных по линиям
-                topEdge(position, Constans.UPDATE_LINE_ONE)
-                leftEdge(position, Constans.UPDATE_LINE_ONE)
+                topEdge(position)
+                leftEdge(position)
                 plusOne(position, flagStartUpdateLine, positionMoveFinish)
                 plusThree(position, flagStartUpdateLine, positionMoveFinish)
             }
             1 ->{
-                topEdge(position, Constans.UPDATE_LINE_ONE)
+                topEdge(position)
                 plusOne(position, flagStartUpdateLine, positionMoveFinish)
                 minusOne(position, flagStartUpdateLine, positionMoveFinish)
                 plusThree(position, flagStartUpdateLine, positionMoveFinish)
             }
             2->{
-                topEdge(position, Constans.UPDATE_LINE_ONE)
-                rightEdge(position, Constans.UPDATE_LINE_ONE)
+                topEdge(position)
+                rightEdge(position)
                 minusOne(position, flagStartUpdateLine, positionMoveFinish)
                 plusThree(position, flagStartUpdateLine, positionMoveFinish)
             }
             3, 6, 9 -> {
-                leftEdge(position, Constans.UPDATE_LINE_ONE)
+                leftEdge(position)
                 minusThree(position, flagStartUpdateLine, positionMoveFinish)
                 plusOne(position, flagStartUpdateLine, positionMoveFinish)
                 plusThree(position, flagStartUpdateLine, positionMoveFinish)
             }
             5, 8, 11 -> {
-                rightEdge(position, Constans.UPDATE_LINE_ONE)
+                rightEdge(position)
                 minusThree(position, flagStartUpdateLine, positionMoveFinish)
                 minusOne(position, flagStartUpdateLine, positionMoveFinish)
                 plusThree(position, flagStartUpdateLine, positionMoveFinish)
             }
             12 -> {
-                leftEdge(position, Constans.UPDATE_LINE_ONE)
-                bottomEdge(position, Constans.UPDATE_LINE_ONE)
+                leftEdge(position)
+                bottomEdge(position)
                 minusThree(position, flagStartUpdateLine, positionMoveFinish)
                 plusOne(position, flagStartUpdateLine, positionMoveFinish)
             }
             13 -> {
-                bottomEdge(position, Constans.UPDATE_LINE_ONE)
+                bottomEdge(position)
                 minusOne(position, flagStartUpdateLine, positionMoveFinish)
                 minusThree(position, flagStartUpdateLine, positionMoveFinish)
                 plusOne(position, flagStartUpdateLine, positionMoveFinish)
             }
             14 -> {
-                rightEdge(position, Constans.UPDATE_LINE_ONE)
-                bottomEdge(position, Constans.UPDATE_LINE_ONE)
+                rightEdge(position)
+                bottomEdge(position)
                 minusOne(position, flagStartUpdateLine, positionMoveFinish)
                 minusThree(position, flagStartUpdateLine, positionMoveFinish)
             }else ->{
@@ -606,7 +614,7 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
         }
     }
 
-    fun topEdge(positionUpdate: Int, updLinMet: Int){
+    fun topEdge(positionUpdate: Int){
         if(mainArrayView[positionUpdate].arrayPosition[0] == positionUpdate){
             //Если записана 1, то ставим 0
             if(mainArrayView[positionUpdate].arrayLine[1] == 1) {
@@ -617,10 +625,10 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
         }else{//Если позиция не совпала, то записываем 1
             mainArrayView[positionUpdate].arrayLine[1] = 1
         }
-        if(updLinMet == Constans.UPDATE_LINE_ONE) notifyItemChanged(positionUpdate, Unit) //Обновить адаптер по позиции
+        notifyItemChanged(positionUpdate, Unit)
     }
 
-    fun leftEdge(positionUpdate: Int, updLinMet:Int){
+    fun leftEdge(positionUpdate: Int){
         //Если позиция совпала то записываем либо 0 либо 2 и линия слева исчезает
         if(mainArrayView[positionUpdate].arrayPosition[0] == positionUpdate){
             //Если записана 1, то ставим 0
@@ -632,10 +640,10 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
         }else{ //Если позиция не совпала, то записываем 1
             mainArrayView[positionUpdate].arrayLine[0] = 1
         }
-        if(updLinMet == Constans.UPDATE_LINE_ONE) notifyItemChanged(positionUpdate, Unit) //Обновить адаптер по позиции
+        notifyItemChanged(positionUpdate, Unit)
     }
 
-    fun rightEdge(positionUpdate: Int, updLinMet: Int){ //Проверка кубика крайнего справа на то стал ли он на свое место
+    fun rightEdge(positionUpdate: Int){ //Проверка кубика крайнего справа на то стал ли он на свое место
         //Если позиция совпала то записываем либо 0 либо 2 и линия справа исчезает
         if(mainArrayView[positionUpdate].arrayPosition[0] == positionUpdate){
             //Если записана 1, то ставим 0
@@ -647,10 +655,10 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
         }else{ //Если позиция не совпала, то записываем 1 и линия появляется
             mainArrayView[positionUpdate].arrayLine[2] = 1
         }
-        if(updLinMet == Constans.UPDATE_LINE_ONE) notifyItemChanged(positionUpdate, Unit) //Обновить адаптер по позиции
+        notifyItemChanged(positionUpdate, Unit) //Обновить адаптер по позиции
     }
 
-    fun bottomEdge(positionUpdate: Int, updLinMet: Int){ //Проверка кубика нижнего ряда на то стал ли он на свое место
+    fun bottomEdge(positionUpdate: Int){ //Проверка кубика нижнего ряда на то стал ли он на свое место
         //Если позиция совпала то записываем либо 0 либо 2 и линия справа исчезает
         if(mainArrayView[positionUpdate].arrayPosition[0] == positionUpdate){
             //Если записана 1, то ставим 0
@@ -662,7 +670,7 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
         }else{
             mainArrayView[positionUpdate].arrayLine[3] = 1
         }
-        if(updLinMet == Constans.UPDATE_LINE_ONE) notifyItemChanged(positionUpdate, Unit) //Обновить адаптер по позиции
+        notifyItemChanged(positionUpdate, Unit) //Обновить адаптер по позиции
     }
 
     fun updateLineTopMinusThree(plus: Boolean, positionUpdate: Int, flagStartUpdateLine: Int, positionMoveFinish: Int){
@@ -869,7 +877,7 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
             }
             1 ->{
                 //topEdge(position, Constans.UPDATE_LINE_TWO)
-                //plusOneTwo(position, positionMoveFinish)
+                plusOneTwo(position, positionMoveFinish)
                 minusOneTwo(position, positionMoveFinish)
                 plusThreeTwo(position, positionMoveFinish)
             }
@@ -1027,7 +1035,7 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
                         //checkingLinesReDisappearing(positionUpdate, 1)
                         notifyItemChanged(positionUpdate - 3, Unit)
                     }
-                    clickUpdateLine.clickable = true
+                    //clickUpdateLine.clickable = true
                     Log.d("MyLog", "UpdateLineTopTwo true $positionUpdate, 0, pos:$positionUpdate")
                 } else {
                     mainArrayView[positionUpdate - 3].arrayLine[3] = 2
@@ -1040,7 +1048,7 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
                         //checkingLinesReDisappearing(positionUpdate, 1)
                         notifyItemChanged(positionUpdate - 3, Unit)
                     }
-                    clickUpdateLine.clickable = true
+                    //clickUpdateLine.clickable = true
                     Log.d("MyLog", "UpdateLineTopTwo true $positionUpdate, 2, pos:$positionUpdate")
                 }
             } else {
@@ -1057,13 +1065,14 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
                         //checkingLinesReDisappearing(positionUpdate, 1)
                         notifyItemChanged(positionUpdate - 3, Unit)
                     }
-                    clickUpdateLine.clickable = true
+                    //clickUpdateLine.clickable = true
                     Log.d("MyLog", "UpdateLineTopTwo false $positionUpdate, 1, pos:$positionUpdate")
                 }
         }
         /*if(positionUpdate != positionMoveFinish) notifyItemChanged(positionUpdate, Unit)
         if(positionUpdate-6 != positionMoveFinish) notifyItemChanged(positionUpdate-6, Unit)
         clickUpdateLine.clickable = true*/
+        clickUpdateLine.clickable = true
     }
 
     fun updateLineLeftMinusOneTwo(plus: Boolean, positionUpdate: Int, positionMoveFinish: Int) {
@@ -1119,8 +1128,8 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
                 }
                 /*if(positionUpdate != positionMoveFinish) notifyItemChanged(positionUpdate, Unit)
         if(positionUpdate-1 != positionMoveFinish) notifyItemChanged(positionUpdate-1, Unit)*/
-                clickUpdateLine.clickable = true
             }
+        clickUpdateLine.clickable = true
     }
     fun updateLineRightPlusOneTwo(plus: Boolean, positionUpdate: Int, positionMoveFinish: Int) {
         //if (positionUpdatePrevious == positionUpdate + 1) {

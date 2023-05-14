@@ -293,7 +293,7 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
 
         //слушатель нажатия на всю РцВью
         binding.layFragPlayPwpEasy.idRcViewFragPWP.setOnTouchListener(){ viewRc, eventRc ->
-            //Log.d("MyLog", "Слушатель RCView")
+            Log.d("MyLog", "Слушатель RCView")
             when (eventRc.action) {
                 MotionEvent.ACTION_DOWN -> { //Срабатывает когда коснулись экрана
                     //x1 = eventRc.x //Позиция по оси Х куда нажали
