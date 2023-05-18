@@ -7,34 +7,37 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateInterpolator
 import android.widget.ImageView
 import android.widget.LinearLayout
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.plattysoft.leonids.ParticleSystem
 import kitonpompom.cubesgame.R
 import kitonpompom.cubesgame.activities.data.dataArrayBitmap
 import kitonpompom.cubesgame.activities.utils.*
 import kotlin.collections.ArrayList
 
-class AdapterFragPWPMedium(val clickScaleItemInterface: ClickScaleItemInterface): RecyclerView.Adapter<AdapterFragPWPMedium.ImageHolder>(), ItemTouchMoveAndSwipe.ItemTouchDragAdapterPWP{
+class AdapterFragPWPMedium(val clickScaleItemInterface: ClickScaleItemInterface, val activity: FragmentActivity): RecyclerView.Adapter<AdapterFragPWPMedium.ImageHolder>(), ItemTouchMoveAndSwipe.ItemTouchDragAdapterPWP{
     var mainArrayView = ArrayList<dataArrayBitmap>()
     var arrayListBitmap = ArrayList<ArrayList<Bitmap>>()
     var countStart = CountStartLinearVisible()
-    var click =  ClickableState()
-    var clickBack =  ClickableStateBack()
+    var click =  ClickableState()//класс для блокировки нажатия на итем в адаптере пока запущена анимация
+    var clickBack =  ClickableStateBack()//класс для блокировки нажатия на итем в адаптере пока запущена анимация обратного движения
     var clickUpdateLine = ClickableStateUpdateLine() //Для блокировки перетягивания и увелечения во время обновления линий
-    var noMove = NoMoveIfOpenScale()
-    var noMoveBack = NoMoveIfOpenScaleBack()
-    var updateLineNoImage = UpdateLineNoImage()
+    var noMove = NoMoveIfOpenScale()//Класс для блокировки в адаптере возможности срабатывания ОнТач, блокируется из фрагмета с рцвью когда картинка увеличена
+    var noMoveBack = NoMoveIfOpenScaleBack()//Класс для пблокировки в адаптере возможности срабатывания ОнТач при обратной анимации, блокируется из фрагмета с рцвью
+    var updateLineNoImage = UpdateLineNoImage()//класс для блокировки обновления линий без обновления картинки
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_rc_playing_with_pictures_medium, parent,false)
-        Log.d("MyLog", "view.with: ${view.findViewById<View>(R.id.id_item_play_with_pictures_one).width}")
+        //Log.d("MyLog", "view.with: ${view.findViewById<View>(R.id.id_item_play_with_pictures_one).width}")
         return AdapterFragPWPMedium.ImageHolder(view, this, parent.id, click, noMove, clickBack,clickUpdateLine, noMoveBack, updateLineNoImage)
     }
 
     override fun onBindViewHolder(holder: ImageHolder, position: Int) {
-        holder.setData(mainArrayView[position], clickScaleItemInterface)
+        holder.setData(mainArrayView[position], clickScaleItemInterface, activity)
     }
 
     override fun getItemCount(): Int {
@@ -57,10 +60,9 @@ class AdapterFragPWPMedium(val clickScaleItemInterface: ClickScaleItemInterface)
         lateinit var lineTop :LinearLayout
         lateinit var lineRight :LinearLayout
         lateinit var lineBottom :LinearLayout
-        var counter = 0
 
         @SuppressLint("ClickableViewAccessibility")
-        fun setData ( item: dataArrayBitmap, clickScaleItemInterface: ClickScaleItemInterface){
+        fun setData ( item: dataArrayBitmap, clickScaleItemInterface: ClickScaleItemInterface, activity: FragmentActivity){
             imItemOne = itemView.findViewById(R.id.id_item_play_with_pictures_one)
             imItemTwo = itemView.findViewById(R.id.id_item_play_with_pictures_two)
             lineLeft = itemView.findViewById(R.id.linLayLeft)
@@ -70,30 +72,61 @@ class AdapterFragPWPMedium(val clickScaleItemInterface: ClickScaleItemInterface)
             itemView.visibility = View.VISIBLE
             imItemOne.setImageBitmap(item.arrayBitmap[0])
 
-            var x1: Float = 0.0f
-            var x2: Float = 0.0f
-            var y1: Float = 0.0f
-            var y2: Float = 0.0f
             var noReplaySwipe = true
             var actionMoveCheck = false
             var actionNoClickOnTouchIfTouchOnMove = false
 
-            if (item.arrayLine[0] == 0) lineLeft.visibility = View.GONE else lineLeft.visibility = View.VISIBLE
-            if (item.arrayLine[1] == 0) lineTop.visibility = View.GONE else lineTop.visibility = View.VISIBLE
-            if (item.arrayLine[2] == 0) lineRight.visibility = View.GONE else lineRight.visibility = View.VISIBLE
-            if (item.arrayLine[3] == 0) lineBottom.visibility = View.GONE else lineBottom.visibility = View.VISIBLE
+            if (item.arrayLine[0] == 1) {
+                lineLeft.visibility = View.VISIBLE
+            } else {
+                lineLeft.visibility = View.INVISIBLE
+                if(item.arrayLine[0] == 0) {
+                    val runnable =
+                        Runnable { doAnimation(activity, lineLeft) } //Созд. рунабл для замедления.
+                    itemView.postDelayed(runnable, 300L)// Замедление (из View)
+                    clickScaleItemInterface.soundEffect()
+                    clickScaleItemInterface.updateLineTwoNoAnimation(adapterPosition, 0)
+                }
+            }
 
-            //Log.d("MyLog", "Count $adapterPosition")
-            //if(countStartLinearVisible.count)
-            //clickScaleItemInterface.updateLine(adapterPosition)
+            if (item.arrayLine[1] == 1) {
+                lineTop.visibility = View.VISIBLE
+            } else{
+                lineTop.visibility = View.INVISIBLE
+                if(item.arrayLine[1] == 0) {
+                    val runnable = Runnable { doAnimation(activity, lineTop) }
+                    itemView.postDelayed(runnable, 300L)
+                    clickScaleItemInterface.soundEffect()
+                    clickScaleItemInterface.updateLineTwoNoAnimation(adapterPosition, 1)
+                }
+            }
 
-            //if (!countStartLinearVisible.count) {
-            //    if (adapterPosition == 143)
-            //        adapter.countStart.count = true
-            //}
+            if (item.arrayLine[2] == 1){
+                lineRight.visibility = View.VISIBLE
+            } else{
+                lineRight.visibility = View.INVISIBLE
+                if(item.arrayLine[2] == 0) {
+                    val runnable = Runnable { doAnimation(activity, lineRight) }
+                    itemView.postDelayed(runnable, 300L)
+                    clickScaleItemInterface.soundEffect()
+                    clickScaleItemInterface.updateLineTwoNoAnimation(adapterPosition, 2)
+                }
+            }
 
-                //clickScaleItemInterface.countPlus(countStartLinearVisible.count)
-            //updateLineNoImagee.updateLineNoImage = true
+            if (item.arrayLine[3] == 1) {
+                lineBottom.visibility = View.VISIBLE
+            } else{
+                lineBottom.visibility = View.INVISIBLE
+                if(item.arrayLine[3] == 0) {
+                    val runnable = Runnable { doAnimation(activity, lineBottom) }
+                    itemView.postDelayed(runnable, 300L)
+                    clickScaleItemInterface.soundEffect()
+                    clickScaleItemInterface.updateLineTwoNoAnimation(adapterPosition, 3)
+                    //doAnimation(activity, lineBottom)
+                }
+            }
+
+
 
                 imItemOne.setOnClickListener {
                     if (!actionNoClickOnTouchIfTouchOnMove) {
@@ -127,17 +160,11 @@ class AdapterFragPWPMedium(val clickScaleItemInterface: ClickScaleItemInterface)
                             when (eventRc.action) {
                                 MotionEvent.ACTION_DOWN -> { //Срабатывает когда коснулись экрана
                                     actionMoveCheck = false
-                                    x1 = eventRc.x //Позиция по оси Х куда нажали
-                                    y1 = eventRc.y //Позиция по оси Y куда нажали
                                     noReplaySwipe = true
                                 }
                                 MotionEvent.ACTION_MOVE -> {
                                     actionMoveCheck = true
                                     actionNoClickOnTouchIfTouchOnMove = true
-                                    x2 = eventRc.x
-                                    y2 = eventRc.y
-                                    var deltaX: Float = x2 - x1
-                                    var deltaY: Float = y2 - y1
                                     if(noReplaySwipe){
                                         clickScaleItemInterface.moveItem(item.arrayBitmap[0], item.arrayBitmap[1],
                                             item.arrayBitmap[2], item.arrayBitmap[3],
@@ -151,76 +178,10 @@ class AdapterFragPWPMedium(val clickScaleItemInterface: ClickScaleItemInterface)
                                             adapterPosition, itemView, imItemOne)
                                         noReplaySwipe = false
                                     }
-                                    /*Log.d("MyLog", "!!! touchAdapter")
-                                    if (Math.abs(deltaX) > minDistance && noReplaySwipe){
-                                        if(x2 > x1){
-                                            Log.d("MyLog", "rightAdapter")
-                                            clickScaleItemInterface.moveItem(item.arrayBitmap[0], item.arrayBitmap[1],
-                                                item.arrayBitmap[2], item.arrayBitmap[3],
-                                                item.arrayBitmap[4], item.arrayBitmap[5],
-                                                item.arrayNumber[0], item.arrayNumber[1],
-                                                item.arrayNumber[2], item.arrayNumber[3],
-                                                item.arrayNumber[4], item.arrayNumber[5],
-                                                item.arrayPosition[0], item.arrayPosition[1],
-                                                item.arrayPosition[2], item.arrayPosition[3],
-                                                item.arrayPosition[4], item.arrayPosition[5],
-                                                adapterPosition, itemView, imItemOne)
-                                            noReplaySwipe = false
-                                        }else {
-                                            Log.d("MyLog", "leftAdapter")
-                                            clickScaleItemInterface.moveItem(item.arrayBitmap[0], item.arrayBitmap[1],
-                                                item.arrayBitmap[2], item.arrayBitmap[3],
-                                                item.arrayBitmap[4], item.arrayBitmap[5],
-                                                item.arrayNumber[0], item.arrayNumber[1],
-                                                item.arrayNumber[2], item.arrayNumber[3],
-                                                item.arrayNumber[4], item.arrayNumber[5],
-                                                item.arrayPosition[0], item.arrayPosition[1],
-                                                item.arrayPosition[2], item.arrayPosition[3],
-                                                item.arrayPosition[4], item.arrayPosition[5],
-                                                adapterPosition, itemView, imItemOne)
-                                            noReplaySwipe = false
-                                        }
-                                    }
-                                    if (Math.abs(deltaY) > minDistanceUpDown && noReplaySwipe){
-                                        if(y2 > y1){
-                                            Log.d("MyLog", "downAdapter")
-                                            clickScaleItemInterface.moveItem(item.arrayBitmap[0], item.arrayBitmap[1],
-                                                item.arrayBitmap[2], item.arrayBitmap[3],
-                                                item.arrayBitmap[4], item.arrayBitmap[5],
-                                                item.arrayNumber[0], item.arrayNumber[1],
-                                                item.arrayNumber[2], item.arrayNumber[3],
-                                                item.arrayNumber[4], item.arrayNumber[5],
-                                                item.arrayPosition[0], item.arrayPosition[1],
-                                                item.arrayPosition[2], item.arrayPosition[3],
-                                                item.arrayPosition[4], item.arrayPosition[5],
-                                                adapterPosition, itemView, imItemOne)
-                                            noReplaySwipe = false
-                                        }else {
-                                            Log.d("MyLog", "upAdapter")
-                                            clickScaleItemInterface.moveItem(item.arrayBitmap[0], item.arrayBitmap[1],
-                                                item.arrayBitmap[2], item.arrayBitmap[3],
-                                                item.arrayBitmap[4], item.arrayBitmap[5],
-                                                item.arrayNumber[0], item.arrayNumber[1],
-                                                item.arrayNumber[2], item.arrayNumber[3],
-                                                item.arrayNumber[4], item.arrayNumber[5],
-                                                item.arrayPosition[0], item.arrayPosition[1],
-                                                item.arrayPosition[2], item.arrayPosition[3],
-                                                item.arrayPosition[4], item.arrayPosition[5],
-                                                adapterPosition, itemView, imItemOne)
-                                            noReplaySwipe = false
-                                        }
-                                    }*/
                             }
                                 MotionEvent.ACTION_UP -> {
                                     actionNoClickOnTouchIfTouchOnMove = true
-                                   // x2 = eventRc.x
-                                   // y2 = eventRc.y
                                     noReplaySwipe = false
-                                   // var deltaX: Float = x2 - x1
-                                   // var deltaY: Float = y2 - y1
-                                   // if (Math.abs(deltaX) < minDistance && Math.abs(deltaY) < minDistanceUpDown){
-                                        //Log.d("MyLog", "Click Adapter")
-                                   // }
                                     if (clickk.clickable && clickkBack.clickable && clickkUpdateLine.clickable) {
                                         if(!actionMoveCheck) {
                                             clickScaleItemInterface.clickScaleItem(
@@ -237,18 +198,6 @@ class AdapterFragPWPMedium(val clickScaleItemInterface: ClickScaleItemInterface)
                                             )
                                         }else{
                                             clickScaleItemInterface.actionMoveAndActionUP(adapterPosition)
-                                            /*clickScaleItemInterface.clickScaleItem(
-                                                item.arrayBitmap[0], item.arrayBitmap[1],
-                                                item.arrayBitmap[2], item.arrayBitmap[3],
-                                                item.arrayBitmap[4], item.arrayBitmap[5],
-                                                item.arrayNumber[0], item.arrayNumber[1],
-                                                item.arrayNumber[2], item.arrayNumber[3],
-                                                item.arrayNumber[4], item.arrayNumber[5],
-                                                item.arrayPosition[0], item.arrayPosition[1],
-                                                item.arrayPosition[2], item.arrayPosition[3],
-                                                item.arrayPosition[4], item.arrayPosition[5],
-                                                adapterPosition, itemView, imItemOne
-                                            )*/
                                         }
                                     }
                                 }
@@ -258,14 +207,31 @@ class AdapterFragPWPMedium(val clickScaleItemInterface: ClickScaleItemInterface)
                     return@setOnTouchListener false
                 }
         }
+
+        //Анимация звездочек при исчезновении линий
+        fun doAnimation(act: FragmentActivity, view: View) {
+            val ps = ParticleSystem(act, 100, view.context.getDrawable(R.drawable.star_black), 1000L)
+            ps.setSpeedRange(0.1f, 0.25f)
+            ps.setScaleRange(0.7f, 1.3f)
+            ps.setSpeedRange(0.1f, 0.25f)
+            ps.setAcceleration(0.0001f, 90)
+            ps.setRotationSpeedRange(90f, 180f)
+            ps.setFadeOut(200, AccelerateInterpolator())
+            ps.setStartTime(3000L)
+            //ps.emit(1,1,100)
+            ps.oneShot(view, 10)
+            //ps.emit(binding.layFragPlayPwpEasy.idLinLineyka, 100)
+            //particlesPerSecond - кол-во звездочек в секунду (Частиц)
+            //maxParticles - кол-во частиц
+            //timeToLive - Время жизни частицын
+            //setSpeedRange - диапазон скоростей(не меняется)
+            //setScaleRange - размер частиц
+            //setAcceleration - ускорение, угол
+            //setRotationSpeedRange - диапазаон вращения
+            //setFadeOut - затухание
+        }
     }
 
-    /*
-    override fun getItemId(position: Int): Long {
-        //Log.d("MyLog", "Posit $position")
-        return (position.toLong())
-    }
-*/
 
     //Обновляем адаптер когда первый раз рисуется
     fun updateAdapter(newList : ArrayList<dataArrayBitmap>){ // функция обновляет адаптер
@@ -301,8 +267,10 @@ class AdapterFragPWPMedium(val clickScaleItemInterface: ClickScaleItemInterface)
         mainArrayView[position].arrayPosition[5] = ListPosition[5]
         notifyItemChanged(position, null)
         endGameCheck(position)
+        //visibilityView.visibilityView = true //Для того что бы вью появлялась только тогда когда обновили адаптер
         //NO_START_UPDATE_LINE - означает что обновляется не при первом запуске
-        //positionMoveFinish - позиция куда нужно возращать итемc
+        //positionMoveFinish - позиция куда нужно возращать итем
+        //position - Основная позиция куда поставили кубик
         updateLinePosition(position, Constans.NO_START_UPDATE_LINE, positionMoveFinish)
     }
 
@@ -311,12 +279,12 @@ class AdapterFragPWPMedium(val clickScaleItemInterface: ClickScaleItemInterface)
         notifyItemChanged(position, null)
     }
 
-
-
     fun updateLinePosition(position: Int, flagStartUpdateLine: Int, positionMoveFinish: Int){
         //Log.d("MyLog", "positionMoveFinish $positionMoveFinish")
         when(position){
             0->{
+                // Constans.UPDATE_LINE_ONE  - в методе Edge обновляем итем
+                //после записи новых данных по линиям
                 topEdge(position)
                 leftEdge(position)
                 plusOne(position, flagStartUpdateLine, positionMoveFinish)
@@ -372,40 +340,37 @@ class AdapterFragPWPMedium(val clickScaleItemInterface: ClickScaleItemInterface)
         }
     }
 
+    //Проверяем на совпадение картинки справа
     fun plusOne(positionUpdate: Int, flagStartUpdateLine: Int, positionMoveFinish: Int){
+        //Проверяем если совпал номер позиций картинок, если совпал то кубики с одной картинки
         if (mainArrayView[positionUpdate+1].arrayNumber[0] == mainArrayView[positionUpdate].arrayNumber[0]){
+            //Проверяем совпадение порядка картинок, если нашей картинке прибавить +1, то картинка справа стоит правильная
             if(mainArrayView[positionUpdate+1].arrayPosition[0] == mainArrayView[positionUpdate].arrayPosition[0] + 1) {
+                //Проверяем если основная картинка имеет позицию 2,5,8,14, то картинка из крайнего правого ряда и для неё не нужно
+                //проверять следующую картинку (+1) так как она с другого ряда
                 when (mainArrayView[positionUpdate].arrayPosition[0]) {
                     4, 9, 14, 19, 24, 29, 34, 39 -> {
+                        //Если картинка справа с места 5,10,15,20,25,30,35 то на ней не нужно убирать линии, так как она со след. ряда
                         when (mainArrayView[positionUpdate].arrayPosition[0] + 1) {
                             5, 10, 15, 20, 25, 30, 35  -> {
-                                updateLineRightPlusOne(
-                                    false,
-                                    positionUpdate,
-                                    flagStartUpdateLine,
-                                    positionMoveFinish)
+                                //Запускаем метод изменения линий справа
+                                //false - Не удаляем линии
+                                updateLineRightPlusOne(false, positionUpdate, flagStartUpdateLine, positionMoveFinish)
                             }
-                            else -> {
-                                updateLineRightPlusOne(
-                                    true,
-                                    positionUpdate,
-                                    flagStartUpdateLine,
-                                    positionMoveFinish)
+                            else -> {// Удаляем линии
+                                // true - удаляем линию
+                                updateLineRightPlusOne(true, positionUpdate, flagStartUpdateLine, positionMoveFinish)
                             }
                         }
                     }
-                    else -> {
-                        updateLineRightPlusOne(
-                            true,
-                            positionUpdate,
-                            flagStartUpdateLine,
-                            positionMoveFinish)
+                    else -> {//Удаляем линию
+                        updateLineRightPlusOne(true, positionUpdate, flagStartUpdateLine, positionMoveFinish)
                     }
                 }
-            }else {
+            }else {// Картинка по порядку не совпала, линию не стираем
                 updateLineRightPlusOne(false, positionUpdate, flagStartUpdateLine, positionMoveFinish)
             }
-        }else{
+        }else{//Номер картинки справа не совпал, линию не удалем
             updateLineRightPlusOne(false,positionUpdate, flagStartUpdateLine, positionMoveFinish)
         }
     }
@@ -417,27 +382,15 @@ class AdapterFragPWPMedium(val clickScaleItemInterface: ClickScaleItemInterface)
                     5, 10, 15, 20, 25, 30, 35 -> {
                         when (mainArrayView[positionUpdate].arrayPosition[0] - 1) {
                             4, 9, 14, 19, 24, 29, 34, 39 -> {
-                                updateLineLeftMinusOne(
-                                    false,
-                                    positionUpdate,
-                                    flagStartUpdateLine,
-                                    positionMoveFinish)
+                                updateLineLeftMinusOne(false, positionUpdate, flagStartUpdateLine, positionMoveFinish)
                             }
                             else -> {
-                                updateLineLeftMinusOne(
-                                    true,
-                                    positionUpdate,
-                                    flagStartUpdateLine,
-                                    positionMoveFinish)
+                                updateLineLeftMinusOne(true, positionUpdate, flagStartUpdateLine, positionMoveFinish)
                             }
                         }
                     }
                     else -> {
-                        updateLineLeftMinusOne(
-                            true,
-                            positionUpdate,
-                            flagStartUpdateLine,
-                            positionMoveFinish)
+                        updateLineLeftMinusOne(true, positionUpdate, flagStartUpdateLine, positionMoveFinish)
                     }
                 }
             }else{
@@ -474,65 +427,102 @@ class AdapterFragPWPMedium(val clickScaleItemInterface: ClickScaleItemInterface)
     }
 
     fun topEdge(positionUpdate: Int){
-        if(mainArrayView[positionUpdate].arrayPosition[0] == positionUpdate){
-            mainArrayView[positionUpdate].arrayLine[1] = 0
-        }else{
+        if(mainArrayView[positionUpdate].arrayPosition[0] == positionUpdate) {
+            //Если записана 1, то ставим 0
+            if (mainArrayView[positionUpdate].arrayLine[1] == 1) {
+                mainArrayView[positionUpdate].arrayLine[1] = 0
+            } else {//Если записано уже 0 или 2 или 3, то ставим 2
+                mainArrayView[positionUpdate].arrayLine[1] = 2
+            }
+        }else{//Если позиция не совпала, то записываем 1
             mainArrayView[positionUpdate].arrayLine[1] = 1
         }
         notifyItemChanged(positionUpdate, Unit)
     }
 
     fun leftEdge(positionUpdate: Int){
+        //Если позиция совпала то записываем либо 0 либо 2 и линия слева исчезает
         if(mainArrayView[positionUpdate].arrayPosition[0] == positionUpdate){
-            mainArrayView[positionUpdate].arrayLine[0] = 0
-        }else{
+            //Если записана 1, то ставим 0
+            if(mainArrayView[positionUpdate].arrayLine[0] == 1){
+                mainArrayView[positionUpdate].arrayLine[0] = 0
+            }else{ //Если записано уже 0 или 2 или 3, то ставим 2
+                mainArrayView[positionUpdate].arrayLine[0] = 2
+            }
+        }else{ //Если позиция не совпала, то записываем 1
             mainArrayView[positionUpdate].arrayLine[0] = 1
         }
         notifyItemChanged(positionUpdate, Unit)
     }
 
-    fun rightEdge(positionUpdate: Int){
+    fun rightEdge(positionUpdate: Int){//Проверка кубика крайнего справа на то стал ли он на свое место
+    //Если позиция совпала то записываем либо 0 либо 2 и линия справа исчезает
         if(mainArrayView[positionUpdate].arrayPosition[0] == positionUpdate){
-            mainArrayView[positionUpdate].arrayLine[2] = 0
-        }else{
+            //Если записана 1, то ставим 0
+            if(mainArrayView[positionUpdate].arrayLine[2] == 1) {
+                mainArrayView[positionUpdate].arrayLine[2] = 0
+            }else{ //Если записано уже 0 или 2 или 3, то ставим 2
+                mainArrayView[positionUpdate].arrayLine[2] = 2
+            }
+        }else{ //Если позиция не совпала, то записываем 1 и линия появляется
             mainArrayView[positionUpdate].arrayLine[2] = 1
         }
-        notifyItemChanged(positionUpdate, Unit)
+        notifyItemChanged(positionUpdate, Unit) //Обновить адаптер по позиции
     }
 
-    fun bottomEdge(positionUpdate: Int){
+    fun bottomEdge(positionUpdate: Int){ //Проверка кубика нижнего ряда на то стал ли он на свое место
+        //Если позиция совпала то записываем либо 0 либо 2 и линия справа исчезает
         if(mainArrayView[positionUpdate].arrayPosition[0] == positionUpdate){
-            mainArrayView[positionUpdate].arrayLine[3] = 0
+            //Если записана 1, то ставим 0
+            if(mainArrayView[positionUpdate].arrayLine[3] == 1) {
+                mainArrayView[positionUpdate].arrayLine[3] = 0
+            }else{ //Если записано уже 0 или 2 или 3, то ставим 2
+                mainArrayView[positionUpdate].arrayLine[3] = 2
+            }
         }else{
             mainArrayView[positionUpdate].arrayLine[3] = 1
         }
-        notifyItemChanged(positionUpdate, Unit)
+        notifyItemChanged(positionUpdate, Unit) //Обновить адаптер по позиции
     }
 
     fun updateLineTopMinusFive(plus: Boolean, positionUpdate: Int, flagStartUpdateLine: Int, positionMoveFinish: Int){
         //Если картинки совпадают то plus - true и линия исчезает, 0 - исчезает, 1 - появляется
         if (plus){
-            //Если цифра выполняем только тогда когда цифра должна измениться с 0 на 1 или 1 на 0
+            //Выполняем только тогда когда цифра должна измениться с 0 на 1 или 1 на 0
             if(mainArrayView[positionUpdate - 5].arrayLine[3] == 1 &&
                 mainArrayView[positionUpdate].arrayLine[1] == 1) {
-                mainArrayView[positionUpdate - 5].arrayLine[3] = 0
-                mainArrayView[positionUpdate].arrayLine[1] = 0
-                //Log.d("MyLog", "UpdateLineTop true $positionUpdate")
+                //mainArrayView[positionUpdate - 3].arrayLine[3] = 0
+                //mainArrayView[positionUpdate].arrayLine[1] = 0
+                // Если Constans.NO_START_UPDATE_LINE, запускаем не первый раз, если при первом запуске то не запускаем
+                // индивидуальное обновление итема
                 if (flagStartUpdateLine == Constans.NO_START_UPDATE_LINE){
                     updateLineNoImage.updateLineNoImage = false
                     clickUpdateLine.clickable = false
                     //Unit - Убирает анимацию мигания при обновлении итема
                     notifyItemChanged(positionUpdate, Unit)
+                    // Если позиция картинки сверхку не равна позиции возращающейся на старое место картинки, то
+                    //обновляем позицию картинку сверху
                     if(positionUpdate-5 != positionMoveFinish) notifyItemChanged(positionUpdate-5, Unit)
+                    updateLinePositionTwo(positionUpdate - 5, positionMoveFinish)
+                }
+            }else{
+                mainArrayView[positionUpdate - 5].arrayLine[3] = 2
+                mainArrayView[positionUpdate].arrayLine[1] = 2
+                //Log.d("MyLog", "UpdateLineTop true $positionUpdate")
+                if (flagStartUpdateLine == Constans.NO_START_UPDATE_LINE) {
+                    updateLineNoImage.updateLineNoImage = false
+                    clickUpdateLine.clickable = false
+                    //Unit - Убирает анимацию мигания при обновлении итема
+                    notifyItemChanged(positionUpdate, Unit)
+                    if (positionUpdate - 5 != positionMoveFinish) notifyItemChanged(positionUpdate - 5, Unit)
                     updateLinePositionTwo(positionUpdate - 5, positionMoveFinish)
                 }
             }
         } else {
-            if(mainArrayView[positionUpdate - 5].arrayLine[3] == 0 &&
-                mainArrayView[positionUpdate].arrayLine[1] == 0) {
+            if(mainArrayView[positionUpdate - 5].arrayLine[3] == 0 || mainArrayView[positionUpdate - 5].arrayLine[3] == 2 &&
+                mainArrayView[positionUpdate].arrayLine[1] == 0 || mainArrayView[positionUpdate].arrayLine[1] == 2) {
                 mainArrayView[positionUpdate - 5].arrayLine[3] = 1
                 mainArrayView[positionUpdate].arrayLine[1] = 1
-                //Log.d("MyLog", "UpdateLineTop false $positionUpdate")
                 if (flagStartUpdateLine == Constans.NO_START_UPDATE_LINE){
                     updateLineNoImage.updateLineNoImage = false
                     clickUpdateLine.clickable = false
@@ -543,71 +533,105 @@ class AdapterFragPWPMedium(val clickScaleItemInterface: ClickScaleItemInterface)
                 }
             }
         }
-
-
     }
-    fun updateLineLeftMinusOne(plus: Boolean, positionUpdate: Int, flagStartUpdateLine: Int, positionMoveFinish: Int){
-        if (plus){
-            if(mainArrayView[positionUpdate - 1].arrayLine[2] == 1 &&
-                mainArrayView[positionUpdate].arrayLine[0] == 1) {
-                mainArrayView[positionUpdate - 1].arrayLine[2] = 0
-                mainArrayView[positionUpdate].arrayLine[0] = 0
-                //Log.d("MyLog", "UpdateLineLeft true $positionUpdate")
+    fun updateLineLeftMinusOne(plus: Boolean, positionUpdate: Int, flagStartUpdateLine: Int, positionMoveFinish: Int) {
+        if (plus) {
+            if (mainArrayView[positionUpdate - 1].arrayLine[2] == 1 &&
+                mainArrayView[positionUpdate].arrayLine[0] == 1
+            ) {
+                //mainArrayView[positionUpdate - 1].arrayLine[2] = 0
+                //mainArrayView[positionUpdate].arrayLine[0] = 0
                 if (flagStartUpdateLine == Constans.NO_START_UPDATE_LINE) {
                     clickUpdateLine.clickable = false
                     updateLineNoImage.updateLineNoImage = false
                     notifyItemChanged(positionUpdate, Unit)
-                    if(positionUpdate-1 != positionMoveFinish) notifyItemChanged(positionUpdate - 1, Unit)
+                    if (positionUpdate - 1 != positionMoveFinish) notifyItemChanged(
+                        positionUpdate - 1,
+                        Unit
+                    )
+                    updateLinePositionTwo(positionUpdate - 1, positionMoveFinish)
+                }
+            } else {
+                mainArrayView[positionUpdate - 1].arrayLine[2] = 2
+                mainArrayView[positionUpdate].arrayLine[0] = 2
+                if (flagStartUpdateLine == Constans.NO_START_UPDATE_LINE) {
+                    clickUpdateLine.clickable = false
+                    updateLineNoImage.updateLineNoImage = false
+                    notifyItemChanged(positionUpdate, Unit)
+                    if (positionUpdate - 1 != positionMoveFinish) notifyItemChanged(
+                        positionUpdate - 1,
+                        Unit
+                    )
                     updateLinePositionTwo(positionUpdate - 1, positionMoveFinish)
                 }
             }
         } else {
-            if(mainArrayView[positionUpdate - 1].arrayLine[2] == 0 &&
-                mainArrayView[positionUpdate].arrayLine[0] == 0) {
+            if (mainArrayView[positionUpdate - 1].arrayLine[2] == 0 || mainArrayView[positionUpdate - 1].arrayLine[2] == 2 &&
+                mainArrayView[positionUpdate].arrayLine[0] == 0 || mainArrayView[positionUpdate].arrayLine[0] == 2
+            ) {
                 mainArrayView[positionUpdate - 1].arrayLine[2] = 1
                 mainArrayView[positionUpdate].arrayLine[0] = 1
-                //Log.d("MyLog", "UpdateLineLeft false $positionUpdate")
                 if (flagStartUpdateLine == Constans.NO_START_UPDATE_LINE) {
                     clickUpdateLine.clickable = false
                     updateLineNoImage.updateLineNoImage = false
                     notifyItemChanged(positionUpdate, Unit)
-                    if(positionUpdate-1 != positionMoveFinish) notifyItemChanged(positionUpdate - 1, Unit)
+                    if (positionUpdate - 1 != positionMoveFinish) notifyItemChanged(
+                        positionUpdate - 1,
+                        Unit
+                    )
                     updateLinePositionTwo(positionUpdate - 1, positionMoveFinish)
                 }
             }
         }
     }
 
-    fun updateLineRightPlusOne(plus: Boolean, positionUpdate: Int, flagStartUpdateLine: Int, positionMoveFinish: Int){
-        if (plus){
+    fun updateLineRightPlusOne(plus: Boolean, positionUpdate: Int, flagStartUpdateLine: Int, positionMoveFinish: Int) {
+        // plus true - удалить линии, false - Не удалять
+        if (plus) {
+            //Если раньше записана 1, то ставим 0
             if (mainArrayView[positionUpdate + 1].arrayLine[0] == 1 &&
-                mainArrayView[positionUpdate].arrayLine[2] == 1) {
-                mainArrayView[positionUpdate + 1].arrayLine[0] = 0
-                mainArrayView[positionUpdate].arrayLine[2] = 0
-                //Log.d("MyLog", "UpdateLineRight true $positionUpdate")
+                mainArrayView[positionUpdate].arrayLine[2] == 1
+            ) {
+                //mainArrayView[positionUpdate + 1].arrayLine[0] = 0
+                //mainArrayView[positionUpdate].arrayLine[2] = 0
                 if (flagStartUpdateLine == Constans.NO_START_UPDATE_LINE) {
                     updateLineNoImage.updateLineNoImage = false
                     clickUpdateLine.clickable = false
                     notifyItemChanged(positionUpdate, Unit)
-                    if(positionUpdate+1 != positionMoveFinish) {
-                        notifyItemChanged(positionUpdate + 1, Unit)
-                    }
+                    if (positionUpdate + 1 != positionMoveFinish) notifyItemChanged(
+                        positionUpdate + 1,
+                        Unit
+                    )
+                    updateLinePositionTwo(positionUpdate + 1, positionMoveFinish)
+                }
+            } else {
+                mainArrayView[positionUpdate + 1].arrayLine[0] = 2
+                mainArrayView[positionUpdate].arrayLine[2] = 2
+                if (flagStartUpdateLine == Constans.NO_START_UPDATE_LINE) {
+                    updateLineNoImage.updateLineNoImage = false
+                    clickUpdateLine.clickable = false
+                    notifyItemChanged(positionUpdate, Unit)
+                    if (positionUpdate + 1 != positionMoveFinish) notifyItemChanged(
+                        positionUpdate + 1,
+                        Unit
+                    )
                     updateLinePositionTwo(positionUpdate + 1, positionMoveFinish)
                 }
             }
-        }else {
-            if (mainArrayView[positionUpdate + 1].arrayLine[0] == 0 &&
-                mainArrayView[positionUpdate].arrayLine[2] == 0) {
+        } else {
+            if (mainArrayView[positionUpdate + 1].arrayLine[0] == 0 || mainArrayView[positionUpdate + 1].arrayLine[0] == 2 &&
+                mainArrayView[positionUpdate].arrayLine[2] == 0 || mainArrayView[positionUpdate].arrayLine[2] == 2
+            ) {
                 mainArrayView[positionUpdate + 1].arrayLine[0] = 1
                 mainArrayView[positionUpdate].arrayLine[2] = 1
-                //Log.d("MyLog", "UpdateLineRight false $positionUpdate")
                 if (flagStartUpdateLine == Constans.NO_START_UPDATE_LINE) {
                     updateLineNoImage.updateLineNoImage = false
                     clickUpdateLine.clickable = false
                     notifyItemChanged(positionUpdate, Unit)
-                    if(positionUpdate+1 != positionMoveFinish) {
-                        notifyItemChanged(positionUpdate + 1, Unit)
-                    }
+                    if (positionUpdate + 1 != positionMoveFinish) notifyItemChanged(
+                        positionUpdate + 1,
+                        Unit
+                    )
                     updateLinePositionTwo(positionUpdate + 1, positionMoveFinish)
                 }
             }
@@ -615,13 +639,22 @@ class AdapterFragPWPMedium(val clickScaleItemInterface: ClickScaleItemInterface)
     }
 
     fun updateLineBottomPlusFive(plus: Boolean, positionUpdate: Int, flagStartUpdateLine: Int, positionMoveFinish: Int){
-        //Log.d("MyLog", "UpdateLineBottom $positionUpdate")
         if (plus){
             if(mainArrayView[positionUpdate + 5].arrayLine[1] == 1 &&
                 mainArrayView[positionUpdate].arrayLine[3] == 1) {
-                mainArrayView[positionUpdate + 5].arrayLine[1] = 0
-                mainArrayView[positionUpdate].arrayLine[3] = 0
-                //Log.d("MyLog", "UpdateLineBottom true $positionUpdate")
+                //mainArrayView[positionUpdate + 3].arrayLine[1] = 0
+                //mainArrayView[positionUpdate].arrayLine[3] = 0
+                if (flagStartUpdateLine == Constans.NO_START_UPDATE_LINE) {
+                    updateLineNoImage.updateLineNoImage = false
+                    clickUpdateLine.clickable = false
+                    notifyItemChanged(positionUpdate, Unit)
+                    if(positionUpdate+5 != positionMoveFinish) notifyItemChanged(positionUpdate + 5, Unit)
+                    //positionUpdate - передаем позицию что бы снова не обновлять у соседнего кубика полоски
+                    updateLinePositionTwo(positionUpdate + 5, positionMoveFinish)
+                }
+            }else{
+                mainArrayView[positionUpdate + 5].arrayLine[1] = 2
+                mainArrayView[positionUpdate].arrayLine[3] = 2
                 if (flagStartUpdateLine == Constans.NO_START_UPDATE_LINE) {
                     updateLineNoImage.updateLineNoImage = false
                     clickUpdateLine.clickable = false
@@ -631,11 +664,10 @@ class AdapterFragPWPMedium(val clickScaleItemInterface: ClickScaleItemInterface)
                 }
             }
         } else {
-            if(mainArrayView[positionUpdate + 5].arrayLine[1] == 0 &&
-                mainArrayView[positionUpdate].arrayLine[3] == 0) {
+            if(mainArrayView[positionUpdate + 5].arrayLine[1] == 0 || mainArrayView[positionUpdate + 5].arrayLine[1] == 2 &&
+                mainArrayView[positionUpdate].arrayLine[3] == 0 || mainArrayView[positionUpdate].arrayLine[3] == 2) {
                 mainArrayView[positionUpdate + 5].arrayLine[1] = 1
                 mainArrayView[positionUpdate].arrayLine[3] = 1
-                //Log.d("MyLog", "UpdateLineBottom false $positionUpdate")
                 if (flagStartUpdateLine == Constans.NO_START_UPDATE_LINE) {
                     updateLineNoImage.updateLineNoImage = false
                     clickUpdateLine.clickable = false
@@ -701,24 +733,15 @@ class AdapterFragPWPMedium(val clickScaleItemInterface: ClickScaleItemInterface)
                     4, 9, 14, 19, 24, 29, 34, 39 -> {
                         when (mainArrayView[positionUpdate].arrayPosition[0]+1) {
                             5, 10, 15, 20, 25, 30, 35  -> {
-                                updateLineRightPlusOneTwo(
-                                    false,
-                                    positionUpdate,
-                                    positionMoveFinish)
+                                updateLineRightPlusOneTwo(false, positionUpdate, positionMoveFinish)
                             }
                             else -> {
-                                updateLineRightPlusOneTwo(
-                                    true,
-                                    positionUpdate,
-                                    positionMoveFinish)
+                                updateLineRightPlusOneTwo(true, positionUpdate, positionMoveFinish)
                             }
                         }
                     }
                     else -> {
-                        updateLineRightPlusOneTwo(
-                            true,
-                            positionUpdate,
-                            positionMoveFinish)
+                        updateLineRightPlusOneTwo(true, positionUpdate, positionMoveFinish)
                     }
                 }
             }else {
@@ -736,24 +759,15 @@ class AdapterFragPWPMedium(val clickScaleItemInterface: ClickScaleItemInterface)
                     5, 10, 15, 20, 25, 30, 35 -> {
                         when (mainArrayView[positionUpdate].arrayPosition[0]-1) {
                             4, 9, 14, 19, 24, 29, 34, 39 -> {
-                                updateLineLeftMinusOneTwo(
-                                    false,
-                                    positionUpdate,
-                                    positionMoveFinish)
+                                updateLineLeftMinusOneTwo(false, positionUpdate, positionMoveFinish)
                             }
                             else -> {
-                                updateLineLeftMinusOneTwo(
-                                    true,
-                                    positionUpdate,
-                                    positionMoveFinish)
+                                updateLineLeftMinusOneTwo(true, positionUpdate, positionMoveFinish)
                             }
                         }
                     }
                     else -> {
-                        updateLineLeftMinusOneTwo(
-                            true,
-                            positionUpdate,
-                            positionMoveFinish)
+                        updateLineLeftMinusOneTwo(true, positionUpdate, positionMoveFinish)
                     }
                 }
             }else {
@@ -789,107 +803,141 @@ class AdapterFragPWPMedium(val clickScaleItemInterface: ClickScaleItemInterface)
     }
 
     fun updateLineTopMinusFiveTwo(plus: Boolean, positionUpdate: Int, positionMoveFinish: Int){
-        if (plus){
+        if (plus) {
             if (mainArrayView[positionUpdate - 5].arrayLine[3] == 1 &&
                 mainArrayView[positionUpdate].arrayLine[1] == 1) {
-                    mainArrayView[positionUpdate - 5].arrayLine[3] = 0
-                    mainArrayView[positionUpdate].arrayLine[1] = 0
-                    if(positionUpdate != positionMoveFinish) notifyItemChanged(positionUpdate, Unit)
-                    if(positionUpdate-5 != positionMoveFinish) notifyItemChanged(positionUpdate-5, Unit)
-                    clickUpdateLine.clickable = true
-                    //Log.d("MyLog", "UpdateLineTopTwo true $positionUpdate")
+                mainArrayView[positionUpdate - 5].arrayLine[3] = 0
+                mainArrayView[positionUpdate].arrayLine[1] = 0
+                if (positionUpdate != positionMoveFinish) notifyItemChanged(positionUpdate, Unit)
+                if (positionUpdate - 5 != positionMoveFinish) notifyItemChanged(positionUpdate - 5, Unit)
+            } else {
+                mainArrayView[positionUpdate - 5].arrayLine[3] = 2
+                mainArrayView[positionUpdate].arrayLine[1] = 2
+                if (positionUpdate != positionMoveFinish) notifyItemChanged(positionUpdate, Unit)
+                if (positionUpdate - 5 != positionMoveFinish) notifyItemChanged(positionUpdate - 5, Unit)
             }
         } else {
-            if (mainArrayView[positionUpdate - 5].arrayLine[3] == 0 &&
-                mainArrayView[positionUpdate].arrayLine[1] == 0) {
-                    mainArrayView[positionUpdate - 5].arrayLine[3] = 1
-                    mainArrayView[positionUpdate].arrayLine[1] = 1
-                    if (positionUpdate != positionMoveFinish) notifyItemChanged(positionUpdate, Unit)
-                    if (positionUpdate-5 != positionMoveFinish) notifyItemChanged(positionUpdate-5, Unit)
-                    clickUpdateLine.clickable = true
-                    //Log.d("MyLog", "UpdateLineTopTwo false $positionUpdate")
+            if (mainArrayView[positionUpdate - 5].arrayLine[3] == 0 || mainArrayView[positionUpdate - 5].arrayLine[3] == 2 &&
+                mainArrayView[positionUpdate].arrayLine[1] == 0 || mainArrayView[positionUpdate].arrayLine[1] == 2) {
+                mainArrayView[positionUpdate - 5].arrayLine[3] = 1
+                mainArrayView[positionUpdate].arrayLine[1] = 1
+                if (positionUpdate != positionMoveFinish) notifyItemChanged(positionUpdate, Unit)
+                if (positionUpdate - 5 != positionMoveFinish) notifyItemChanged(positionUpdate - 5, Unit)
             }
         }
         /*if(positionUpdate != positionMoveFinish) notifyItemChanged(positionUpdate, Unit)
-        if(positionUpdate-6 != positionMoveFinish) notifyItemChanged(positionUpdate-6, Unit)
-        clickUpdateLine.clickable = true*/
+        if(positionUpdate-6 != positionMoveFinish) notifyItemChanged(positionUpdate-6, Unit)*/
+        clickUpdateLine.clickable = true
     }
 
-    fun updateLineLeftMinusOneTwo(plus: Boolean, positionUpdate: Int, positionMoveFinish: Int){
-        if (plus){
-            if ( mainArrayView[positionUpdate - 1].arrayLine[2] == 1 &&
+    fun updateLineLeftMinusOneTwo(plus: Boolean, positionUpdate: Int, positionMoveFinish: Int) {
+        if (plus) {
+            if (mainArrayView[positionUpdate - 1].arrayLine[2] == 1 &&
                 mainArrayView[positionUpdate].arrayLine[0] == 1) {
-                    mainArrayView[positionUpdate - 1].arrayLine[2] = 0
-                    mainArrayView[positionUpdate].arrayLine[0] = 0
-                    if(positionUpdate != positionMoveFinish) notifyItemChanged(positionUpdate, Unit)
-                    if(positionUpdate-1 != positionMoveFinish) notifyItemChanged(positionUpdate-1, Unit)
-                    //clickUpdateLine.clickable = true
-                    //Log.d("MyLog", "UpdateLineLeftTwo true $positionUpdate")
+                mainArrayView[positionUpdate - 1].arrayLine[2] = 0
+                mainArrayView[positionUpdate].arrayLine[0] = 0
+                if (positionUpdate != positionMoveFinish) notifyItemChanged(positionUpdate, Unit)
+                if (positionUpdate - 1 != positionMoveFinish) notifyItemChanged(positionUpdate - 1, Unit)
+            } else {
+                mainArrayView[positionUpdate - 1].arrayLine[2] = 2
+                mainArrayView[positionUpdate].arrayLine[0] = 2
+                if (positionUpdate != positionMoveFinish) notifyItemChanged(positionUpdate, Unit)
+                if (positionUpdate - 1 != positionMoveFinish) notifyItemChanged(positionUpdate - 1, Unit)
             }
         } else {
-            if ( mainArrayView[positionUpdate - 1].arrayLine[2] == 0 &&
-                mainArrayView[positionUpdate].arrayLine[0] == 0) {
-                    mainArrayView[positionUpdate - 1].arrayLine[2] = 1
-                    mainArrayView[positionUpdate].arrayLine[0] = 1
-                    if(positionUpdate != positionMoveFinish) notifyItemChanged(positionUpdate, Unit)
-                    if(positionUpdate-1 != positionMoveFinish) notifyItemChanged(positionUpdate-1, Unit)
-                    //clickUpdateLine.clickable = true
-                    //Log.d("MyLog", "UpdateLineLeftTwo false $positionUpdate")
+            if (mainArrayView[positionUpdate - 1].arrayLine[2] == 0 || mainArrayView[positionUpdate - 1].arrayLine[2] == 2 &&
+                mainArrayView[positionUpdate].arrayLine[0] == 0 || mainArrayView[positionUpdate].arrayLine[0] == 2
+            ) {
+                mainArrayView[positionUpdate - 1].arrayLine[2] = 1
+                mainArrayView[positionUpdate].arrayLine[0] = 1
+                if (positionUpdate != positionMoveFinish) {
+                    notifyItemChanged(positionUpdate, Unit)
+                }
+                if (positionUpdate - 1 != positionMoveFinish) {
+                    notifyItemChanged(positionUpdate - 1, Unit)
+                }
             }
+            /*if(positionUpdate != positionMoveFinish) notifyItemChanged(positionUpdate, Unit)
+    if(positionUpdate-1 != positionMoveFinish) notifyItemChanged(positionUpdate-1, Unit)*/
         }
-        /*if(positionUpdate != positionMoveFinish) notifyItemChanged(positionUpdate, Unit)
-        if(positionUpdate-1 != positionMoveFinish) notifyItemChanged(positionUpdate-1, Unit)*/
         clickUpdateLine.clickable = true
     }
     fun updateLineRightPlusOneTwo(plus: Boolean, positionUpdate: Int, positionMoveFinish: Int){
-        if (plus){
+        if (plus) {
             if (mainArrayView[positionUpdate + 1].arrayLine[0] == 1 &&
-                mainArrayView[positionUpdate].arrayLine[2] == 1) {
-                    mainArrayView[positionUpdate + 1].arrayLine[0] = 0
-                    mainArrayView[positionUpdate].arrayLine[2] = 0
-                    if(positionUpdate != positionMoveFinish) notifyItemChanged(positionUpdate, Unit)
-                    if(positionUpdate+1 != positionMoveFinish) notifyItemChanged(positionUpdate+1, Unit)
-                    //clickUpdateLine.clickable = true
-                    //Log.d("MyLog", "UpdateLineRightTwo true $positionUpdate")
-            }
-        }else {
-            if (mainArrayView[positionUpdate + 1].arrayLine[0] == 0 &&
-                mainArrayView[positionUpdate].arrayLine[2] == 0) {
-                    mainArrayView[positionUpdate + 1].arrayLine[0] = 1
-                    mainArrayView[positionUpdate].arrayLine[2] = 1
-                    if(positionUpdate != positionMoveFinish) notifyItemChanged(positionUpdate, Unit)
-                    if(positionUpdate+1 != positionMoveFinish) notifyItemChanged(positionUpdate+1, Unit)
-                    //clickUpdateLine.clickable = true
-                    //Log.d("MyLog", "UpdateLineRightTwo false $positionUpdate")
-            }
-        }
-        /*if(positionUpdate != positionMoveFinish) notifyItemChanged(positionUpdate, Unit)
-        if(positionUpdate+1 != positionMoveFinish) notifyItemChanged(positionUpdate+1, Unit)*/
-        clickUpdateLine.clickable = true
-    }
-    fun updateLineBottomPlusFiveTwo(plus: Boolean, positionUpdate: Int, positionMoveFinish: Int){
-        //Log.d("MyLog", "UpdateLineBottom $positionUpdate")
-        if (plus){
-            if (mainArrayView[positionUpdate+5].arrayLine[1] == 1 && mainArrayView[positionUpdate].arrayLine[3] == 1) {
-                mainArrayView[positionUpdate + 5].arrayLine[1] = 0
-                mainArrayView[positionUpdate].arrayLine[3] = 0
-                if(positionUpdate != positionMoveFinish) notifyItemChanged(positionUpdate, Unit)
-                if(positionUpdate+5 != positionMoveFinish) notifyItemChanged(positionUpdate+5, Unit)
-                //clickUpdateLine.clickable = true
-                //Log.d("MyLog", "UpdateLineBottomTwo true $positionUpdate")
+                mainArrayView[positionUpdate].arrayLine[2] == 1
+            ) {
+                mainArrayView[positionUpdate + 1].arrayLine[0] = 0
+                mainArrayView[positionUpdate].arrayLine[2] = 0
+                if (positionUpdate != positionMoveFinish){
+                    notifyItemChanged(positionUpdate, Unit)
+                }
+                if (positionUpdate + 1 != positionMoveFinish){
+                    notifyItemChanged(positionUpdate + 1, Unit)
+                }
+            } else {
+                mainArrayView[positionUpdate + 1].arrayLine[0] = 2
+                mainArrayView[positionUpdate].arrayLine[2] = 2
+                if (positionUpdate != positionMoveFinish){
+                    notifyItemChanged(positionUpdate, Unit)
+                }
+                if (positionUpdate + 1 != positionMoveFinish){
+                    notifyItemChanged(positionUpdate + 1, Unit)
+                }
             }
         } else {
-            if (mainArrayView[positionUpdate + 5].arrayLine[1] == 0 && mainArrayView[positionUpdate].arrayLine[3] == 0){
-                mainArrayView[positionUpdate + 5].arrayLine[1] = 1
-                mainArrayView[positionUpdate].arrayLine[3] = 1
-                if(positionUpdate != positionMoveFinish) notifyItemChanged(positionUpdate, Unit)
-                if(positionUpdate+5 != positionMoveFinish) notifyItemChanged(positionUpdate+5, Unit)
-                //clickUpdateLine.clickable = true
-                //Log.d("MyLog", "UpdateLineBottomTwo false $positionUpdate")
+            if (mainArrayView[positionUpdate + 1].arrayLine[0] == 0 || mainArrayView[positionUpdate + 1].arrayLine[0] == 2 &&
+                mainArrayView[positionUpdate].arrayLine[2] == 0 || mainArrayView[positionUpdate].arrayLine[2] == 2
+            ) {
+                mainArrayView[positionUpdate + 1].arrayLine[0] = 1
+                mainArrayView[positionUpdate].arrayLine[2] = 1
+                if (positionUpdate != positionMoveFinish){
+                    notifyItemChanged(positionUpdate, Unit)
+                }
+                if (positionUpdate + 1 != positionMoveFinish){
+                    notifyItemChanged(positionUpdate + 1, Unit)
+                }
             }
         }
         /*if(positionUpdate != positionMoveFinish) notifyItemChanged(positionUpdate, Unit)
-        if(positionUpdate+6 != positionMoveFinish) notifyItemChanged(positionUpdate+6, Unit)*/
+    if(positionUpdate+1 != positionMoveFinish) notifyItemChanged(positionUpdate+1, Unit)*/
+        clickUpdateLine.clickable = true
+    }
+    fun updateLineBottomPlusFiveTwo(plus: Boolean, positionUpdate: Int, positionMoveFinish: Int) {
+        if (plus) {
+            if (mainArrayView[positionUpdate + 5].arrayLine[1] == 1 &&
+                mainArrayView[positionUpdate].arrayLine[3] == 1
+            ) {
+                mainArrayView[positionUpdate + 5].arrayLine[1] = 0
+                mainArrayView[positionUpdate].arrayLine[3] = 0
+                if (positionUpdate != positionMoveFinish) {
+                    notifyItemChanged(positionUpdate, Unit)
+                }
+                if (positionUpdate + 5 != positionMoveFinish){
+                    notifyItemChanged(positionUpdate + 5, Unit)
+                }
+            } else {
+                mainArrayView[positionUpdate + 5].arrayLine[1] = 2
+                mainArrayView[positionUpdate].arrayLine[3] = 2
+                if (positionUpdate != positionMoveFinish){
+                    notifyItemChanged(positionUpdate, Unit)
+                }
+                if (positionUpdate + 5 != positionMoveFinish){
+                    notifyItemChanged(positionUpdate + 5, Unit)
+                }
+            }
+        } else {
+            if (mainArrayView[positionUpdate + 5].arrayLine[1] == 0 || mainArrayView[positionUpdate + 5].arrayLine[1] == 2 &&
+                mainArrayView[positionUpdate].arrayLine[3] == 0 || mainArrayView[positionUpdate].arrayLine[3] == 2
+            ) {
+                mainArrayView[positionUpdate + 5].arrayLine[1] = 1
+                mainArrayView[positionUpdate].arrayLine[3] = 1
+                if (positionUpdate != positionMoveFinish) notifyItemChanged(positionUpdate, Unit)
+                if (positionUpdate + 5 != positionMoveFinish) notifyItemChanged(positionUpdate + 5, Unit)
+            }
+        }
+        /*if(positionUpdate != positionMoveFinish) notifyItemChanged(positionUpdate, Unit)
+    if(positionUpdate+6 != positionMoveFinish) notifyItemChanged(positionUpdate+6, Unit)*/
         clickUpdateLine.clickable = true
     }
 
@@ -898,10 +946,8 @@ class AdapterFragPWPMedium(val clickScaleItemInterface: ClickScaleItemInterface)
         var count = 0
         for (i in 0 until mainArrayView.size) {
             if (mainArrayView[i].arrayNumber[0] == mainArrayView[positionUpdate].arrayNumber[0]){
-                //Log.d("MyLog", "yes")
                 if(i == mainArrayView[i].arrayPosition[0]){
                     count++
-                    //Log.d("MyLog", "count $count")
                 }else{
                     break
                 }
@@ -910,7 +956,6 @@ class AdapterFragPWPMedium(val clickScaleItemInterface: ClickScaleItemInterface)
             }
         }
         if(count == mainArrayView.size){
-
             clickScaleItemInterface.imageIsCollected(mainArrayView[0].arrayNumber[0])
         }
     }
@@ -940,16 +985,12 @@ class AdapterFragPWPMedium(val clickScaleItemInterface: ClickScaleItemInterface)
             position, coordinate, coordinateBackStart, positionMove)
     }
 
-    /*fun touchActionUpClick(posClick: Int){
-        if (click.clickable) {
-            clickScaleItemInterface.clickScaleItem(
-                mainArrayView[posClick].arrayBitmap[0], mainArrayView[posClick].arrayBitmap[1],
-                mainArrayView[posClick].arrayBitmap[2], mainArrayView[posClick].arrayBitmap[3],
-                mainArrayView[posClick].arrayBitmap[4], mainArrayView[posClick].arrayBitmap[5],
-                adapterPosition, itemView, imItemOne
-            )
-        }
-    }*/
+    //Обновляем в массиве позиции на которых уже отработала анимация на 2
+    //для того что бы анимация не срабатывала второй раз на уже исчезнувших линиях
+    //Запускается через интерфейс в фрагменте, запускается на итеме в адаптере
+    fun updateLinePosTwo(pos: Int, numberLine: Int){
+        mainArrayView[pos].arrayLine[numberLine] = 2
+    }
 
     fun countPlus(count: Int){
         count +1
@@ -971,6 +1012,8 @@ class AdapterFragPWPMedium(val clickScaleItemInterface: ClickScaleItemInterface)
                               position: Int, coordinate: List<Float>,
                               coordinateBackStart: List<Float>, positionMove: Int)
 
+        fun soundEffect()
+
         // Если картинка собрана, отправляем с какой позиции кубика картинка собрана,
         // что бы обновить в drawerLayout, и потом подсветить собраную картинку.
         fun imageIsCollected (positionImageCollected: Int)
@@ -978,5 +1021,9 @@ class AdapterFragPWPMedium(val clickScaleItemInterface: ClickScaleItemInterface)
         fun countPlus (count:Int)
         //Если одновременно сработали ActionMove и actionUP в слушателе нажатия и картинка не успела потянуться
         fun actionMoveAndActionUP(position: Int)
+
+        //Метод для того что бы обновить в массиве линии которые уже срабатывали
+        //После того как линия исчезла, записать в массив вместо нуля - двойку
+        fun updateLineTwoNoAnimation(position: Int, numberLine:Int)
     }
 }

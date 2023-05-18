@@ -21,6 +21,7 @@ import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LifecycleOwner
 import kitonpompom.cubesgame.R
@@ -42,7 +43,8 @@ class FragmentPlayingWithPicturesMedium : Fragment(), AdapterFragPWPHard.ClickSc
     private val dataModel: DataModel by activityViewModels()
     private var job: Job? = null
     private val adapterHard: AdapterFragPWPHard? = AdapterFragPWPHard(this)
-    private val adapterMedium: AdapterFragPWPMedium? = AdapterFragPWPMedium(this)
+    private lateinit var adapterMedium: AdapterFragPWPMedium
+    //private val adapterMedium: AdapterFragPWPMedium? = AdapterFragPWPMedium(this)
     //private val swipeCallback = ItemTouchMoveAndSwipe(adapter!!)
     //private val touchHelper = ItemTouchHelper(swipeCallback)
     lateinit var image1: ImageView
@@ -72,6 +74,7 @@ class FragmentPlayingWithPicturesMedium : Fragment(), AdapterFragPWPHard.ClickSc
     //var arrayInt = arrayOf(0,1,2,3,4,5)
     lateinit var itemViewGlobal: View //педаем сюда вью, что бы была возможность использовать по всему классу
     lateinit var imItemGlobal: ImageView //педаем сюда имадж вью, что бы была возможность использовать по всему классу
+    lateinit var mediaPlayerCubeFalling: MediaPlayer
     val noClick = ClickableState() //Объект для блокировки ActionUp в Move
     val noClickBack = ClickableStateBack() //Объект для блокировки ActionUp в Move для обратного движения
     //var imMoveHeight by Delegates.notNull<Int>()
@@ -100,7 +103,7 @@ class FragmentPlayingWithPicturesMedium : Fragment(), AdapterFragPWPHard.ClickSc
         super.onViewCreated(view, savedInstanceState)
         initRcView() //инициализируем адаптер и рцВью
         initHeaderDrawerLayout() //инициализируем хидер в драйвер лайоуте
-        var mediaPlayerCubeFalling = MediaPlayer.create(activity as AppCompatActivity, R.raw.knopka_klik_myagkii_blizkii_priglushennyii)
+        mediaPlayerCubeFalling = MediaPlayer.create(activity as AppCompatActivity, R.raw.milnii_puzir2)
 
         //получаем картинки и пилим их на куски, потом перемешиваем и отправляем в адаптер
         dataModel.listBitmapForAdapterFragPWP.observe(activity as LifecycleOwner) {
@@ -591,24 +594,12 @@ class FragmentPlayingWithPicturesMedium : Fragment(), AdapterFragPWPHard.ClickSc
         linLayImage5 = binding.headerForDrawerPwp.getHeaderView(0).findViewById(R.id.lin_im_5)
         linLayImage6 = binding.headerForDrawerPwp.getHeaderView(0).findViewById(R.id.lin_im_6)
     }
-    /*
-    fun proverkaMassivaNaPovtor(arr: ArrayList<dataArrayPositionAndNumberBitmap>):Boolean{
-        var re: Boolean = false
-        for (i in arr.indices) {
-            for (j in i + 1 until arr.size){
-                if (arr[i] == arr[j]){
-                    //Log.d("MyLog", "arrPovtor ${arr[j]}")
-                    re = true
-                }
-            }
-        }
-        return re
-    }*/
 
     //Инициализация менеджера и присваивания рцвью адаптера
     @SuppressLint("ClickableViewAccessibility")
     fun initRcView(){
 
+        adapterMedium = AdapterFragPWPMedium(this, activity as FragmentActivity)
         binding.layFragPlayPwpMedium.idRcViewFragPWP.layoutManager = CustomGridLayoutManagerMedium(activity as AppCompatActivity)
         binding.layFragPlayPwpMedium.idRcViewFragPWP.adapter = adapterMedium
 
@@ -715,16 +706,6 @@ class FragmentPlayingWithPicturesMedium : Fragment(), AdapterFragPWPHard.ClickSc
 
             //adapter?.clickable = true
         }
-        /*}else{
-            binding.idImViewScale2.setImageBitmap(b0)
-            (AnimatorInflater.loadAnimator(
-                activity as AppCompatActivity,
-                R.animator.animation_cube_scale_start
-            ) as ObjectAnimator).apply {
-                target = binding.idImViewScale2
-                start()
-            }
-        }*/
 
     }
 
@@ -936,6 +917,10 @@ class FragmentPlayingWithPicturesMedium : Fragment(), AdapterFragPWPHard.ClickSc
         }
     }
 
+    override fun soundEffect() {
+        mediaPlayerCubeFalling.start()
+    }
+
     //После обновления позиции в адаптере происходит проверка собрана картинка, если да то сюда приходит позиция, какую картинку собрали
     override fun imageIsCollected(positionImageCollected: Int) {
         arrayCollectedImage[positionImageCollected] = 1
@@ -956,6 +941,10 @@ class FragmentPlayingWithPicturesMedium : Fragment(), AdapterFragPWPHard.ClickSc
         arrayBitmap.clear()
         arrayNumber.clear()
         arrayPosition.clear()
+    }
+
+    override fun updateLineTwoNoAnimation(position: Int, numberLine: Int) {
+        adapterMedium.updateLinePosTwo(position, numberLine)
     }
 
     fun collectedImageVisible(arrayCollected: ArrayList<Int>){

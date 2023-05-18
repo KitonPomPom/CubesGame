@@ -997,6 +997,14 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
         arrayPosition.clear()
     }
 
+    //Интерфейс проходной, для запуска функции внутри адаптера для обновления линий который уже исчезли, что бы
+    // второй раз не срабатывала анимация уже на исчезнувших линиях
+    override fun updateLineTwoNoAnimation(position: Int, numberLine: Int) {
+        adapterEasy.updateLinePosTwo(position, numberLine)
+    }
+
+
+
     fun collectedImageVisible(arrayCollected: ArrayList<Int>){
         if (arrayCollected[0] == 1) linLayImage1.setBackgroundColor(activity!!.getColor(R.color.green_main)) else linLayImage1.setBackgroundColor(activity!!.getColor(R.color.white))
         if (arrayCollected[1] == 1) linLayImage2.setBackgroundColor(activity!!.getColor(R.color.green_main)) else linLayImage2.setBackgroundColor(activity!!.getColor(R.color.white))

@@ -95,8 +95,8 @@ class AdapterFragPWPHard(val clickScaleItemInterface: ClickScaleItemInterface): 
                 //clickScaleItemInterface.countPlus(countStartLinearVisible.count)
             //updateLineNoImagee.updateLineNoImage = true
 
-                imItemOne.setOnClickListener {
-                    if (!actionNoClickOnTouchIfTouchOnMove) {
+            imItemOne.setOnClickListener {
+                if (!actionNoClickOnTouchIfTouchOnMove) {
                         //Log.d("MyLog", "clicker ${noMovee.noMoveIfOpenScale} ${noMoveeBack.noMoveIfOpenScale}")
                         if (!noMovee.noMoveIfOpenScale && noMoveeBack.noMoveIfOpenScale) {
                             if (clickk.clickable && clickkBack.clickable && clickkUpdateLine.clickable) {

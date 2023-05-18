@@ -35,13 +35,13 @@ import kotlinx.coroutines.*
 import java.lang.Math.abs
 
 
-class FragmentPlayingWithPicturesTwo : Fragment(), AdapterFragPWPHard.ClickScaleItemInterface, AdapterFragPWPMedium.ClickScaleItemInterface {
+class FragmentPlayingWithPicturesTwo : Fragment(), AdapterFragPWPHard.ClickScaleItemInterface {
 
     lateinit var binding: DrawerLayoutPwpTwoBinding
     private val dataModel: DataModel by activityViewModels()
     private var job: Job? = null
     private val adapterHard: AdapterFragPWPHard? = AdapterFragPWPHard(this)
-    private val adapterMedium: AdapterFragPWPMedium? = AdapterFragPWPMedium(this)
+    //private val adapterMedium: AdapterFragPWPMedium? = AdapterFragPWPMedium(this)
     //private val swipeCallback = ItemTouchMoveAndSwipe(adapter!!)
     //private val touchHelper = ItemTouchHelper(swipeCallback)
     lateinit var image1: ImageView
