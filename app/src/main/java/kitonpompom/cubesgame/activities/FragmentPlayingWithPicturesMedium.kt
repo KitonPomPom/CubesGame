@@ -42,7 +42,6 @@ class FragmentPlayingWithPicturesMedium : Fragment(), AdapterFragPWPHard.ClickSc
     lateinit var binding: DrawerLayoutPwpMediumBinding
     private val dataModel: DataModel by activityViewModels()
     private var job: Job? = null
-    private val adapterHard: AdapterFragPWPHard? = AdapterFragPWPHard(this)
     private lateinit var adapterMedium: AdapterFragPWPMedium
     //private val adapterMedium: AdapterFragPWPMedium? = AdapterFragPWPMedium(this)
     //private val swipeCallback = ItemTouchMoveAndSwipe(adapter!!)

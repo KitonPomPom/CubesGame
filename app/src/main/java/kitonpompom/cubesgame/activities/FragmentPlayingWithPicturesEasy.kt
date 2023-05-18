@@ -385,7 +385,6 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
                                                 adapterEasy?.click?.clickable = true
                                                 noClick.clickable = true
                                                 clickMoveAdapter = false
-                                                //mediaPlayerCubeFalling.start()
                                             }
                                         }
                                     }
@@ -447,8 +446,6 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
                                             duration = 220
                                             start()
                                             doOnEnd {
-                                                //mediaPlayerCubeFalling.isPlaying
-                                                //mediaPlayerCubeFalling.start()
                                                 binding.layFragPlayPwpEasy.idImViewMove.visibility = View.GONE
                                                 arrayBitmap.clear()
                                                 arrayNumber.clear()
@@ -746,19 +743,7 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
             arrayPosition.add(p3)
             arrayPosition.add(p4)
             arrayPosition.add(p5)
-
-            //adapter?.clickable = true
         }
-        /*}else{
-            binding.idImViewScale2.setImageBitmap(b0)
-            (AnimatorInflater.loadAnimator(
-                activity as AppCompatActivity,
-                R.animator.animation_cube_scale_start
-            ) as ObjectAnimator).apply {
-                target = binding.idImViewScale2
-                start()
-            }
-        }*/
 
     }
 
