@@ -84,8 +84,7 @@
     <fragment
         android:id="@+id/fragmentPlayingWithPicturesMedium"
         android:name="kitonpompom.cubesgame.activities.FragmentPlayingWithPicturesMedium"
-        android:label="fragment_playing_with_pictures_medium"
-        tools:layout="@layout/fragment_playing_with_pictures_medium" />
+        android:label="FragmentPlayingWithPicturesMedium" />
     <fragment
         android:id="@+id/fragmentPlayingWithPicturesEasy"
         android:name="kitonpompom.cubesgame.activities.FragmentPlayingWithPicturesEasy"

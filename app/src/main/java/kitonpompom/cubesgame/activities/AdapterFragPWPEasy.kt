@@ -2,6 +2,7 @@ package kitonpompom.cubesgame.activities //адаптер для фрагмен�
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -129,11 +130,11 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
             }
 
                 imItemOne.setOnClickListener {
-                    //Log.d("MyLog", "setOnClickListener ItemOne actionNoClick $actionNoClickOnTouchIfTouchOnMove")
+                    Log.d("MyLog", "setOnClickListener ItemOne actionNoClick $actionNoClickOnTouchIfTouchOnMove")
                     if (!actionNoClickOnTouchIfTouchOnMove) {
                         if (!noMovee.noMoveIfOpenScale && noMoveeBack.noMoveIfOpenScale) {
                             if (clickk.clickable && clickkBack.clickable && clickkUpdateLine.clickable) {
-                                //Log.d("MyLog", "Слушатель ImItemOne1")
+                                Log.d("MyLog", "Слушатель ImItemOne1")
                                 clickScaleItemInterface.clickScaleItem(
                                     item.arrayBitmap[0], item.arrayBitmap[1],
                                     item.arrayBitmap[2], item.arrayBitmap[3],
@@ -151,9 +152,10 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
                 }
 
                 imItemOne.setOnTouchListener(){ viewRc, eventRc ->
+                    Log.d("MyLog", "imItemOne.setOnTouchListener")
                     if (noMovee.noMoveIfOpenScale && noMoveeBack.noMoveIfOpenScale){ //Не запускаем если открыт увеличеный Итем
                         if (clickk.clickable && clickkBack.clickable && clickkUpdateLine.clickable) {// Не запускаем пока идет анимация
-                            //Log.d("MyLog", "Слушатель ImItemOne2")
+                            Log.d("MyLog", "Слушатель  тач ImItemOne")
                             val minDistance = 23
                             val minDistanceUpDown = 15
                             when (eventRc.action) {
@@ -162,8 +164,8 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
                                     noReplaySwipe = true
                                 }
                                 MotionEvent.ACTION_MOVE -> {
-                                    //Log.d("MyLog", "ACTION_MOVE")
-                                    actionMoveCheck = true
+                                    Log.d("MyLog", "ACTION_MOVE")
+                                    //actionMoveCheck = true
                                     actionNoClickOnTouchIfTouchOnMove = true
                                     if(noReplaySwipe){
                                         clickScaleItemInterface.moveItem(item.arrayBitmap[0], item.arrayBitmap[1],
@@ -180,7 +182,7 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
                                     }
                                 }
                                 MotionEvent.ACTION_UP -> {
-                                    //Log.d("MyLog", "ACTION_UP")
+                                    Log.d("MyLog", "ACTION_UP")
                                     actionNoClickOnTouchIfTouchOnMove = true
                                     noReplaySwipe = false
                                     if (clickk.clickable && clickkBack.clickable && clickkUpdateLine.clickable) {

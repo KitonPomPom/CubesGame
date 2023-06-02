@@ -13,33 +13,32 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:background="#5C5B5B"
-            android:orientation="horizontal"
-            android:visibility="visible"
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="2dp"
+            android:layout_marginBottom="64dp"
+            android:background="@drawable/cast_bg_bt_buttom_activity_pressed"
+            android:padding="2dp"
+            android:text="12"
+            android:textColor="#FBFAFA"
+            android:textSize="10sp"
             app:layout_constraintBottom_toTopOf="@+id/id_rcView_FragPWP"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintEnd_toEndOf="@+id/id_rcView_FragPWP" />
 
-            <ImageButton
-                android:id="@+id/id_bt_open_drawer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="2dp"
-                android:layout_weight="1"
-                android:src="@drawable/open_drawer_layout" />
-
-            <LinearLayout
-                android:id="@+id/id_lin_Lineyka"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#63815F"
-                android:orientation="horizontal"></LinearLayout>
-        </LinearLayout>
+        <ImageButton
+            android:id="@+id/id_bt_open_drawer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
+            android:layout_marginBottom="2dp"
+            android:layout_weight="1"
+            android:background="@drawable/cast_bg_bt_buttom_activity_pressed"
+            android:padding="2dp"
+            android:src="@drawable/baseline_start_24"
+            app:layout_constraintBottom_toTopOf="@+id/id_rcView_FragPWP"
+            app:layout_constraintStart_toStartOf="@+id/id_rcView_FragPWP" />
 
         <kitonpompom.cubesgame.activities.utils.CustomRecycleView
             android:id="@+id/id_rcView_FragPWP"
@@ -52,8 +51,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="1.0" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/id_imView_scale"

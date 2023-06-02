@@ -14,6 +14,10 @@
     <color name="linear_PWP_item_view_left">#191010</color>
     <color name="linear_PWP_item_view_right">#170E0E</color>
     <color name="linear_PWP_item_view_bottom">#190E0E</color>
+    <color name="grey_header_3">#2d2f31</color>
+    <color name="grey_header_2">#313435</color>
+    <color name="grey_header_1">#3c3f41</color>
+
 
     <color name="video_counter_color_pix">#E53935</color>
     <color name="primary_color_pix">#075e54</color>

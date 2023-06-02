@@ -13,15 +13,11 @@
         layout="@layout/fragment_playing_with_pictures_easy"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
-
-    <com.google.android.material.navigation.NavigationView
-        android:id="@+id/header_for_drawer_pwp"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <include
+        android:id="@+id/lay_frag_play_pwp_easy2"
+        layout="@layout/header_for_drawer_pwp_easy"
         android:layout_gravity="start"
-        android:background="@color/grey_black"
-        android:fitsSystemWindows="true"
-        app:headerLayout="@layout/header_for_drawer_pwp_easy">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
-    </com.google.android.material.navigation.NavigationView>
 </androidx.drawerlayout.widget.DrawerLayout>

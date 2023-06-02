@@ -168,7 +168,7 @@ class AdapterFragPWPHard(val clickScaleItemInterface: ClickScaleItemInterface, v
                                     noReplaySwipe = true
                                 }
                                 MotionEvent.ACTION_MOVE -> {
-                                    actionMoveCheck = true
+                                    //actionMoveCheck = true
                                     actionNoClickOnTouchIfTouchOnMove = true
                                     x2 = eventRc.x
                                     y2 = eventRc.y
@@ -224,7 +224,8 @@ class AdapterFragPWPHard(val clickScaleItemInterface: ClickScaleItemInterface, v
                 }
         }
         fun doAnimation(act: FragmentActivity, view: View) {
-            val ps = ParticleSystem(act, 100, view.context.getDrawable(R.drawable.star_black), 1000L)
+            val ps = ParticleSystem(act, 100, view.context.getDrawable(R.drawable.star_black),
+                500L)
             ps.setSpeedRange(0.1f, 0.25f)
             ps.setScaleRange(0.7f, 1.3f)
             ps.setSpeedRange(0.1f, 0.25f)

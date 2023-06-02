@@ -163,7 +163,7 @@ class AdapterFragPWPMedium(val clickScaleItemInterface: ClickScaleItemInterface,
                                     noReplaySwipe = true
                                 }
                                 MotionEvent.ACTION_MOVE -> {
-                                    actionMoveCheck = true
+                                    //actionMoveCheck = true
                                     actionNoClickOnTouchIfTouchOnMove = true
                                     if(noReplaySwipe){
                                         clickScaleItemInterface.moveItem(item.arrayBitmap[0], item.arrayBitmap[1],
@@ -210,7 +210,7 @@ class AdapterFragPWPMedium(val clickScaleItemInterface: ClickScaleItemInterface,
 
         //Анимация звездочек при исчезновении линий
         fun doAnimation(act: FragmentActivity, view: View) {
-            val ps = ParticleSystem(act, 100, view.context.getDrawable(R.drawable.star_black), 1000L)
+            val ps = ParticleSystem(act, 100, view.context.getDrawable(R.drawable.star_black), 500L)
             ps.setSpeedRange(0.1f, 0.25f)
             ps.setScaleRange(0.7f, 1.3f)
             ps.setSpeedRange(0.1f, 0.25f)

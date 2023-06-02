@@ -37,6 +37,8 @@ class MainActivity : AppCompatActivity() {
             navController.addOnDestinationChangedListener { _, destination, _ ->
                 when (destination.id) {
                     R.id.fragmentPlayingWithPicturesTwo -> binding.idBotNavView.visibility = View.GONE
+                    R.id.fragmentPlayingWithPicturesMedium -> binding.idBotNavView.visibility = View.GONE
+                    R.id.fragmentPlayingWithPicturesEasy -> binding.idBotNavView.visibility = View.GONE
                 else -> binding.idBotNavView.visibility = View.VISIBLE
                 }
             }
