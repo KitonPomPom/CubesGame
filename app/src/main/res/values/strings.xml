@@ -21,6 +21,8 @@
     <string name="shuffling">Перемешать</string>
     <string name="choose_the_difficulty">Выбирите сложность</string>
     <string name="timer_null">--:--:--</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

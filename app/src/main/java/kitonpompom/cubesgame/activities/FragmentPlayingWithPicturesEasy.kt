@@ -41,6 +41,7 @@ import kitonpompom.cubesgame.databinding.DrawerLayoutPwpEasyBinding
 import kotlinx.coroutines.*
 import java.lang.Math.abs
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScaleItemInterface {
@@ -80,7 +81,7 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
     var openItemScale = false //true - Открыт\увеличен itemScale
     val durationAnimationCubeSpeed: Long = 300
     //var arrayInt = arrayOf(0,1,2,3,4,5)
-    lateinit var itemViewGlobal: View //педаем сюда вью на который нажали, что бы была возможность использовать по всему классу
+    lateinit var itemViewGlobal: View //передаем сюда вью на который нажали, что бы была возможность использовать по всему классу
     lateinit var itemViewGlobalMove: View //педаем сюда вью которое начали тянуть, что бы была возможность использовать по всему классу
     lateinit var imItemGlobal: ImageView //педаем сюда имадж вью, что бы была возможность использовать по всему классу
     lateinit var mediaPlayerCubeFalling: MediaPlayer
@@ -88,6 +89,7 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
     val noClickBack = ClickableStateBack() //Объект для блокировки ActionUp в Move для обратного движения
     //var imMoveHeight by Delegates.notNull<Int>()
     //var imMoveWidth by Delegates.notNull<Int>()
+    var tempListBitmap = ArrayList<dataArrayBitmap>()
 
     var optionDifficulty: Int? = null
 
@@ -126,9 +128,9 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
             job = CoroutineScope(Dispatchers.Main).launch {
                 //Включаем диалог с загрузкой перед началом игры
                 delay(300L)
+
                 val dialog = ProgressDialog.createProgressDialog(activity as Activity, Constans.FRAGMENT_PLAYING_WITH_PICTURE)
                 //Создаем массивы с нарезаными картинками
-
                 val arrayCroppedImage1 = (ImageManagerTwo.croppedImageEasy(it[0]))
                 val arrayCroppedImage2 = (ImageManagerTwo.croppedImageEasy(it[1]))
                 val arrayCroppedImage3 = (ImageManagerTwo.croppedImageEasy(it[2]))
@@ -154,16 +156,8 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
                 //Отрисовываем рамки в зависимости от значений массива arrayCollectedImage
                 collectedImageVisible(arrayCollectedImage)
 
+                //Cоздаем массивы
                 val tempList = ArrayList<List<Bitmap>>()
-                var tempListBitmap = ArrayList<dataArrayBitmap>()
-                var tempListBitmapFinish = ArrayList<dataArrayBitmap>()
-                var arrayPositionAndNumber0 = ArrayList<dataArrayPositionAndNumberBitmap>()
-                val arrayPositionAndNumber1 = ArrayList<dataArrayPositionAndNumberBitmap>()
-                val arrayPositionAndNumber2 = ArrayList<dataArrayPositionAndNumberBitmap>()
-                val arrayPositionAndNumber3 = ArrayList<dataArrayPositionAndNumberBitmap>()
-                val arrayPositionAndNumber4 = ArrayList<dataArrayPositionAndNumberBitmap>()
-                val arrayPositionAndNumber5 = ArrayList<dataArrayPositionAndNumberBitmap>()
-
 
                 tempList.add(arrayCroppedImage1)
                 tempList.add(arrayCroppedImage2)
@@ -172,6 +166,8 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
                 tempList.add(arrayCroppedImage5)
                 tempList.add(arrayCroppedImage6)
 
+                //Создаем массив tempListBitmap<dataArrayBitmap> с позициями, номерами,
+                // картинками и значениями линий (не перемешанный)
                 for(index in 0 until arrayCroppedImage1.size){
                     val arrayPosition = ArrayList<Int>()
                     val arrayNumber = ArrayList<Int>()
@@ -189,115 +185,40 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
                     tempListBitmap.add(dataArrayBitmap(arrayPosition,arrayNumber,arrayBitmap,arrayLine))
                 }
 
-                for (index in tempListBitmap) {
-                    //Log.d("MyLog", "do ${index}")
-                    arrayPositionAndNumber0.add(dataArrayPositionAndNumberBitmap(index.arrayPosition[0],index.arrayNumber[0]))
-                    arrayPositionAndNumber1.add(dataArrayPositionAndNumberBitmap(index.arrayPosition[1],index.arrayNumber[1]))
-                    arrayPositionAndNumber2.add(dataArrayPositionAndNumberBitmap(index.arrayPosition[2],index.arrayNumber[2]))
-                    arrayPositionAndNumber3.add(dataArrayPositionAndNumberBitmap(index.arrayPosition[3],index.arrayNumber[3]))
-                    arrayPositionAndNumber4.add(dataArrayPositionAndNumberBitmap(index.arrayPosition[4],index.arrayNumber[4]))
-                    arrayPositionAndNumber5.add(dataArrayPositionAndNumberBitmap(index.arrayPosition[5],index.arrayNumber[5]))
-                }
-
-                val arrayPositionAndNumberBitmap = ArrayList<ArrayList<dataArrayPositionAndNumberBitmap>>()
-                arrayPositionAndNumberBitmap.add(arrayPositionAndNumber0)
-                arrayPositionAndNumberBitmap.add(arrayPositionAndNumber1)
-                arrayPositionAndNumberBitmap.add(arrayPositionAndNumber2)
-                arrayPositionAndNumberBitmap.add(arrayPositionAndNumber3)
-                arrayPositionAndNumberBitmap.add(arrayPositionAndNumber4)
-                arrayPositionAndNumberBitmap.add(arrayPositionAndNumber5)
-
-
-
-                shuffleArrayDataArrayPositionAndNumberBitmap(arrayPositionAndNumber0)
-
-                //val shuffleArrayPositionAndNumberBitmap0 = shuffleArrayDataArrayPositionAndNumberBitmap(arrayPositionAndNumber0)
-                val shuffleArrayPositionAndNumberBitmap1 = shuffleArrayDataArrayPositionAndNumberBitmap(arrayPositionAndNumber1)
-                val shuffleArrayPositionAndNumberBitmap2 = shuffleArrayDataArrayPositionAndNumberBitmap(arrayPositionAndNumber2)
-                val shuffleArrayPositionAndNumberBitmap3 = shuffleArrayDataArrayPositionAndNumberBitmap(arrayPositionAndNumber3)
-                val shuffleArrayPositionAndNumberBitmap4 = shuffleArrayDataArrayPositionAndNumberBitmap(arrayPositionAndNumber4)
-                val shuffleArrayPositionAndNumberBitmap5 = shuffleArrayDataArrayPositionAndNumberBitmap(arrayPositionAndNumber5)
-
-                val arrayShuffleArrayPositionAndNumberBitmap = ArrayList<ArrayList<dataArrayPositionAndNumberBitmap>>()
-                //arrayShuffleArrayPositionAndNumberBitmap.add(shuffleArrayPositionAndNumberBitmap0)
-                arrayShuffleArrayPositionAndNumberBitmap.add(arrayPositionAndNumber0)
-                arrayShuffleArrayPositionAndNumberBitmap.add(shuffleArrayPositionAndNumberBitmap1)
-                arrayShuffleArrayPositionAndNumberBitmap.add(shuffleArrayPositionAndNumberBitmap2)
-                arrayShuffleArrayPositionAndNumberBitmap.add(shuffleArrayPositionAndNumberBitmap3)
-                arrayShuffleArrayPositionAndNumberBitmap.add(shuffleArrayPositionAndNumberBitmap4)
-                arrayShuffleArrayPositionAndNumberBitmap.add(shuffleArrayPositionAndNumberBitmap5)
-
-                for(index in 0 until arrayCroppedImage1.size) {
-                    val tArrayDataArrayBitmap = ArrayList<dataArrayBitmap>()
-                    val tDataPosNumBit = ArrayList<dataPosNumBit>()
-                    val arrayPosition = ArrayList<Int>()
-                    val arrayNumber = ArrayList<Int>()
-                    val arrayBitmap = ArrayList<Bitmap>()
-                    for (i in 0..5) {
-                        arrayPosition.add(tempListBitmap[arrayShuffleArrayPositionAndNumberBitmap[i][index].arrayPosition].arrayPosition[arrayShuffleArrayPositionAndNumberBitmap[i][index].arrayNumber])
-                        arrayNumber.add(tempListBitmap[arrayShuffleArrayPositionAndNumberBitmap[i][index].arrayPosition].arrayNumber[arrayShuffleArrayPositionAndNumberBitmap[i][index].arrayNumber])
-                        arrayBitmap.add(tempListBitmap[arrayShuffleArrayPositionAndNumberBitmap[i][index].arrayPosition].arrayBitmap[arrayShuffleArrayPositionAndNumberBitmap[i][index].arrayNumber])
-                        //arrayPosition.add(tempListBitmap[arrayPositionAndNumberBitmap[i][index].arrayPosition].arrayPosition[arrayShuffleArrayPositionAndNumberBitmap[i][index].arrayNumber])
-                        //arrayNumber.add(tempListBitmap[arrayPositionAndNumberBitmap[i][index].arrayPosition].arrayNumber[arrayShuffleArrayPositionAndNumberBitmap[i][index].arrayNumber])
-                        //arrayBitmap.add(tempListBitmap[arrayPositionAndNumberBitmap[i][index].arrayPosition].arrayBitmap[arrayShuffleArrayPositionAndNumberBitmap[i][index].arrayNumber])
-                    }
-
-                    var num = shuffleIntArray(arrayNumber)
-                    val arrayPositionTemp = ArrayList<Int>()
-                    val arrayNumberTemp = ArrayList<Int>()
-                    val arrayBitmapTemp = ArrayList<Bitmap>()
-                    for (i in num) {
-                        arrayPositionTemp.add(arrayPosition[i])
-                        arrayNumberTemp.add(arrayNumber[i])
-                        arrayBitmapTemp.add(arrayBitmap[i])
-                    }
-
-                    val arrayLine = ArrayList<Int>()
-                    for (i in 0..3) {
-                        arrayLine.add(1)
-                    }
-                    //Log.d("MyLog", "do $num")
-                    //tArrayDataArrayBitmap.add(tDataPosNumBit)
-                    //tempListBitmapFinish.add(dataArrayBitmap(arrayPosition,arrayNumber,arrayBitmap))
-                    tempListBitmapFinish.add(
-                        dataArrayBitmap(
-                            arrayPositionTemp,
-                            arrayNumberTemp,
-                            arrayBitmapTemp,
-                            arrayLine
-                        )
-                    )
-                }
                 //Log.d("MyLog", "arrayPositionAndNumber0 ${arrayShuffleArrayPositionAndNumberBitmap[0][0].arrayPosition}")
 
                 //adapterEasy?.updateAdapter(tempListBitmap)// не перемешеный
-                adapterEasy?.updateAdapter(tempListBitmapFinish) // перемешеный
+                adapterEasy?.updateAdapter(shuffleTempListBitmap(tempListBitmap)) // перемешеный
                 //Выключаем диалог после того как все загрузилось
                 dialog.dismiss()
                 //Открываем драйвер лэоут
-                binding.idDrawerLayout.openDrawer(GravityCompat.START)
             }
         }
 
         binding.layFragPlayPwpEasy.idBtOpenDrawer.setOnClickListener(){
-           //itemViewGlobal.visibility = View.GONE
-           // binding.layFragPlayPwpEasy.idImViewMove2.visibility = View.GONE
-         //Log.d("MyLog", "Нажал ${linLayParent.layoutParams.height}")
-            //job = CoroutineScope(Dispatchers.Main).launch {
-                //Timer().schedule(3000){
-             //  delay(3000L)
+            binding.idDrawerLayout.openDrawer(GravityCompat.START)
+        }
 
-            mediaPlayerCubeFalling.start()
-                    doAnimation()
-                //}
-            //}
+        binding.layFragPlayPwpEasy2.imBtExit.setOnClickListener(){
+            Log.d("MyLog", "Слушатель imBtExit")
+        }
+
+        binding.layFragPlayPwpEasy2.imBtSound.setOnClickListener(){
+            Log.d("MyLog", "Слушатель imBtSound")
+        }
+
+        binding.layFragPlayPwpEasy2.imBtShuffle.setOnClickListener(){
+            Log.d("MyLog", "Слушатель imBtShuffle")
+            adapterEasy?.updateAdapter(shuffleTempListBitmap(tempListBitmap))
+        }
+
+        binding.layFragPlayPwpEasy2.imBtColorLine.setOnClickListener(){
+            Log.d("MyLog", "Слушатель imBtColorLine")
+        }
 
 
-
-
-             //ParticleSystem(this, numParticles, drawableResId, timeToLive)
-             //.setSpeedRange(0.2f, 0.5f)
-             //   .oneShot(anchorView, numParticles)
+        binding.layFragPlayPwpEasy2.imBtHelp.setOnClickListener(){
+            Log.d("MyLog", "Слушатель imBtHelp")
         }
 
 
@@ -600,6 +521,99 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
             }
             return@setOnTouchListener true
         }
+    }
+
+    //Перемешать массив основной массив ArrayList<dataArrayBitmap>
+    fun shuffleTempListBitmap(tempListBitmap:ArrayList<dataArrayBitmap>):ArrayList<dataArrayBitmap>{
+        val tempList = ArrayList<List<Bitmap>>()
+        //var tempListBitmap = ArrayList<dataArrayBitmap>()
+        var tempListBitmapFinish = ArrayList<dataArrayBitmap>()
+        var arrayPositionAndNumber0 = ArrayList<dataArrayPositionAndNumberBitmap>()
+        val arrayPositionAndNumber1 = ArrayList<dataArrayPositionAndNumberBitmap>()
+        val arrayPositionAndNumber2 = ArrayList<dataArrayPositionAndNumberBitmap>()
+        val arrayPositionAndNumber3 = ArrayList<dataArrayPositionAndNumberBitmap>()
+        val arrayPositionAndNumber4 = ArrayList<dataArrayPositionAndNumberBitmap>()
+        val arrayPositionAndNumber5 = ArrayList<dataArrayPositionAndNumberBitmap>()
+
+        for (index in tempListBitmap) {
+            arrayPositionAndNumber0.add(dataArrayPositionAndNumberBitmap(index.arrayPosition[0],index.arrayNumber[0]))
+            arrayPositionAndNumber1.add(dataArrayPositionAndNumberBitmap(index.arrayPosition[1],index.arrayNumber[1]))
+            arrayPositionAndNumber2.add(dataArrayPositionAndNumberBitmap(index.arrayPosition[2],index.arrayNumber[2]))
+            arrayPositionAndNumber3.add(dataArrayPositionAndNumberBitmap(index.arrayPosition[3],index.arrayNumber[3]))
+            arrayPositionAndNumber4.add(dataArrayPositionAndNumberBitmap(index.arrayPosition[4],index.arrayNumber[4]))
+            arrayPositionAndNumber5.add(dataArrayPositionAndNumberBitmap(index.arrayPosition[5],index.arrayNumber[5]))
+        }
+
+        val arrayPositionAndNumberBitmap = ArrayList<ArrayList<dataArrayPositionAndNumberBitmap>>()
+        arrayPositionAndNumberBitmap.add(arrayPositionAndNumber0)
+        arrayPositionAndNumberBitmap.add(arrayPositionAndNumber1)
+        arrayPositionAndNumberBitmap.add(arrayPositionAndNumber2)
+        arrayPositionAndNumberBitmap.add(arrayPositionAndNumber3)
+        arrayPositionAndNumberBitmap.add(arrayPositionAndNumber4)
+        arrayPositionAndNumberBitmap.add(arrayPositionAndNumber5)
+
+
+
+        shuffleArrayDataArrayPositionAndNumberBitmap(arrayPositionAndNumber0)
+
+        //val shuffleArrayPositionAndNumberBitmap0 = shuffleArrayDataArrayPositionAndNumberBitmap(arrayPositionAndNumber0)
+        val shuffleArrayPositionAndNumberBitmap1 = shuffleArrayDataArrayPositionAndNumberBitmap(arrayPositionAndNumber1)
+        val shuffleArrayPositionAndNumberBitmap2 = shuffleArrayDataArrayPositionAndNumberBitmap(arrayPositionAndNumber2)
+        val shuffleArrayPositionAndNumberBitmap3 = shuffleArrayDataArrayPositionAndNumberBitmap(arrayPositionAndNumber3)
+        val shuffleArrayPositionAndNumberBitmap4 = shuffleArrayDataArrayPositionAndNumberBitmap(arrayPositionAndNumber4)
+        val shuffleArrayPositionAndNumberBitmap5 = shuffleArrayDataArrayPositionAndNumberBitmap(arrayPositionAndNumber5)
+
+        val arrayShuffleArrayPositionAndNumberBitmap = ArrayList<ArrayList<dataArrayPositionAndNumberBitmap>>()
+        //arrayShuffleArrayPositionAndNumberBitmap.add(shuffleArrayPositionAndNumberBitmap0)
+        arrayShuffleArrayPositionAndNumberBitmap.add(arrayPositionAndNumber0)
+        arrayShuffleArrayPositionAndNumberBitmap.add(shuffleArrayPositionAndNumberBitmap1)
+        arrayShuffleArrayPositionAndNumberBitmap.add(shuffleArrayPositionAndNumberBitmap2)
+        arrayShuffleArrayPositionAndNumberBitmap.add(shuffleArrayPositionAndNumberBitmap3)
+        arrayShuffleArrayPositionAndNumberBitmap.add(shuffleArrayPositionAndNumberBitmap4)
+        arrayShuffleArrayPositionAndNumberBitmap.add(shuffleArrayPositionAndNumberBitmap5)
+
+        for(index in 0 until tempListBitmap.size) {
+            val tArrayDataArrayBitmap = ArrayList<dataArrayBitmap>()
+            val tDataPosNumBit = ArrayList<dataPosNumBit>()
+            val arrayPosition = ArrayList<Int>()
+            val arrayNumber = ArrayList<Int>()
+            val arrayBitmap = ArrayList<Bitmap>()
+            for (i in 0..5) {
+                arrayPosition.add(tempListBitmap[arrayShuffleArrayPositionAndNumberBitmap[i][index].arrayPosition].arrayPosition[arrayShuffleArrayPositionAndNumberBitmap[i][index].arrayNumber])
+                arrayNumber.add(tempListBitmap[arrayShuffleArrayPositionAndNumberBitmap[i][index].arrayPosition].arrayNumber[arrayShuffleArrayPositionAndNumberBitmap[i][index].arrayNumber])
+                arrayBitmap.add(tempListBitmap[arrayShuffleArrayPositionAndNumberBitmap[i][index].arrayPosition].arrayBitmap[arrayShuffleArrayPositionAndNumberBitmap[i][index].arrayNumber])
+                //arrayPosition.add(tempListBitmap[arrayPositionAndNumberBitmap[i][index].arrayPosition].arrayPosition[arrayShuffleArrayPositionAndNumberBitmap[i][index].arrayNumber])
+                //arrayNumber.add(tempListBitmap[arrayPositionAndNumberBitmap[i][index].arrayPosition].arrayNumber[arrayShuffleArrayPositionAndNumberBitmap[i][index].arrayNumber])
+                //arrayBitmap.add(tempListBitmap[arrayPositionAndNumberBitmap[i][index].arrayPosition].arrayBitmap[arrayShuffleArrayPositionAndNumberBitmap[i][index].arrayNumber])
+            }
+
+            var num = shuffleIntArray(arrayNumber)
+            val arrayPositionTemp = ArrayList<Int>()
+            val arrayNumberTemp = ArrayList<Int>()
+            val arrayBitmapTemp = ArrayList<Bitmap>()
+            for (i in num) {
+                arrayPositionTemp.add(arrayPosition[i])
+                arrayNumberTemp.add(arrayNumber[i])
+                arrayBitmapTemp.add(arrayBitmap[i])
+            }
+
+            val arrayLine = ArrayList<Int>()
+            for (i in 0..3) {
+                arrayLine.add(1)
+            }
+            //Log.d("MyLog", "do $num")
+            //tArrayDataArrayBitmap.add(tDataPosNumBit)
+            //tempListBitmapFinish.add(dataArrayBitmap(arrayPosition,arrayNumber,arrayBitmap))
+            tempListBitmapFinish.add(
+                dataArrayBitmap(
+                    arrayPositionTemp,
+                    arrayNumberTemp,
+                    arrayBitmapTemp,
+                    arrayLine
+                )
+            )
+        }
+        return tempListBitmapFinish
     }
 
     //Метод перемешивания позиций и номеров перед началом игры
