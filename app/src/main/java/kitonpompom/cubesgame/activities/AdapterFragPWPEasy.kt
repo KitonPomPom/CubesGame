@@ -2,6 +2,7 @@ package kitonpompom.cubesgame.activities //адаптер для фрагмен�
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
+import android.graphics.drawable.ColorDrawable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -27,12 +28,25 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
     var noMove = NoMoveIfOpenScale()//Класс для блокировки в адаптере возможности срабатывания ОнТач, блокируется из фрагмета с рцвью когда картинка увеличена
     var noMoveBack = NoMoveIfOpenScaleBack()//Класс для пблокировки в адаптере возможности срабатывания ОнТач при обратной анимации, блокируется из фрагмета с рцвью
     var updateLineNoImage = UpdateLineNoImage()//класс для блокировки обновления линий без обновления картинки
+    var colorLine = false //Цвет линий false - черный
+    lateinit var view: View
+    var colorAnimationStars = false //Цвет звездочек в анимации false - черный
     //var visibilityView = VisibilityViewAdapter()
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_rc_playing_with_pictures_easy, parent,false)
-        return AdapterFragPWPEasy.ImageHolder(view, this, parent.id, click, noMove, clickBack,clickUpdateLine, noMoveBack)
+        //Если colorLine false - загружаем черные линии, если true - белые
+        if (!colorLine) {
+             view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_rc_playing_with_pictures_easy, parent, false)
+            colorAnimationStars = false
+        }else{
+             view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_rc_playing_with_pictures_easy_white, parent, false)
+            colorAnimationStars = true
+        }
+            Log.d("MyLog", "OnCreateViewHolder")
+        return AdapterFragPWPEasy.ImageHolder(view, this, parent.id, click, noMove, clickBack,clickUpdateLine, noMoveBack, colorAnimationStars)
     }
 
     override fun onBindViewHolder(holder: ImageHolder, position: Int) {
@@ -52,7 +66,7 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
 
 
     class ImageHolder (itemView : View, val adapter: AdapterFragPWPEasy, id: Int, var clickk: ClickableState, var noMovee: NoMoveIfOpenScale,
-                       var clickkBack: ClickableStateBack, var clickkUpdateLine: ClickableStateUpdateLine, var noMoveeBack: NoMoveIfOpenScaleBack) : RecyclerView.ViewHolder(itemView)  {
+                       var clickkBack: ClickableStateBack, var clickkUpdateLine: ClickableStateUpdateLine, var noMoveeBack: NoMoveIfOpenScaleBack, val colorAnimation:Boolean) : RecyclerView.ViewHolder(itemView)  {
         lateinit var imItemOne : ImageView
         lateinit var imItemTwo : ImageView
         lateinit var lineLeft :LinearLayout
@@ -69,7 +83,10 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
             lineTop = itemView.findViewById(R.id.linLayTop)
             lineRight = itemView.findViewById(R.id.linLayRight)
             lineBottom = itemView.findViewById(R.id.linLayBottom)
-            //Log.d("MyLog", "SetData")
+            val backgr = lineBottom.background
+            val color = (backgr as ColorDrawable).color
+            Log.d("MyLog", "background $color")
+
             itemView.visibility = View.VISIBLE
 
 
@@ -85,7 +102,7 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
                 lineLeft.visibility = View.INVISIBLE
                 if(item.arrayLine[0] == 0) {
                     val runnable =
-                        Runnable { doAnimation(activity, lineLeft) } //Созд. рунабл для замедления.
+                        Runnable { doAnimation(activity, lineLeft, colorAnimation) } //Созд. рунабл для замедления.
                     itemView.postDelayed(runnable, 300L)// Замедление (из View)
                     clickScaleItemInterface.soundEffect()
                     clickScaleItemInterface.updateLineTwoNoAnimation(adapterPosition, 0)
@@ -97,7 +114,7 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
             } else{
                 lineTop.visibility = View.INVISIBLE
                 if(item.arrayLine[1] == 0) {
-                    val runnable = Runnable { doAnimation(activity, lineTop) }
+                    val runnable = Runnable { doAnimation(activity, lineTop, colorAnimation) }
                     itemView.postDelayed(runnable, 300L)
                     clickScaleItemInterface.soundEffect()
                     clickScaleItemInterface.updateLineTwoNoAnimation(adapterPosition, 1)
@@ -109,7 +126,7 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
             } else{
                 lineRight.visibility = View.INVISIBLE
                 if(item.arrayLine[2] == 0) {
-                    val runnable = Runnable { doAnimation(activity, lineRight) }
+                    val runnable = Runnable { doAnimation(activity, lineRight, colorAnimation) }
                     itemView.postDelayed(runnable, 300L)
                     clickScaleItemInterface.soundEffect()
                     clickScaleItemInterface.updateLineTwoNoAnimation(adapterPosition, 2)
@@ -121,7 +138,7 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
             } else{
                 lineBottom.visibility = View.INVISIBLE
                 if(item.arrayLine[3] == 0) {
-                    val runnable = Runnable { doAnimation(activity, lineBottom) }
+                    val runnable = Runnable { doAnimation(activity, lineBottom, colorAnimation) }
                     itemView.postDelayed(runnable, 300L)
                     clickScaleItemInterface.soundEffect()
                     clickScaleItemInterface.updateLineTwoNoAnimation(adapterPosition, 3)
@@ -214,8 +231,11 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
         }
 
         //Анимация звездочек при исчезновении линий
-        fun doAnimation(act: FragmentActivity, view: View) {
-            val ps = ParticleSystem(act, 100, view.context.getDrawable(R.drawable.star_black), 1000L)
+        fun doAnimation(act: FragmentActivity, view: View, colorAnimation: Boolean) {
+            var starColor = view.context.getDrawable(R.drawable.star_black)
+            if(colorAnimation)
+                starColor =  view.context.getDrawable(R.drawable.star_white)
+            val ps = ParticleSystem(act, 100, starColor, 1000L)
             ps.setSpeedRange(0.1f, 0.25f)
             ps.setScaleRange(0.7f, 1.3f)
             ps.setSpeedRange(0.1f, 0.25f)
@@ -247,6 +267,11 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
             //NO_POSITION_MOVE - заглушка что бы не проверять рядом стоящие элементы на совпадение
             updateLinePosition(i, Constans.START_UPDATE_LINE, Constans.NO_POSITION_MOVE)
         }
+        notifyDataSetChanged()
+    }
+
+    fun updateWhiteBlackLine(color:Boolean){
+        colorLine = color
         notifyDataSetChanged()
     }
 

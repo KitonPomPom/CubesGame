@@ -4,7 +4,7 @@ import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
+import android.app.AlertDialog
 import android.graphics.Bitmap
 import android.graphics.Path
 import android.media.MediaPlayer
@@ -19,36 +19,45 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
 import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.drawerlayout.widget.DrawerLayout.DrawerListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LifecycleOwner
-import com.plattysoft.leonids.ParticleSystem
 import kitonpompom.cubesgame.R
 import kitonpompom.cubesgame.activities.data.DataModel
 import kitonpompom.cubesgame.activities.data.dataArrayBitmap
 import kitonpompom.cubesgame.activities.data.dataArrayPositionAndNumberBitmap
 import kitonpompom.cubesgame.activities.data.dataPosNumBit
+import kitonpompom.cubesgame.activities.dialogs.FinishCongratulationDialog
+import kitonpompom.cubesgame.activities.dialogs.InterfaceFinishCongratulationDialog
+import kitonpompom.cubesgame.activities.dialogs.InterfaceYesNoDialog
 import kitonpompom.cubesgame.activities.dialogs.ProgressDialog
+import kitonpompom.cubesgame.activities.dialogs.YesNoDialog
 import kitonpompom.cubesgame.activities.utils.*
 import kitonpompom.cubesgame.databinding.DrawerLayoutPwpEasyBinding
 import kotlinx.coroutines.*
 import java.lang.Math.abs
 import java.util.*
-import kotlin.collections.ArrayList
 
 
-class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScaleItemInterface {
+class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScaleItemInterface, InterfaceYesNoDialog, InterfaceFinishCongratulationDialog {
 
     lateinit var binding: DrawerLayoutPwpEasyBinding
     private val dataModel: DataModel by activityViewModels()
     private var job: Job? = null
+    private val dialogYesNo = YesNoDialog(this)
+    private val dialogCongratulationDialog = FinishCongratulationDialog(this)
+    lateinit var dialogYesNoAlert: AlertDialog
+    private var finishCloseDriver = false
     //private val adapterHard: AdapterFragPWPHard? = AdapterFragPWPHard(this)
     //private val adapterMedium: AdapterFragPWPMedium? = AdapterFragPWPMedium(this)
     lateinit var adapterEasy: AdapterFragPWPEasy
@@ -89,6 +98,7 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
     val noClickBack = ClickableStateBack() //Объект для блокировки ActionUp в Move для обратного движения
     //var imMoveHeight by Delegates.notNull<Int>()
     //var imMoveWidth by Delegates.notNull<Int>()
+    var colorLine = true // Цвет линий
     var tempListBitmap = ArrayList<dataArrayBitmap>()
 
     var optionDifficulty: Int? = null
@@ -196,7 +206,9 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
         }
 
         binding.layFragPlayPwpEasy.idBtOpenDrawer.setOnClickListener(){
-            binding.idDrawerLayout.openDrawer(GravityCompat.START)
+            FinishAnimationCongratulation.animationFinishStart(binding.layFragPlayPwpEasy.idRcViewFragPWP,
+            binding.layFragPlayPwpEasy.idViewFinishAnimation, dialogCongratulationDialog, activity as FragmentActivity, colorLine)
+
         }
 
         binding.layFragPlayPwpEasy2.imBtExit.setOnClickListener(){
@@ -209,10 +221,19 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
 
         binding.layFragPlayPwpEasy2.imBtShuffle.setOnClickListener(){
             Log.d("MyLog", "Слушатель imBtShuffle")
-            adapterEasy?.updateAdapter(shuffleTempListBitmap(tempListBitmap))
+            dialogYesNoAlert = dialogYesNo.createYesNoDialog(activity as Activity, Constans.BT_SHUFFLE)
+
         }
 
         binding.layFragPlayPwpEasy2.imBtColorLine.setOnClickListener(){
+            if(colorLine){
+            adapterEasy.updateWhiteBlackLine(colorLine)
+                colorLine = false
+            }else{
+                adapterEasy.updateWhiteBlackLine(colorLine)
+            colorLine = true
+            }
+            binding.layFragPlayPwpEasy.idRcViewFragPWP.adapter = adapterEasy
             Log.d("MyLog", "Слушатель imBtColorLine")
         }
 
@@ -220,6 +241,22 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
         binding.layFragPlayPwpEasy2.imBtHelp.setOnClickListener(){
             Log.d("MyLog", "Слушатель imBtHelp")
         }
+
+        //Слушатель действия на драйвер лэоут (Закрытие\открытие)
+        binding.idDrawerLayout.addDrawerListener(object : DrawerListener {
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
+            override fun onDrawerOpened(drawerView: View) {}
+            override fun onDrawerClosed(drawerView: View) {
+                if(finishCloseDriver){
+                    finishCloseDriver = false
+                    dialogYesNoAlert = dialogYesNo.createYesNoDialog(activity as Activity, Constans.BT_SHUFFLE)
+                }
+            }
+            override fun onDrawerStateChanged(newState: Int) {
+                //Toast.makeText(activity, "state: $newState", Toast.LENGTH_SHORT).show()
+            }
+        })
+
 
 
 
@@ -991,10 +1028,13 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
 
     //После обновления позиции в адаптере происходит проверка собрана картинка, если да то сюда приходит позиция, какую картинку собрали
     override fun imageIsCollected(positionImageCollected: Int) {
+        finishCloseDriver = true
         arrayCollectedImage[positionImageCollected] = 1
         collectedImageVisible(arrayCollectedImage)
+        FinishAnimationCongratulation.animationFinishStart(binding.layFragPlayPwpEasy.idRcViewFragPWP,
+            binding.layFragPlayPwpEasy.idViewFinishAnimation, dialogCongratulationDialog, activity as FragmentActivity,colorLine)
         // Открыть драйвер лэйоут что бы показать какую картинку собрал
-        binding.idDrawerLayout.openDrawer(GravityCompat.START)
+        //binding.idDrawerLayout.openDrawer(GravityCompat.START)
         //Log.d("MyLog", "Finish $positionImageCollected")
     }
     //Не используется
@@ -1279,8 +1319,6 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
         }
     }
 
-
-
     fun up(){
         var tempBitmap = arrayBitmap[0]
         arrayBitmap[0] = arrayBitmap[4]
@@ -1438,27 +1476,26 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
     }
 
 
-    fun doAnimation() {
-        val ps = ParticleSystem(activity as FragmentActivity, 100, R.drawable.star_pink, 400L)
-        ps.setStartTime(300000)
-        //ps.setSpeedRange(0.1f, 0.25f)
-        //ps.setScaleRange(0.7f, 1.3f)
-        //ps.setSpeedRange(0.1f, 0.25f)
-        //ps.setAcceleration(0.0001f, 90)
-        //ps.setRotationSpeedRange(90f, 180f)
-        //ps.setFadeOut(200, AccelerateInterpolator())
-        //ps.oneShot(binding.layFragPlayPwpEasy.idLinLineyka, 10)
 
-        //ps.emit(binding.layFragPlayPwpEasy.idLinLineyka, 100)
-        //particlesPerSecond - кол-во звездочек в секунду (Частиц)
-        //maxParticles - кол-во частиц
-        //timeToLive - Время жизни частицын
-        //setSpeedRange - диапазон скоростей(не меняется)
-        //setScaleRange - размер частиц
-        //setAcceleration - ускорение, угол
-        //setRotationSpeedRange - диапазаон вращения
-        //setFadeOut - затухание
+    //Интерфейс который срабатывает в диалоге Да\Нет
+    override fun interfaceYesNoDialog(optionDifficulty: Int) {
+        when (optionDifficulty){
+            Constans.YES -> {
+                binding.idDrawerLayout.closeDrawer(GravityCompat.START)
+                adapterEasy?.updateAdapter(shuffleTempListBitmap(tempListBitmap))
+                dialogYesNoAlert.dismiss()
+            }
+            Constans.NO -> {
+                dialogYesNoAlert.dismiss()
+            }
+        }
     }
+
+
+    override fun interfaceFinishCongratulationDialog() {
+        binding.idDrawerLayout.openDrawer(GravityCompat.START)
+    }
+
 
 
 }

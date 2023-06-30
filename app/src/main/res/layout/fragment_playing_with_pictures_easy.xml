@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/grey_black"
+    android:background="@color/grey_header_3"
     tools:context=".activities.FragmentPlayingWithPicturesEasy">
 
     <!-- TODO: Update blank fragment layout -->
@@ -24,11 +24,21 @@
             android:drawableLeft="@drawable/stars_weather_icon"
             android:gravity="center"
             android:padding="2dp"
+            android:paddingEnd="8dp"
             android:text="12"
             android:textColor="#FBFAFA"
             android:textSize="16sp"
             app:layout_constraintBottom_toTopOf="@+id/id_rcView_FragPWP"
             app:layout_constraintEnd_toEndOf="@+id/id_rcView_FragPWP" />
+
+        <LinearLayout
+            android:id="@+id/id_view_finish_animation"
+            android:layout_width="1dp"
+            android:layout_height="1dp"
+            android:background="@android:color/transparent"
+            android:orientation="vertical"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
             android:id="@+id/id_bt_open_drawer"

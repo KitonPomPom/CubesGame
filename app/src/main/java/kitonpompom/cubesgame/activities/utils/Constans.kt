@@ -22,4 +22,9 @@ object Constans {
     const val EASY = 566
     const val MEDIUM = 567
     const val HARD = 568
+    //Название кнопки откуда запускаем диалог, что бы загрузить нужный View в диалоге
+    const val BT_SHUFFLE = 53
+    const val BT_BACK = 58
+    const val YES = 90
+    const val NO = 91
 }
