@@ -25,6 +25,7 @@
     <string name="no">Нет</string>
     <string name="next">Продолжить</string>
     <string name="congratulation">Поздравляем</string>
+    <string name="use">Использовать</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -38,6 +38,7 @@ import kitonpompom.cubesgame.activities.data.dataArrayBitmap
 import kitonpompom.cubesgame.activities.data.dataArrayPositionAndNumberBitmap
 import kitonpompom.cubesgame.activities.data.dataPosNumBit
 import kitonpompom.cubesgame.activities.dialogs.FinishCongratulationDialog
+import kitonpompom.cubesgame.activities.dialogs.HelpScoreDialog
 import kitonpompom.cubesgame.activities.dialogs.InterfaceFinishCongratulationDialog
 import kitonpompom.cubesgame.activities.dialogs.InterfaceYesNoDialog
 import kitonpompom.cubesgame.activities.dialogs.ProgressDialog
@@ -55,9 +56,11 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
     private val dataModel: DataModel by activityViewModels()
     private var job: Job? = null
     private val dialogYesNo = YesNoDialog(this)
+    private val dialogHelpScore = HelpScoreDialog(this)
     private val dialogCongratulationDialog = FinishCongratulationDialog(this)
     lateinit var dialogYesNoAlert: AlertDialog
     private var finishCloseDriver = false
+    var scoreHelp: Int = 13
     //private val adapterHard: AdapterFragPWPHard? = AdapterFragPWPHard(this)
     //private val adapterMedium: AdapterFragPWPMedium? = AdapterFragPWPMedium(this)
     lateinit var adapterEasy: AdapterFragPWPEasy
@@ -69,6 +72,12 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
     lateinit var image4: ImageView
     lateinit var image5: ImageView
     lateinit var image6: ImageView
+    lateinit var imageBitmap1: Bitmap
+    lateinit var imageBitmap2: Bitmap
+    lateinit var imageBitmap3: Bitmap
+    lateinit var imageBitmap4: Bitmap
+    lateinit var imageBitmap5: Bitmap
+    lateinit var imageBitmap6: Bitmap
     lateinit var linLayImage1: CardView
     lateinit var linLayImage2: CardView
     lateinit var linLayImage3: CardView
@@ -163,6 +172,14 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
                 image5.setImageBitmap(it[4])
                 image6.setImageBitmap(it[5])
 
+                //Инициализируем и передаем битмапы в класс
+                imageBitmap1 = it[0]
+                imageBitmap2 = it[1]
+                imageBitmap3 = it[2]
+                imageBitmap4 = it[3]
+                imageBitmap5 = it[4]
+                imageBitmap6 = it[5]
+
                 //Отрисовываем рамки в зависимости от значений массива arrayCollectedImage
                 collectedImageVisible(arrayCollectedImage)
 
@@ -239,6 +256,9 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
 
 
         binding.layFragPlayPwpEasy2.imBtHelp.setOnClickListener(){
+
+            dialogHelpScore.createHelpScoreDialog(activity as FragmentActivity, imageBitmap1, imageBitmap2,
+                imageBitmap3, imageBitmap4, imageBitmap5, imageBitmap6, scoreHelp, arrayCollectedImage)
             Log.d("MyLog", "Слушатель imBtHelp")
         }
 
