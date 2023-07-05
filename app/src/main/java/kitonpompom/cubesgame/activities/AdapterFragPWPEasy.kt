@@ -1023,6 +1023,11 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
     fun countPlus(count: Int){
         count +1
     }
+
+    fun helpScoreToFrag(){
+        clickScaleItemInterface.helpScore(mainArrayView)
+    }
+
     interface ClickScaleItemInterface{
         fun clickScaleItem( b0 : Bitmap, b1 : Bitmap, b2 : Bitmap, b3 : Bitmap, b4 : Bitmap,
                             b5 : Bitmap, n0: Int, n1: Int, n2: Int, n3: Int, n4: Int, n5: Int,
@@ -1041,6 +1046,8 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
                               coordinateBackStart: List<Float>, positionMove: Int)
 
         fun soundEffect()
+
+        fun helpScore(arrayList : ArrayList<dataArrayBitmap>)
 
         // Если картинка собрана, отправляем с какой позиции кубика картинка собрана,
         // что бы обновить в drawerLayout, и потом подсветить собраную картинку.

@@ -48,6 +48,7 @@ import kitonpompom.cubesgame.databinding.DrawerLayoutPwpEasyBinding
 import kotlinx.coroutines.*
 import java.lang.Math.abs
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScaleItemInterface, InterfaceYesNoDialog, InterfaceFinishCongratulationDialog {
@@ -60,7 +61,9 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
     private val dialogCongratulationDialog = FinishCongratulationDialog(this)
     lateinit var dialogYesNoAlert: AlertDialog
     private var finishCloseDriver = false
-    var scoreHelp: Int = 13
+
+    var scoreHelp: Int = 13 //Очки игрока
+    var mainArrayView = ArrayList<dataArrayBitmap>() //Массив из адаптера со всеми данными по картинкам на экране
     //private val adapterHard: AdapterFragPWPHard? = AdapterFragPWPHard(this)
     //private val adapterMedium: AdapterFragPWPMedium? = AdapterFragPWPMedium(this)
     lateinit var adapterEasy: AdapterFragPWPEasy
@@ -256,9 +259,10 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
 
 
         binding.layFragPlayPwpEasy2.imBtHelp.setOnClickListener(){
-
-            dialogHelpScore.createHelpScoreDialog(activity as FragmentActivity, imageBitmap1, imageBitmap2,
-                imageBitmap3, imageBitmap4, imageBitmap5, imageBitmap6, scoreHelp, arrayCollectedImage)
+            //Запускаем функцию в адаптере, которая через интерфейс запускает функцию helpScore
+            //который передает весь масиив со всеми данными ArrayList<dataArrayBitmap>()
+            // на наш фрагмен где мы и запускаем диалог выбора helpScore
+            adapterEasy.helpScoreToFrag()
             Log.d("MyLog", "Слушатель imBtHelp")
         }
 
@@ -1044,6 +1048,11 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
 
     override fun soundEffect() {
         mediaPlayerCubeFalling.start()
+    }
+
+    override fun helpScore(mainArrayView: ArrayList<dataArrayBitmap>) {
+        dialogHelpScore.createHelpScoreDialog(activity as FragmentActivity, imageBitmap1, imageBitmap2,
+            imageBitmap3, imageBitmap4, imageBitmap5, imageBitmap6, scoreHelp, arrayCollectedImage, mainArrayView)
     }
 
     //После обновления позиции в адаптере происходит проверка собрана картинка, если да то сюда приходит позиция, какую картинку собрали
