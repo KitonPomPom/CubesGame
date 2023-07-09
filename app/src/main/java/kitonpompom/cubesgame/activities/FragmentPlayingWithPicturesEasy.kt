@@ -22,6 +22,7 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.menu.MenuView.ItemView
 import androidx.cardview.widget.CardView
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
@@ -40,6 +41,7 @@ import kitonpompom.cubesgame.activities.data.dataPosNumBit
 import kitonpompom.cubesgame.activities.dialogs.FinishCongratulationDialog
 import kitonpompom.cubesgame.activities.dialogs.HelpScoreDialog
 import kitonpompom.cubesgame.activities.dialogs.InterfaceFinishCongratulationDialog
+import kitonpompom.cubesgame.activities.dialogs.InterfaceHelpScoreDialog
 import kitonpompom.cubesgame.activities.dialogs.InterfaceYesNoDialog
 import kitonpompom.cubesgame.activities.dialogs.ProgressDialog
 import kitonpompom.cubesgame.activities.dialogs.YesNoDialog
@@ -51,7 +53,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScaleItemInterface, InterfaceYesNoDialog, InterfaceFinishCongratulationDialog {
+class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScaleItemInterface, InterfaceYesNoDialog, InterfaceFinishCongratulationDialog, InterfaceHelpScoreDialog {
 
     lateinit var binding: DrawerLayoutPwpEasyBinding
     private val dataModel: DataModel by activityViewModels()
@@ -62,7 +64,7 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
     lateinit var dialogYesNoAlert: AlertDialog
     private var finishCloseDriver = false
 
-    var scoreHelp: Int = 13 //Очки игрока
+    var scoreHelp: Int = 16 //Очки игрока
     var mainArrayView = ArrayList<dataArrayBitmap>() //Массив из адаптера со всеми данными по картинкам на экране
     //private val adapterHard: AdapterFragPWPHard? = AdapterFragPWPHard(this)
     //private val adapterMedium: AdapterFragPWPMedium? = AdapterFragPWPMedium(this)
@@ -226,8 +228,15 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
         }
 
         binding.layFragPlayPwpEasy.idBtOpenDrawer.setOnClickListener(){
-            FinishAnimationCongratulation.animationFinishStart(binding.layFragPlayPwpEasy.idRcViewFragPWP,
-            binding.layFragPlayPwpEasy.idViewFinishAnimation, dialogCongratulationDialog, activity as FragmentActivity, colorLine)
+            val fr =  binding.layFragPlayPwpEasy.idRcViewFragPWP.findViewHolderForAdapterPosition(0)
+            val itemOne = fr?.itemView?.findViewById<ImageView>(R.id.id_item_play_with_pictures_one)
+            val itemView = fr?.itemView
+            if (itemView != null  && itemOne != null) {
+                adapterEasy.helpScore(0, itemView, itemOne)
+            }
+
+            //FinishAnimationCongratulation.animationFinishStart(binding.layFragPlayPwpEasy.idRcViewFragPWP,
+            //binding.layFragPlayPwpEasy.idViewFinishAnimation, dialogCongratulationDialog, activity as FragmentActivity, colorLine)
 
         }
 
@@ -324,7 +333,7 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
                     if (clickMoveAdapter && arrayBitmap.isNotEmpty() && noClick.clickable && noClickBack.clickable  && !openItemScale) {
                         x2 = eventRc.x
                         y2 = eventRc.y
-                        //Если позиция над которой отпустили кубик не равна 144 ???
+                        //Если позиция над которой отпустили кубик не равна 15 ???
                         if (MoveItemScaleTwo.moveItemRcEasy(x2, y2, viewRc) != 15) {
                             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
                                 val rcViewX = binding.layFragPlayPwpEasy.idRcViewFragPWP.x
@@ -486,19 +495,27 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
                         var deltaY: Float = y2 - y1
                         if (abs(deltaX) > minDistance && noReplaySwipe){
                             if(x2 > x1){
-                                right()
+                                DirectionRotationCubeManager.right(arrayBitmap, arrayNumber, arrayPosition,
+                                    binding.layFragPlayPwpEasy.idImViewScale, binding.layFragPlayPwpEasy.idImViewScale2,
+                                    durationAnimationCubeSpeed)
                                 noReplaySwipe = false
                             }else {
-                                left()
+                                DirectionRotationCubeManager.left(arrayBitmap, arrayNumber, arrayPosition,
+                                    binding.layFragPlayPwpEasy.idImViewScale, binding.layFragPlayPwpEasy.idImViewScale2,
+                                    durationAnimationCubeSpeed)
                                 noReplaySwipe = false
                             }
                         }
                         if (abs(deltaY) > minDistanceUpDown && noReplaySwipe){
                             if(y2 > y1){
-                                down()
+                                DirectionRotationCubeManager.down(arrayBitmap, arrayNumber, arrayPosition,
+                                    binding.layFragPlayPwpEasy.idImViewScale, binding.layFragPlayPwpEasy.idImViewScale2,
+                                    durationAnimationCubeSpeed)
                                 noReplaySwipe = false
                             }else {
-                                up()
+                                DirectionRotationCubeManager.up(arrayBitmap, arrayNumber, arrayPosition,
+                                    binding.layFragPlayPwpEasy.idImViewScale, binding.layFragPlayPwpEasy.idImViewScale2,
+                                    durationAnimationCubeSpeed)
                                 noReplaySwipe = false
                             }
                         }
@@ -546,19 +563,27 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
                         var deltaY: Float = y2 - y1
                         if (abs(deltaX) > minDistance && noReplaySwipe){
                             if(x2 > x1){
-                                right()
+                                DirectionRotationCubeManager.right(arrayBitmap, arrayNumber, arrayPosition,
+                                    binding.layFragPlayPwpEasy.idImViewScale, binding.layFragPlayPwpEasy.idImViewScale2,
+                                    durationAnimationCubeSpeed)
                                 noReplaySwipe = false
                             }else {
-                                left()
+                                DirectionRotationCubeManager.left(arrayBitmap, arrayNumber, arrayPosition,
+                                    binding.layFragPlayPwpEasy.idImViewScale, binding.layFragPlayPwpEasy.idImViewScale2,
+                                    durationAnimationCubeSpeed)
                                 noReplaySwipe = false
                             }
                         }
                         if (abs(deltaY) > minDistanceUpDown && noReplaySwipe){
                             if(y2 > y1){
-                                down()
+                                DirectionRotationCubeManager.down(arrayBitmap, arrayNumber, arrayPosition,
+                                    binding.layFragPlayPwpEasy.idImViewScale, binding.layFragPlayPwpEasy.idImViewScale2,
+                                    durationAnimationCubeSpeed)
                                 noReplaySwipe = false
                             }else {
-                                up()
+                                DirectionRotationCubeManager.up(arrayBitmap, arrayNumber, arrayPosition,
+                                    binding.layFragPlayPwpEasy.idImViewScale, binding.layFragPlayPwpEasy.idImViewScale2,
+                                    durationAnimationCubeSpeed)
                                 noReplaySwipe = false
                             }
                         }
@@ -1348,163 +1373,6 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
         }
     }
 
-    fun up(){
-        var tempBitmap = arrayBitmap[0]
-        arrayBitmap[0] = arrayBitmap[4]
-        arrayBitmap[4] = arrayBitmap[5]
-        arrayBitmap[5] = arrayBitmap[3]
-        arrayBitmap[3] = tempBitmap
-        var tempNumber = arrayNumber[0]
-        arrayNumber[0] = arrayNumber[4]
-        arrayNumber[4] = arrayNumber[5]
-        arrayNumber[5] = arrayNumber[3]
-        arrayNumber[3] = tempNumber
-        var tempPosition = arrayPosition[0]
-        arrayPosition[0] = arrayPosition[4]
-        arrayPosition[4] = arrayPosition[5]
-        arrayPosition[5] = arrayPosition[3]
-        arrayPosition[3] = tempPosition
-        binding.layFragPlayPwpEasy.idImViewScale.scaleX = 1.0f
-        binding.layFragPlayPwpEasy.idImViewScale.scaleY = 1.0f
-        binding.layFragPlayPwpEasy.idImViewScale2.scaleX = 1.0f
-        binding.layFragPlayPwpEasy.idImViewScale2.scaleY = 1.0f
-        if(binding.layFragPlayPwpEasy.idImViewScale.visibility == View.VISIBLE) {
-            binding.layFragPlayPwpEasy.idImViewScale2.setImageBitmap(arrayBitmap[0])
-            binding.layFragPlayPwpEasy.idImViewScale2.visibility = View.VISIBLE
-            binding.layFragPlayPwpEasy.idImViewScale.startAnimation(CubeAnimation.create(
-                CubeAnimation.UP, false, durationAnimationCubeSpeed))
-            binding.layFragPlayPwpEasy.idImViewScale2.startAnimation(CubeAnimation.create(
-                CubeAnimation.UP, true, durationAnimationCubeSpeed))
-            binding.layFragPlayPwpEasy.idImViewScale.visibility = View.GONE
-        }else{
-            binding.layFragPlayPwpEasy.idImViewScale.setImageBitmap(arrayBitmap[0])
-            binding.layFragPlayPwpEasy.idImViewScale.visibility = View.VISIBLE
-            binding.layFragPlayPwpEasy.idImViewScale2.startAnimation(CubeAnimation.create(
-                CubeAnimation.UP, false, durationAnimationCubeSpeed))
-            binding.layFragPlayPwpEasy.idImViewScale.startAnimation(CubeAnimation.create(
-                CubeAnimation.UP, true, durationAnimationCubeSpeed))
-            binding.layFragPlayPwpEasy.idImViewScale2.visibility = View.GONE
-        }
-    }
-
-    fun down(){
-        var tempBitmap = arrayBitmap[0]
-        arrayBitmap[0] = arrayBitmap[3]
-        arrayBitmap[3] = arrayBitmap[5]
-        arrayBitmap[5] = arrayBitmap[4]
-        arrayBitmap[4] = tempBitmap
-        var tempNumber = arrayNumber[0]
-        arrayNumber[0] = arrayNumber[3]
-        arrayNumber[3] = arrayNumber[5]
-        arrayNumber[5] = arrayNumber[4]
-        arrayNumber[4] = tempNumber
-        var tempPosition = arrayPosition[0]
-        arrayPosition[0] = arrayPosition[3]
-        arrayPosition[3] = arrayPosition[5]
-        arrayPosition[5] = arrayPosition[4]
-        arrayPosition[4] = tempPosition
-        binding.layFragPlayPwpEasy.idImViewScale.scaleX = 1.0f
-        binding.layFragPlayPwpEasy.idImViewScale.scaleY = 1.0f
-        binding.layFragPlayPwpEasy.idImViewScale2.scaleX = 1.0f
-        binding.layFragPlayPwpEasy.idImViewScale2.scaleY = 1.0f
-        if(binding.layFragPlayPwpEasy.idImViewScale.visibility == View.VISIBLE) {
-            binding.layFragPlayPwpEasy.idImViewScale2.setImageBitmap(arrayBitmap[0])
-            binding.layFragPlayPwpEasy.idImViewScale2.visibility = View.VISIBLE
-            binding.layFragPlayPwpEasy.idImViewScale.startAnimation(CubeAnimation.create(
-                CubeAnimation.DOWN, false, durationAnimationCubeSpeed))
-            binding.layFragPlayPwpEasy.idImViewScale2.startAnimation(CubeAnimation.create(
-                CubeAnimation.DOWN, true, durationAnimationCubeSpeed))
-            binding.layFragPlayPwpEasy.idImViewScale.visibility = View.GONE
-        }else{
-            binding.layFragPlayPwpEasy.idImViewScale.setImageBitmap(arrayBitmap[0])
-            binding.layFragPlayPwpEasy.idImViewScale.visibility = View.VISIBLE
-            binding.layFragPlayPwpEasy.idImViewScale2.startAnimation(CubeAnimation.create(
-                CubeAnimation.DOWN, false, durationAnimationCubeSpeed ))
-            binding.layFragPlayPwpEasy.idImViewScale.startAnimation(CubeAnimation.create(
-                CubeAnimation.DOWN, true, durationAnimationCubeSpeed))
-            binding.layFragPlayPwpEasy.idImViewScale2.visibility = View.GONE
-        }
-    }
-
-    fun right(){
-        var tempBitmap = arrayBitmap[0]
-        arrayBitmap[0] = arrayBitmap[1]
-        arrayBitmap[1] = arrayBitmap[5]
-        arrayBitmap[5] = arrayBitmap[2]
-        arrayBitmap[2] = tempBitmap
-        var tempNumber = arrayNumber[0]
-        arrayNumber[0] = arrayNumber[1]
-        arrayNumber[1] = arrayNumber[5]
-        arrayNumber[5] = arrayNumber[2]
-        arrayNumber[2] = tempNumber
-        var tempPosition = arrayPosition[0]
-        arrayPosition[0] = arrayPosition[1]
-        arrayPosition[1] = arrayPosition[5]
-        arrayPosition[5] = arrayPosition[2]
-        arrayPosition[2] = tempPosition
-        binding.layFragPlayPwpEasy.idImViewScale.scaleX = 1.0f
-        binding.layFragPlayPwpEasy.idImViewScale.scaleY = 1.0f
-        binding.layFragPlayPwpEasy.idImViewScale2.scaleX = 1.0f
-        binding.layFragPlayPwpEasy.idImViewScale2.scaleY = 1.0f
-        if(binding.layFragPlayPwpEasy.idImViewScale.visibility == View.VISIBLE) {
-            binding.layFragPlayPwpEasy.idImViewScale2.setImageBitmap(arrayBitmap[0])
-            binding.layFragPlayPwpEasy.idImViewScale2.visibility = View.VISIBLE
-            binding.layFragPlayPwpEasy.idImViewScale.startAnimation(CubeAnimation.create(
-                CubeAnimation.RIGHT, false, durationAnimationCubeSpeed ))
-            binding.layFragPlayPwpEasy.idImViewScale2.startAnimation(CubeAnimation.create(
-                CubeAnimation.RIGHT, true, durationAnimationCubeSpeed))
-            binding.layFragPlayPwpEasy.idImViewScale.visibility = View.GONE
-        }else{
-            binding.layFragPlayPwpEasy.idImViewScale.setImageBitmap(arrayBitmap[0])
-            binding.layFragPlayPwpEasy.idImViewScale.visibility = View.VISIBLE
-            binding.layFragPlayPwpEasy.idImViewScale2.startAnimation(CubeAnimation.create(
-                CubeAnimation.RIGHT, false, durationAnimationCubeSpeed))
-            binding.layFragPlayPwpEasy.idImViewScale.startAnimation(CubeAnimation.create(
-                CubeAnimation.RIGHT, true, durationAnimationCubeSpeed))
-            binding.layFragPlayPwpEasy.idImViewScale2.visibility = View.GONE
-        }
-    }
-
-    fun left(){
-        var tempBitmap = arrayBitmap[0]
-        arrayBitmap[0] = arrayBitmap[2]
-        arrayBitmap[2] = arrayBitmap[5]
-        arrayBitmap[5] = arrayBitmap[1]
-        arrayBitmap[1] = tempBitmap
-        var tempNumber = arrayNumber[0]
-        arrayNumber[0] = arrayNumber[2]
-        arrayNumber[2] = arrayNumber[5]
-        arrayNumber[5] = arrayNumber[1]
-        arrayNumber[1] = tempNumber
-        var tempPosition = arrayPosition[0]
-        arrayPosition[0] = arrayPosition[2]
-        arrayPosition[2] = arrayPosition[5]
-        arrayPosition[5] = arrayPosition[1]
-        arrayPosition[1] = tempPosition
-        binding.layFragPlayPwpEasy.idImViewScale.scaleX = 1.0f
-        binding.layFragPlayPwpEasy.idImViewScale.scaleY = 1.0f
-        binding.layFragPlayPwpEasy.idImViewScale2.scaleX = 1.0f
-        binding.layFragPlayPwpEasy.idImViewScale2.scaleY = 1.0f
-        if(binding.layFragPlayPwpEasy.idImViewScale.visibility == View.VISIBLE) {
-            binding.layFragPlayPwpEasy.idImViewScale2.setImageBitmap(arrayBitmap[0])
-            binding.layFragPlayPwpEasy.idImViewScale2.visibility = View.VISIBLE
-            binding.layFragPlayPwpEasy.idImViewScale.startAnimation(CubeAnimation.create(
-                CubeAnimation.LEFT, false, durationAnimationCubeSpeed))
-            binding.layFragPlayPwpEasy.idImViewScale2.startAnimation(CubeAnimation.create
-                (CubeAnimation.LEFT, true, durationAnimationCubeSpeed))
-            binding.layFragPlayPwpEasy.idImViewScale.visibility = View.GONE
-        }else{
-            binding.layFragPlayPwpEasy.idImViewScale.setImageBitmap(arrayBitmap[0])
-            binding.layFragPlayPwpEasy.idImViewScale.visibility = View.VISIBLE
-            binding.layFragPlayPwpEasy.idImViewScale2.startAnimation(CubeAnimation.create(
-                CubeAnimation.LEFT, false, durationAnimationCubeSpeed))
-            binding.layFragPlayPwpEasy.idImViewScale.startAnimation(CubeAnimation.create(
-                CubeAnimation.LEFT, true, durationAnimationCubeSpeed))
-            binding.layFragPlayPwpEasy.idImViewScale2.visibility = View.GONE
-        }
-    }
-
-
 
     //Интерфейс который срабатывает в диалоге Да\Нет
     override fun interfaceYesNoDialog(optionDifficulty: Int) {
@@ -1525,6 +1393,9 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
         binding.idDrawerLayout.openDrawer(GravityCompat.START)
     }
 
+    override fun interfaceHelpScoreDialog(selectImage: Int, openImage: Int) {
+
+    }
 
 
 }

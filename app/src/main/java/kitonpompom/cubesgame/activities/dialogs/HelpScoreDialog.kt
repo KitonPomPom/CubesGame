@@ -15,9 +15,9 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import kitonpompom.cubesgame.R
 import kitonpompom.cubesgame.activities.data.dataArrayBitmap
 import kitonpompom.cubesgame.databinding.DialogHelpPwpBinding
-import java.util.ArrayList
+import kotlin.collections.ArrayList
 
-class HelpScoreDialog(private val interfaceFinishCongratulationDialog: InterfaceFinishCongratulationDialog) {
+class HelpScoreDialog(private val interfaceHelpScoreDialog: InterfaceHelpScoreDialog) {
 
     lateinit var view: ConstraintLayout
 
@@ -36,6 +36,11 @@ class HelpScoreDialog(private val interfaceFinishCongratulationDialog: Interface
         var openImage5: Int = 0
         var openImage6: Int = 0
 
+        //Максимальное кол-во кубиков которое можно повернуть выделеной картинки
+        var maxOpenImage: Int = 0
+        //Выбраная картинка для передачи в интерфейс
+        var selectImage: Int = 1
+
         val scoreText = view.findViewById<TextView>(R.id.id_tv_score_help)
         val btUp = view.findViewById<ImageButton>(R.id.id_bt_up)
         val btDown = view.findViewById<ImageButton>(R.id.id_bt_down)
@@ -53,6 +58,8 @@ class HelpScoreDialog(private val interfaceFinishCongratulationDialog: Interface
         val cardSelectImage4 = view.findViewById<CardView>(R.id.card_select_image4)
         val cardSelectImage5 = view.findViewById<CardView>(R.id.card_select_image5)
         val cardSelectImage6 = view.findViewById<CardView>(R.id.card_select_image6)
+        val cardSelectImageArray: Array<CardView> = arrayOf(cardSelectImage1, cardSelectImage2, cardSelectImage3,
+            cardSelectImage4, cardSelectImage5, cardSelectImage6)
         val imView1 = view.findViewById<ImageView>(R.id.imageV1)
         val imView2 = view.findViewById<ImageView>(R.id.imageV2)
         val imView3 = view.findViewById<ImageView>(R.id.imageV3)
@@ -66,6 +73,11 @@ class HelpScoreDialog(private val interfaceFinishCongratulationDialog: Interface
         imView4.setImageBitmap(image4)
         imView5.setImageBitmap(image5)
         imView6.setImageBitmap(image6)
+
+        //arrayCollected[0] = 1
+        //arrayCollected[1] = 1
+        arrayCollected[2] = 1
+        arrayCollected[3] = 1
 
         if (arrayCollected[0] == 1) linear1.setCardBackgroundColor(act.getColor(R.color.green_main)) else linear1.setCardBackgroundColor(act.getColor(R.color.grey))
         if (arrayCollected[1] == 1) linear2.setCardBackgroundColor(act.getColor(R.color.green_main)) else linear2.setCardBackgroundColor(act.getColor(R.color.grey))
@@ -85,33 +97,157 @@ class HelpScoreDialog(private val interfaceFinishCongratulationDialog: Interface
             }
         }
 
-        Log.d("MyLog", "1:$openImage1,2:$openImage2,3:$openImage3,4:$openImage4," +
-                "5:$openImage5,6:$openImage6")
 
-        if (arrayCollected[0] == 0){
-            cardSelectImage1.visibility = View.GONE
-            scoreText.text = (openImage1).toString()
-        }else{
-            if (arrayCollected[1] == 0){
-                cardSelectImage2.visibility = View.GONE
-            }else{
-                if (arrayCollected[2] == 0){
-                    cardSelectImage3.visibility = View.GONE
+
+        var openImageArray: ArrayList<Int> = arrayListOf()
+        openImageArray.add(mainArrayView.size - openImage1)
+        openImageArray.add(mainArrayView.size - openImage2)
+        openImageArray.add(mainArrayView.size - openImage3)
+        openImageArray.add(mainArrayView.size - openImage4)
+        openImageArray.add(mainArrayView.size - openImage5)
+        openImageArray.add(mainArrayView.size - openImage6)
+
+        Log.d("MyLog", "1:${mainArrayView.size}")
+
+        //Выбираем какая картинка будет выделена автоматически при запуске
+        for (i in 0 .. arrayCollected.size){
+            if (arrayCollected[i] == 0){
+                cardSelectImageArray[i].visibility = View.GONE
+                maxOpenImage = openImageArray[i]
+                selectImage = i
+                if(score < openImageArray[i]){
+                    scoreText.text = score.toString()
                 }else{
-                    if (arrayCollected[3] == 0){
-                        cardSelectImage4.visibility = View.GONE
-                    }else{
-                        if (arrayCollected[4] == 0){
-                            cardSelectImage5.visibility = View.GONE
-                        }else{
-                            if (arrayCollected[5] == 0){
-                                cardSelectImage6.visibility = View.GONE
-                            }
-                        }
-                    }
+                    scoreText.text = openImageArray[i].toString()
+                }
+                break
+            }
+        }
+
+        cardSelectImage1.setOnClickListener(){
+            if (arrayCollected[0] == 0){
+                cardSelectImage1.visibility = View.GONE
+                cardSelectImage2.visibility = View.VISIBLE
+                cardSelectImage3.visibility = View.VISIBLE
+                cardSelectImage4.visibility = View.VISIBLE
+                cardSelectImage5.visibility = View.VISIBLE
+                cardSelectImage6.visibility = View.VISIBLE
+                maxOpenImage = openImageArray[0]
+                selectImage = 0
+                if(score < openImageArray[0]){
+                    scoreText.text = score.toString()
+                }else{
+                    scoreText.text = openImageArray[0].toString()
                 }
             }
         }
+
+        cardSelectImage2.setOnClickListener(){
+            if (arrayCollected[1] == 0){
+                cardSelectImage1.visibility = View.VISIBLE
+                cardSelectImage2.visibility = View.GONE
+                cardSelectImage3.visibility = View.VISIBLE
+                cardSelectImage4.visibility = View.VISIBLE
+                cardSelectImage5.visibility = View.VISIBLE
+                cardSelectImage6.visibility = View.VISIBLE
+                maxOpenImage = openImageArray[1]
+                selectImage = 1
+                if(score < openImageArray[1]){
+                    scoreText.text = score.toString()
+                }else{
+                    scoreText.text = openImageArray[1].toString()
+                }
+            }
+        }
+
+        cardSelectImage3.setOnClickListener(){
+            if (arrayCollected[2] == 0){
+                cardSelectImage1.visibility = View.VISIBLE
+                cardSelectImage2.visibility = View.VISIBLE
+                cardSelectImage3.visibility = View.GONE
+                cardSelectImage4.visibility = View.VISIBLE
+                cardSelectImage5.visibility = View.VISIBLE
+                cardSelectImage6.visibility = View.VISIBLE
+                maxOpenImage = openImageArray[2]
+                selectImage = 2
+                if(score < openImageArray[2]){
+                    scoreText.text = score.toString()
+                }else{
+                    scoreText.text = openImageArray[2].toString()
+                }
+            }
+        }
+
+        cardSelectImage4.setOnClickListener(){
+            if (arrayCollected[3] == 0){
+                cardSelectImage1.visibility = View.VISIBLE
+                cardSelectImage2.visibility = View.VISIBLE
+                cardSelectImage3.visibility = View.VISIBLE
+                cardSelectImage4.visibility = View.GONE
+                cardSelectImage5.visibility = View.VISIBLE
+                cardSelectImage6.visibility = View.VISIBLE
+                maxOpenImage = openImageArray[3]
+                selectImage = 3
+                if(score < openImageArray[3]){
+                    scoreText.text = score.toString()
+                }else{
+                    scoreText.text = openImageArray[3].toString()
+                }
+            }
+        }
+
+        cardSelectImage5.setOnClickListener(){
+            if (arrayCollected[4] == 0){
+                cardSelectImage1.visibility = View.VISIBLE
+                cardSelectImage2.visibility = View.VISIBLE
+                cardSelectImage3.visibility = View.VISIBLE
+                cardSelectImage4.visibility = View.VISIBLE
+                cardSelectImage5.visibility = View.GONE
+                cardSelectImage6.visibility = View.VISIBLE
+                maxOpenImage = openImageArray[4]
+                selectImage = 4
+                if(score < openImageArray[4]){
+                    scoreText.text = score.toString()
+                }else{
+                    scoreText.text = openImageArray[4].toString()
+                }
+            }
+        }
+
+        cardSelectImage6.setOnClickListener(){
+            if (arrayCollected[5] == 0){
+                cardSelectImage1.visibility = View.VISIBLE
+                cardSelectImage2.visibility = View.VISIBLE
+                cardSelectImage3.visibility = View.VISIBLE
+                cardSelectImage4.visibility = View.VISIBLE
+                cardSelectImage5.visibility = View.VISIBLE
+                cardSelectImage6.visibility = View.GONE
+                maxOpenImage = openImageArray[5]
+                selectImage = 5
+                if(score < openImageArray[5]){
+                    scoreText.text = score.toString()
+                }else{
+                    scoreText.text = openImageArray[5].toString()
+                }
+            }
+        }
+
+        btUp.setOnClickListener(){
+            var scoreTextTemp = scoreText.text.toString().toInt()
+            if (scoreTextTemp < maxOpenImage){
+                scoreTextTemp++
+                scoreText.text = scoreTextTemp.toString()
+            }
+        }
+
+        btDown.setOnClickListener(){
+            var scoreTextTemp = scoreText.text.toString().toInt()
+            if (scoreTextTemp > 0){
+                scoreTextTemp--
+                scoreText.text = scoreTextTemp.toString()
+            }
+        }
+
 
         //textVTime.text = "--:--:--"
         //textVScore.text = "16"
@@ -122,7 +258,13 @@ class HelpScoreDialog(private val interfaceFinishCongratulationDialog: Interface
         dialog.setCancelable(false)
         dialog.show()
         //Log.d("MyLog", "dialog 4 $dialog")
+
+        btCancel.setOnClickListener(){
+            dialog.dismiss()
+        }
         btUse.setOnClickListener() {
+            var tempScore = scoreText.text.toString().toInt()
+            interfaceHelpScoreDialog.interfaceHelpScoreDialog(selectImage ,tempScore)
             //interfaceFinishCongratulationDialog.interfaceFinishCongratulationDialog()
             dialog.dismiss()
         }

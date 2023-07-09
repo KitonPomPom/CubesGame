@@ -57,6 +57,7 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
         return mainArrayView.size
     }
 
+    //Не используем
     override fun onMove(startPos: Int, targetPos: Int) {
         val targetItem = mainArrayView[targetPos]
         mainArrayView[targetPos] = mainArrayView[startPos]
@@ -96,6 +97,7 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
             var actionMoveCheck = false
             var actionNoClickOnTouchIfTouchOnMove = false
 
+            //Проверяем наличие линий и включаем анимацию
             if (item.arrayLine[0] == 1) {
                 lineLeft.visibility = View.VISIBLE
             } else {
@@ -214,8 +216,7 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
                                                 item.arrayPosition[0], item.arrayPosition[1],
                                                 item.arrayPosition[2], item.arrayPosition[3],
                                                 item.arrayPosition[4], item.arrayPosition[5],
-                                                adapterPosition, itemView, imItemOne
-                                            )
+                                                adapterPosition, itemView, imItemOne)
                                         }else{
                                                 clickScaleItemInterface.actionMoveAndActionUP(
                                                     adapterPosition
@@ -229,6 +230,8 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
                     return@setOnTouchListener false
                 }
         }
+
+
 
         //Анимация звездочек при исчезновении линий
         fun doAnimation(act: FragmentActivity, view: View, colorAnimation: Boolean) {
@@ -255,6 +258,21 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
             //setRotationSpeedRange - диапазаон вращения
             //setFadeOut - затухание
         }
+    }
+
+    fun helpScore(position:Int, itemView: View, imItemOne: ImageView){
+        clickScaleItemInterface.clickScaleItem(
+            mainArrayView[position].arrayBitmap[0], mainArrayView[position].arrayBitmap[1],
+            mainArrayView[position].arrayBitmap[2], mainArrayView[position].arrayBitmap[3],
+            mainArrayView[position].arrayBitmap[4], mainArrayView[position].arrayBitmap[5],
+            mainArrayView[position].arrayNumber[0], mainArrayView[position].arrayNumber[1],
+            mainArrayView[position].arrayNumber[2], mainArrayView[position].arrayNumber[3],
+            mainArrayView[position].arrayNumber[4], mainArrayView[position].arrayNumber[5],
+            mainArrayView[position].arrayPosition[0], mainArrayView[position].arrayPosition[1],
+            mainArrayView[position].arrayPosition[2], mainArrayView[position].arrayPosition[3],
+            mainArrayView[position].arrayPosition[4], mainArrayView[position].arrayPosition[5],
+            position, itemView, imItemOne)
+
     }
 
     //Обновляем адаптер когда первый раз рисуется
