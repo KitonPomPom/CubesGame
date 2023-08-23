@@ -18,16 +18,12 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.view.menu.MenuView.ItemView
 import androidx.cardview.widget.CardView
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
 import androidx.core.view.GravityCompat
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.drawerlayout.widget.DrawerLayout.DrawerListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -94,7 +90,7 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
     var arrayBitmap = ArrayList<Bitmap>()//Массив с картинками
     var arrayNumber = ArrayList<Int>()//Массив с номерами картинок на кубике
     var arrayPosition = ArrayList<Int>()//Массив с изначальными позициями картинок на кубике
-    var arrayCollectedImage = ArrayList<Int>()//Массив с значениями картинок которые собрали, для отображения в драйвер лэоут
+    var arrayCollectedImage = ArrayList<Int>()//Массив с значениями картинок которые собрали(рамки), для отображения в драйвер лэоут
     var arrayBitmapMoveReturn = ArrayList<Bitmap>()//Массив с картинками
     var arrayNumberMoveReturn = ArrayList<Int>()//Массив с номерами на кубике
     var arrayPositionMoveReturn = ArrayList<Int>()//Массив с изначальными позициями картинок на кубике
@@ -228,12 +224,17 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
         }
 
         binding.layFragPlayPwpEasy.idBtOpenDrawer.setOnClickListener(){
-            val fr =  binding.layFragPlayPwpEasy.idRcViewFragPWP.findViewHolderForAdapterPosition(0)
+            binding.idDrawerLayout.openDrawer(GravityCompat.START)
+            /*val fr =  binding.layFragPlayPwpEasy.idRcViewFragPWP.findViewHolderForAdapterPosition(0)
             val itemOne = fr?.itemView?.findViewById<ImageView>(R.id.id_item_play_with_pictures_one)
             val itemView = fr?.itemView
+            val adapter = binding.layFragPlayPwpEasy.idRcViewFragPWP.adapter as AdapterFragPWPEasy
             if (itemView != null  && itemOne != null) {
-                adapterEasy.helpScore(0, itemView, itemOne)
-            }
+                adapter.helpScore(0, itemView, itemOne, Constans.HELPSCORESTART)
+            }*/
+
+            //startDirectionRotationCube(7, 4, mainArrayView,
+            //binding, adapterEasy)
 
             //FinishAnimationCongratulation.animationFinishStart(binding.layFragPlayPwpEasy.idRcViewFragPWP,
             //binding.layFragPlayPwpEasy.idViewFinishAnimation, dialogCongratulationDialog, activity as FragmentActivity, colorLine)
@@ -275,6 +276,10 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
             Log.d("MyLog", "Слушатель imBtHelp")
         }
 
+        binding.layFragPlayPwpEasy.textView4.setOnClickListener(){
+            Log.d("MyLog", "Слушатель textView4")
+        }
+
         //Слушатель действия на драйвер лэоут (Закрытие\открытие)
         binding.idDrawerLayout.addDrawerListener(object : DrawerListener {
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
@@ -295,7 +300,7 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
 
         //слушатель нажатия на всю РцВью
         binding.layFragPlayPwpEasy.idRcViewFragPWP.setOnTouchListener(){ viewRc, eventRc ->
-            Log.d("MyLog", "Слушатель RCView")
+            //Log.d("MyLog", "Слушатель RCView")
             when (eventRc.action) {
                 MotionEvent.ACTION_DOWN -> { //Срабатывает когда коснулись экрана
                     //x1 = eventRc.x //Позиция по оси Х куда нажали
@@ -495,27 +500,27 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
                         var deltaY: Float = y2 - y1
                         if (abs(deltaX) > minDistance && noReplaySwipe){
                             if(x2 > x1){
-                                DirectionRotationCubeManager.right(arrayBitmap, arrayNumber, arrayPosition,
+                                DirectionRotationCubeManager.right(0, arrayBitmap, arrayNumber, arrayPosition,
                                     binding.layFragPlayPwpEasy.idImViewScale, binding.layFragPlayPwpEasy.idImViewScale2,
-                                    durationAnimationCubeSpeed)
+                                    durationAnimationCubeSpeed, Constans.NO_HELPSCORESTART, adapterEasy, binding, 999, 999)
                                 noReplaySwipe = false
                             }else {
-                                DirectionRotationCubeManager.left(arrayBitmap, arrayNumber, arrayPosition,
+                                DirectionRotationCubeManager.left(0, arrayBitmap, arrayNumber, arrayPosition,
                                     binding.layFragPlayPwpEasy.idImViewScale, binding.layFragPlayPwpEasy.idImViewScale2,
-                                    durationAnimationCubeSpeed)
+                                    durationAnimationCubeSpeed, Constans.NO_HELPSCORESTART, adapterEasy, binding, 999, 999)
                                 noReplaySwipe = false
                             }
                         }
                         if (abs(deltaY) > minDistanceUpDown && noReplaySwipe){
                             if(y2 > y1){
-                                DirectionRotationCubeManager.down(arrayBitmap, arrayNumber, arrayPosition,
+                                DirectionRotationCubeManager.down(0, arrayBitmap, arrayNumber, arrayPosition,
                                     binding.layFragPlayPwpEasy.idImViewScale, binding.layFragPlayPwpEasy.idImViewScale2,
-                                    durationAnimationCubeSpeed)
+                                    durationAnimationCubeSpeed, Constans.NO_HELPSCORESTART, adapterEasy, binding, 999, 99)
                                 noReplaySwipe = false
                             }else {
-                                DirectionRotationCubeManager.up(arrayBitmap, arrayNumber, arrayPosition,
+                                DirectionRotationCubeManager.up(0, arrayBitmap, arrayNumber, arrayPosition,
                                     binding.layFragPlayPwpEasy.idImViewScale, binding.layFragPlayPwpEasy.idImViewScale2,
-                                    durationAnimationCubeSpeed)
+                                    durationAnimationCubeSpeed, Constans.NO_HELPSCORESTART, adapterEasy, binding, 999, 999)
                                 noReplaySwipe = false
                             }
                         }
@@ -532,7 +537,7 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
                                 arrayBitmap[4], arrayBitmap[5], arrayNumber[0],  arrayNumber[1], arrayNumber[2], arrayNumber[3],
                                 arrayNumber[4], arrayNumber[5], arrayPosition[0],  arrayPosition[1], arrayPosition[2], arrayPosition[3],
                                 arrayPosition[4], arrayPosition[5],
-                                positionClick, itemViewGlobal)
+                                positionClick, itemViewGlobal, Constans.NO_HELPSCORESTART)
                         }
                     }
                 }
@@ -563,27 +568,27 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
                         var deltaY: Float = y2 - y1
                         if (abs(deltaX) > minDistance && noReplaySwipe){
                             if(x2 > x1){
-                                DirectionRotationCubeManager.right(arrayBitmap, arrayNumber, arrayPosition,
+                                DirectionRotationCubeManager.right(0, arrayBitmap, arrayNumber, arrayPosition,
                                     binding.layFragPlayPwpEasy.idImViewScale, binding.layFragPlayPwpEasy.idImViewScale2,
-                                    durationAnimationCubeSpeed)
+                                    durationAnimationCubeSpeed, Constans.NO_HELPSCORESTART, adapterEasy, binding, 999, 999)
                                 noReplaySwipe = false
                             }else {
-                                DirectionRotationCubeManager.left(arrayBitmap, arrayNumber, arrayPosition,
+                                DirectionRotationCubeManager.left(0, arrayBitmap, arrayNumber, arrayPosition,
                                     binding.layFragPlayPwpEasy.idImViewScale, binding.layFragPlayPwpEasy.idImViewScale2,
-                                    durationAnimationCubeSpeed)
+                                    durationAnimationCubeSpeed, Constans.NO_HELPSCORESTART, adapterEasy, binding, 999, 999)
                                 noReplaySwipe = false
                             }
                         }
                         if (abs(deltaY) > minDistanceUpDown && noReplaySwipe){
                             if(y2 > y1){
-                                DirectionRotationCubeManager.down(arrayBitmap, arrayNumber, arrayPosition,
+                                DirectionRotationCubeManager.down(0, arrayBitmap, arrayNumber, arrayPosition,
                                     binding.layFragPlayPwpEasy.idImViewScale, binding.layFragPlayPwpEasy.idImViewScale2,
-                                    durationAnimationCubeSpeed)
+                                    durationAnimationCubeSpeed, Constans.NO_HELPSCORESTART, adapterEasy, binding, 999, 999)
                                 noReplaySwipe = false
                             }else {
-                                DirectionRotationCubeManager.up(arrayBitmap, arrayNumber, arrayPosition,
+                                DirectionRotationCubeManager.up(0, arrayBitmap, arrayNumber, arrayPosition,
                                     binding.layFragPlayPwpEasy.idImViewScale, binding.layFragPlayPwpEasy.idImViewScale2,
-                                    durationAnimationCubeSpeed)
+                                    durationAnimationCubeSpeed, Constans.NO_HELPSCORESTART, adapterEasy, binding, 999, 999)
                                 noReplaySwipe = false
                             }
                         }
@@ -600,7 +605,7 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
                             animObjectMinus(positionClickOpen, arrayBitmap[0], arrayBitmap[1], arrayBitmap[2], arrayBitmap[3],
                                 arrayBitmap[4], arrayBitmap[5], arrayNumber[0],  arrayNumber[1], arrayNumber[2], arrayNumber[3],
                                 arrayNumber[4], arrayNumber[5], arrayPosition[0],  arrayPosition[1], arrayPosition[2], arrayPosition[3],
-                                arrayPosition[4], arrayPosition[5], positionClick, itemViewGlobal)
+                                arrayPosition[4], arrayPosition[5], positionClick, itemViewGlobal, Constans.NO_HELPSCORESTART)
                         }
                     }
                 }
@@ -794,9 +799,12 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
         p5: Int,
         position: Int,
         itemView: View,
-        imItem: ImageView
+        imItem: ImageView,
+        directionRotation: Int,
+        selectImage: Int,
+        openImage: Int
     ) {
-        Log.d("MyLog", "clickScaleItem")
+        //Log.d("MyLog", "clickScaleItem")
         binding.layFragPlayPwpEasy.idImViewScale.elevation = 1f
         //Log.d("MyLog", "itemViewId ${itemView.visibility}")
         itemViewGlobal = itemView
@@ -804,8 +812,9 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
         positionClick = position
         binding.layFragPlayPwpEasy.idImViewMove2.visibility = View.GONE //Прячем картинку которая прилетает обратно и находится поднизом
         if (openItemScale){
+            Log.d("MyLog", "openItemScale = true")
             //запускается когда итем уже увеличен, и закрывает предыдущий итем и запускает новый
-            animObjectMinus(positionClickOpen, b0,b1,b2,b3,b4,b5,n0,n1,n2,n3,n4,n5, p0,p1,p2,p3,p4,p5, positionClick, itemView)
+            animObjectMinus(positionClickOpen, b0,b1,b2,b3,b4,b5,n0,n1,n2,n3,n4,n5, p0,p1,p2,p3,p4,p5, positionClick, itemView, directionRotation)
         }else {
             //itemViewGlobal.visibility = View.INVISIBLE
             binding.layFragPlayPwpEasy.idImViewScale.visibility = View.VISIBLE
@@ -834,7 +843,7 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
             binding.layFragPlayPwpEasy.idImViewScale2.visibility = View.GONE
 
             binding.layFragPlayPwpEasy.idImViewScale.setImageBitmap(b0)
-            animObjectPlus(position)
+            animObjectPlus(position, directionRotation, selectImage, openImage)
             //openItemScale = true //открыт/увеличен scaleItem
             //adapterEasy?.noMove?.noMoveIfOpenScale = false
             arrayBitmap.clear()
@@ -1075,9 +1084,21 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
         mediaPlayerCubeFalling.start()
     }
 
-    override fun helpScore(mainArrayView: ArrayList<dataArrayBitmap>) {
+    //Интерфейс получения данных с adaptera, после нажатия на кнопку помощи и запуска диалога подсказки
+    override fun helpScore(mainArrayViewTemp: ArrayList<dataArrayBitmap>) {
+        mainArrayView.addAll(mainArrayViewTemp)
         dialogHelpScore.createHelpScoreDialog(activity as FragmentActivity, imageBitmap1, imageBitmap2,
             imageBitmap3, imageBitmap4, imageBitmap5, imageBitmap6, scoreHelp, arrayCollectedImage, mainArrayView)
+    }
+    //Интерфейс получения данных с adaptera, после того как кубик повернулся и нужно новый повернуть
+    override fun helpScoreNext(
+        selectImage: Int,
+        openImage: Int,
+        mainArrayViewTemp: ArrayList<dataArrayBitmap>,
+        posRotation: Int
+    ) {
+        mainArrayView.addAll(mainArrayViewTemp)
+        HelpScoreManager.startDirectionRotationCube(selectImage, openImage, mainArrayView, binding, posRotation)
     }
 
     //После обновления позиции в адаптере происходит проверка собрана картинка, если да то сюда приходит позиция, какую картинку собрали
@@ -1124,7 +1145,8 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
     }
 
     //Метод анимации увелечения кубика если просто нажали
-    fun animObjectPlus(position: Int){
+    fun animObjectPlus(position: Int, directionRotation: Int, selectImage: Int,
+                       openImage: Int){
         //Определяем координаты начала увелечения в зависимости от позиции на которую нажали
         when(position) {
             0 -> {
@@ -1205,6 +1227,16 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
                 //Log.d("MyLog", "end animation plus")
                 adapterEasy?.click?.clickable = true
                 noClickItemScale = true//Отключить блакировку нажатия на увеличивающийся итем после окончания анимации увелечения
+
+                //Если в numberRotation пришел номер положения для вращения кубика, то исполнить. А если
+                //заглушка Constans.NO_HELPSCORESTART, то не выполнять
+                if (Constans.NO_HELPSCORESTART != directionRotation){
+                    DirectionRotationCubeManager.rotationHelpScore(directionRotation, position, arrayBitmap, arrayNumber, arrayPosition,
+                        binding.layFragPlayPwpEasy.idImViewScale, binding.layFragPlayPwpEasy.idImViewScale2,
+                        durationAnimationCubeSpeed, adapterEasy, binding, selectImage,
+                        openImage)
+                    openItemScale = false
+                }
                 //binding.idImViewScale.isClickable = false
                 //binding.idImViewScale2.isClickable = false
             }
@@ -1215,7 +1247,7 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
     fun animObjectMinus(positionClickOp: Int, b0 : Bitmap, b1 : Bitmap, b2 : Bitmap,
                         b3 : Bitmap, b4 : Bitmap, b5 : Bitmap, n0: Int, n1: Int, n2: Int, n3: Int, n4: Int, n5: Int,
                         p0: Int, p1: Int, p2: Int, p3: Int, p4: Int, p5: Int,
-                        positionClick: Int, itemViewGl: View){
+                        positionClick: Int, itemViewGl: View, constHelpScore: Int){
         adapterEasy?.updateAdapterPosition(arrayBitmap, arrayNumber, arrayPosition, positionClickOp, Constans.NO_POSITION_MOVE)
         val scaleX = PropertyValuesHolder.ofFloat(View.SCALE_X, (binding.layFragPlayPwpEasy.idRcViewFragPWP.width/3f) / binding.layFragPlayPwpEasy.idImViewScale.width)
         val scaleY = PropertyValuesHolder.ofFloat(View.SCALE_Y, (binding.layFragPlayPwpEasy.idRcViewFragPWP.width/3f) / binding.layFragPlayPwpEasy.idImViewScale.width)
@@ -1264,7 +1296,8 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
                         binding.layFragPlayPwpEasy.idImViewScale2.visibility = View.GONE
 
                         binding.layFragPlayPwpEasy.idImViewScale.setImageBitmap(b0)
-                        animObjectPlus(positionClickOpen)
+                        // 999 - Заглушка
+                        animObjectPlus(positionClickOpen, constHelpScore, 999, 999)
                         openItemScale = true
                         arrayBitmap.clear()
                         arrayBitmap.add(b0)
@@ -1338,7 +1371,8 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
                         binding.layFragPlayPwpEasy.idImViewScale2.visibility = View.GONE
 
                         binding.layFragPlayPwpEasy.idImViewScale.setImageBitmap(b0)
-                        animObjectPlus(positionClickOpen)
+                        //999 - заглушка
+                        animObjectPlus(positionClickOpen, constHelpScore, 999 , 999)
                         openItemScale = true
                         arrayBitmap.clear()
                         arrayBitmap.add(b0)
@@ -1393,8 +1427,35 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
         binding.idDrawerLayout.openDrawer(GravityCompat.START)
     }
 
-    override fun interfaceHelpScoreDialog(selectImage: Int, openImage: Int) {
+    override fun interfaceHelpScoreDialog(selectImage: Int, openImage: Int, posRotationCube: Int) {
+        binding.idDrawerLayout.closeDrawer(GravityCompat.START)
+        //HelpScoreManager.startDirectionRotationCube(selectImage, openImage, mainArrayView,
+        //binding, adapterEasy)
+        //selectImage - выбраная картинка для поворота кубов
+        //openImage - кол-во кубов которое нужно повернуть
+        //mainArrayView - массив со всеми данными по полю типа  ArrayList<dataArrayBitmap>
+        // posRotation - позиция которую вращаем
+        HelpScoreManager.startDirectionRotationCube(selectImage, openImage, mainArrayView,
+            binding, posRotationCube)
+    }
 
+    //Метод который мы запускаем по нажатии кнопки "Выдвинуть меню"
+    //Не используется
+    fun startDirectionRotationCube (selectImage: Int, openImage: Int, mainArrayView: ArrayList<dataArrayBitmap>,
+                                    binding: DrawerLayoutPwpEasyBinding, adapterFragPWPEasy: AdapterFragPWPEasy) {
+        binding.layFragPlayPwpEasy.idImViewScale2.visibility = View.GONE
+        binding.layFragPlayPwpEasy.idImViewMove2.visibility = View.GONE
+        binding.layFragPlayPwpEasy.idImViewMove.visibility = View.GONE
+        val fr =  binding.layFragPlayPwpEasy.idRcViewFragPWP.findViewHolderForAdapterPosition(3)
+        val itemOne = fr?.itemView?.findViewById<ImageView>(R.id.id_item_play_with_pictures_one)
+        val itemView = fr?.itemView
+        val adapter = binding.layFragPlayPwpEasy.idRcViewFragPWP.adapter as AdapterFragPWPEasy
+        if (itemView != null  && itemOne != null) {
+            //position - позиция какой кубик будет вращаться
+            //Constans.HELPSCORESTART - направление вращения кубика
+            adapter.helpScore(3, itemView, itemOne, Constans.HELPSCORESTART, 999, 999)
+
+        }
     }
 
 

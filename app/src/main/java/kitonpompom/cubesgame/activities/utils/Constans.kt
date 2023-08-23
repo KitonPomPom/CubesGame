@@ -27,4 +27,8 @@ object Constans {
     const val BT_BACK = 58
     const val YES = 90
     const val NO = 91
+    //Передаем параметр загрузки HelpScore в адаптер, что бы указать что увелечение было для подсказки
+    const val HELPSCORESTART = 942
+    const val NO_HELPSCORESTART = 762 //Заглушка
+    const val NO_POSROTATION = 932 //Заглушка
 }

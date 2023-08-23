@@ -45,7 +45,7 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
                 .inflate(R.layout.item_rc_playing_with_pictures_easy_white, parent, false)
             colorAnimationStars = true
         }
-            Log.d("MyLog", "OnCreateViewHolder")
+            //Log.d("MyLog", "OnCreateViewHolder")
         return AdapterFragPWPEasy.ImageHolder(view, this, parent.id, click, noMove, clickBack,clickUpdateLine, noMoveBack, colorAnimationStars)
     }
 
@@ -84,9 +84,6 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
             lineTop = itemView.findViewById(R.id.linLayTop)
             lineRight = itemView.findViewById(R.id.linLayRight)
             lineBottom = itemView.findViewById(R.id.linLayBottom)
-            val backgr = lineBottom.background
-            val color = (backgr as ColorDrawable).color
-            Log.d("MyLog", "background $color")
 
             itemView.visibility = View.VISIBLE
 
@@ -149,11 +146,13 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
             }
 
                 imItemOne.setOnClickListener {
-                    Log.d("MyLog", "setOnClickListener ItemOne actionNoClick $actionNoClickOnTouchIfTouchOnMove")
+                    //Log.d("MyLog", "setOnClickListener ItemOne actionNoClick $actionNoClickOnTouchIfTouchOnMove")
                     if (!actionNoClickOnTouchIfTouchOnMove) {
                         if (!noMovee.noMoveIfOpenScale && noMoveeBack.noMoveIfOpenScale) {
                             if (clickk.clickable && clickkBack.clickable && clickkUpdateLine.clickable) {
-                                Log.d("MyLog", "Слушатель ImItemOne1")
+                                //Log.d("MyLog", "Слушатель ImItemOne1")
+                                // selectImage = 999 - потому что это заглушка, используется только из helpScore
+                                // openImage = 999 - потому что это заглушка, используется только из helpScore
                                 clickScaleItemInterface.clickScaleItem(
                                     item.arrayBitmap[0], item.arrayBitmap[1],
                                     item.arrayBitmap[2], item.arrayBitmap[3],
@@ -164,17 +163,17 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
                                     item.arrayPosition[0], item.arrayPosition[1],
                                     item.arrayPosition[2], item.arrayPosition[3],
                                     item.arrayPosition[4], item.arrayPosition[5],
-                                    adapterPosition, itemView, imItemOne)
+                                    adapterPosition, itemView, imItemOne, Constans.NO_HELPSCORESTART, 999, 999)
                             }
                         }
                     }
                 }
 
                 imItemOne.setOnTouchListener(){ viewRc, eventRc ->
-                    Log.d("MyLog", "imItemOne.setOnTouchListener")
+                    //Log.d("MyLog", "imItemOne.setOnTouchListener")
                     if (noMovee.noMoveIfOpenScale && noMoveeBack.noMoveIfOpenScale){ //Не запускаем если открыт увеличеный Итем
                         if (clickk.clickable && clickkBack.clickable && clickkUpdateLine.clickable) {// Не запускаем пока идет анимация
-                            Log.d("MyLog", "Слушатель  тач ImItemOne")
+                            //Log.d("MyLog", "Слушатель  тач ImItemOne")
                             val minDistance = 23
                             val minDistanceUpDown = 15
                             when (eventRc.action) {
@@ -183,7 +182,7 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
                                     noReplaySwipe = true
                                 }
                                 MotionEvent.ACTION_MOVE -> {
-                                    Log.d("MyLog", "ACTION_MOVE")
+                                    //Log.d("MyLog", "ACTION_MOVE")
                                     //actionMoveCheck = true
                                     actionNoClickOnTouchIfTouchOnMove = true
                                     if(noReplaySwipe){
@@ -201,11 +200,13 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
                                     }
                                 }
                                 MotionEvent.ACTION_UP -> {
-                                    Log.d("MyLog", "ACTION_UP")
+                                    //Log.d("MyLog", "ACTION_UP")
                                     actionNoClickOnTouchIfTouchOnMove = true
                                     noReplaySwipe = false
                                     if (clickk.clickable && clickkBack.clickable && clickkUpdateLine.clickable) {
                                         if(!actionMoveCheck) {
+                                            // selectImage = 999 - потому что это заглушка, используется только из helpScore
+                                            // openImage = 999 - потому что это заглушка, используется только из helpScore
                                             clickScaleItemInterface.clickScaleItem(
                                                 item.arrayBitmap[0], item.arrayBitmap[1],
                                                 item.arrayBitmap[2], item.arrayBitmap[3],
@@ -216,7 +217,7 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
                                                 item.arrayPosition[0], item.arrayPosition[1],
                                                 item.arrayPosition[2], item.arrayPosition[3],
                                                 item.arrayPosition[4], item.arrayPosition[5],
-                                                adapterPosition, itemView, imItemOne)
+                                                adapterPosition, itemView, imItemOne, Constans.NO_HELPSCORESTART, 999, 999)
                                         }else{
                                                 clickScaleItemInterface.actionMoveAndActionUP(
                                                     adapterPosition
@@ -260,24 +261,29 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
         }
     }
 
-    fun helpScore(position:Int, itemView: View, imItemOne: ImageView){
+    //Запускаем из HelpScoreManager и передаем значения на fragment картинок того кубика PosRotation который
+    // нужно вращать по подсказке
+    fun helpScore(posRotation:Int, itemView: View, imItemOneImage: ImageView, constHelpScore: Int, selectImage: Int, openImage: Int){
+        //constHelpScore - Если запустили для вращения то сюда приходит номер позиции на которой стоит нужная
+        //нам картинка для вращения
+        //posRotation - Номер кубика который будет вращаться
         clickScaleItemInterface.clickScaleItem(
-            mainArrayView[position].arrayBitmap[0], mainArrayView[position].arrayBitmap[1],
-            mainArrayView[position].arrayBitmap[2], mainArrayView[position].arrayBitmap[3],
-            mainArrayView[position].arrayBitmap[4], mainArrayView[position].arrayBitmap[5],
-            mainArrayView[position].arrayNumber[0], mainArrayView[position].arrayNumber[1],
-            mainArrayView[position].arrayNumber[2], mainArrayView[position].arrayNumber[3],
-            mainArrayView[position].arrayNumber[4], mainArrayView[position].arrayNumber[5],
-            mainArrayView[position].arrayPosition[0], mainArrayView[position].arrayPosition[1],
-            mainArrayView[position].arrayPosition[2], mainArrayView[position].arrayPosition[3],
-            mainArrayView[position].arrayPosition[4], mainArrayView[position].arrayPosition[5],
-            position, itemView, imItemOne)
+            mainArrayView[posRotation].arrayBitmap[0], mainArrayView[posRotation].arrayBitmap[1],
+            mainArrayView[posRotation].arrayBitmap[2], mainArrayView[posRotation].arrayBitmap[3],
+            mainArrayView[posRotation].arrayBitmap[4], mainArrayView[posRotation].arrayBitmap[5],
+            mainArrayView[posRotation].arrayNumber[0], mainArrayView[posRotation].arrayNumber[1],
+            mainArrayView[posRotation].arrayNumber[2], mainArrayView[posRotation].arrayNumber[3],
+            mainArrayView[posRotation].arrayNumber[4], mainArrayView[posRotation].arrayNumber[5],
+            mainArrayView[posRotation].arrayPosition[0], mainArrayView[posRotation].arrayPosition[1],
+            mainArrayView[posRotation].arrayPosition[2], mainArrayView[posRotation].arrayPosition[3],
+            mainArrayView[posRotation].arrayPosition[4], mainArrayView[posRotation].arrayPosition[5],
+            posRotation, itemView, imItemOneImage, constHelpScore, selectImage, openImage)
 
     }
 
     //Обновляем адаптер когда первый раз рисуется
     fun updateAdapter(newList : ArrayList<dataArrayBitmap>){ // функция обновляет адаптер
-        //Log.d("MyLog", "updateAdapter")
+        Log.d("MyLog", "updateAdapter")
         mainArrayView.clear()
         mainArrayView.addAll(newList)
         for (i in 0 until mainArrayView.size) {
@@ -295,7 +301,7 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
 
     //Обновление одного итема, а заним проверяется итемы на совпадения вокруг
     fun updateAdapterPosition(ListBitmap: ArrayList<Bitmap>, ListNumber: ArrayList<Int>, ListPosition: ArrayList<Int> , position: Int, positionMoveFinish: Int) {
-        //Log.d("MyLog", "updateAdapterPosition")
+        Log.d("MyLog", "updateAdapterPosition $position")
         mainArrayView[position].arrayBitmap[0] = ListBitmap[0]
         mainArrayView[position].arrayBitmap[1] = ListBitmap[1]
         mainArrayView[position].arrayBitmap[2] = ListBitmap[2]
@@ -326,7 +332,7 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
 
     //Обновляем только одну позицию, в том случае если потянули, картинка исчезла, а новая не успела загрузиться
     fun updateOnePosition(position: Int){
-        //Log.d("MyLog", "update One Position")
+        Log.d("MyLog", "update One Position")
         notifyItemChanged(position, null)
     }
 
@@ -1042,15 +1048,21 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
         count +1
     }
 
+    //Запускаем с фрагмента для того что бы передать массив с картинками и открыть диалог помощи
     fun helpScoreToFrag(){
         clickScaleItemInterface.helpScore(mainArrayView)
     }
 
+    //Запускаем из DirectionRotationCube когда нужно повернуть следующий кубик в помощи
+    fun helpScoreToDirectionRotationCubeNext(selectImage: Int, openImage: Int, posRotation: Int){
+        clickScaleItemInterface.helpScoreNext(selectImage, openImage, mainArrayView, posRotation)
+    }
+
     interface ClickScaleItemInterface{
-        fun clickScaleItem( b0 : Bitmap, b1 : Bitmap, b2 : Bitmap, b3 : Bitmap, b4 : Bitmap,
-                            b5 : Bitmap, n0: Int, n1: Int, n2: Int, n3: Int, n4: Int, n5: Int,
-                            p0 : Int, p1 : Int, p2 : Int, p3 : Int, p4 : Int, p5 : Int,
-                            position: Int, itemView: View, imItem: ImageView)
+        fun clickScaleItem(b0 : Bitmap, b1 : Bitmap, b2 : Bitmap, b3 : Bitmap, b4 : Bitmap,
+                           b5 : Bitmap, n0: Int, n1: Int, n2: Int, n3: Int, n4: Int, n5: Int,
+                           p0 : Int, p1 : Int, p2 : Int, p3 : Int, p4 : Int, p5 : Int,
+                           position: Int, itemView: View, imItem: ImageView, numberRotation: Int, selectImage: Int, openImage: Int)
 
         fun moveItem(b0 : Bitmap, b1 : Bitmap, b2 : Bitmap, b3 : Bitmap, b4 : Bitmap,
                      b5 : Bitmap, n0: Int, n1: Int, n2: Int, n3: Int, n4: Int, n5: Int,
@@ -1065,7 +1077,13 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
 
         fun soundEffect()
 
+        //Интерфейс который запускается когда нажали кнопку помощи, забирает массив с картинками и открывает
+        //диалог с выбором картинок которые нужно повернуть
+
         fun helpScore(arrayList : ArrayList<dataArrayBitmap>)
+        //Интерфейс который запускается когда мы используем помощь, когда кубик повернулся и нужно повернуть следующий кубик
+        fun helpScoreNext(selectImage: Int, openImage: Int, arrayList : ArrayList<dataArrayBitmap>, posRotation: Int)
+
 
         // Если картинка собрана, отправляем с какой позиции кубика картинка собрана,
         // что бы обновить в drawerLayout, и потом подсветить собраную картинку.

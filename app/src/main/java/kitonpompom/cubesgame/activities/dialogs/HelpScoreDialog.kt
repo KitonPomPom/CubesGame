@@ -74,11 +74,15 @@ class HelpScoreDialog(private val interfaceHelpScoreDialog: InterfaceHelpScoreDi
         imView5.setImageBitmap(image5)
         imView6.setImageBitmap(image6)
 
+            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //Временно отрисовываем рамки для проверки
         //arrayCollected[0] = 1
         //arrayCollected[1] = 1
-        arrayCollected[2] = 1
-        arrayCollected[3] = 1
+        //arrayCollected[2] = 1
+        //arrayCollected[3] = 1
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+        //Отрисовываем рамки на картинках в зависимости от значения 0 или 1 в массиве arrayCollected
         if (arrayCollected[0] == 1) linear1.setCardBackgroundColor(act.getColor(R.color.green_main)) else linear1.setCardBackgroundColor(act.getColor(R.color.grey))
         if (arrayCollected[1] == 1) linear2.setCardBackgroundColor(act.getColor(R.color.green_main)) else linear2.setCardBackgroundColor(act.getColor(R.color.grey))
         if (arrayCollected[2] == 1) linear3.setCardBackgroundColor(act.getColor(R.color.green_main)) else linear3.setCardBackgroundColor(act.getColor(R.color.grey))
@@ -86,6 +90,7 @@ class HelpScoreDialog(private val interfaceHelpScoreDialog: InterfaceHelpScoreDi
         if (arrayCollected[4] == 1) linear5.setCardBackgroundColor(act.getColor(R.color.green_main)) else linear5.setCardBackgroundColor(act.getColor(R.color.grey))
         if (arrayCollected[5] == 1) linear6.setCardBackgroundColor(act.getColor(R.color.green_main)) else linear6.setCardBackgroundColor(act.getColor(R.color.grey))
 
+        // записываем количество кубиков повернутых к нам лицом для каждой картинки
         for (i in mainArrayView){
             when (i.arrayNumber[0]) {
                 0 -> openImage1++
@@ -98,7 +103,7 @@ class HelpScoreDialog(private val interfaceHelpScoreDialog: InterfaceHelpScoreDi
         }
 
 
-
+        //Высчитываем сколько кубиков нам нужно повернуть и записываем в массив 6 значений
         var openImageArray: ArrayList<Int> = arrayListOf()
         openImageArray.add(mainArrayView.size - openImage1)
         openImageArray.add(mainArrayView.size - openImage2)
@@ -107,17 +112,25 @@ class HelpScoreDialog(private val interfaceHelpScoreDialog: InterfaceHelpScoreDi
         openImageArray.add(mainArrayView.size - openImage5)
         openImageArray.add(mainArrayView.size - openImage6)
 
-        Log.d("MyLog", "1:${mainArrayView.size}")
+        //Log.d("MyLog", "1:${mainArrayView.size}")
 
-        //Выбираем какая картинка будет выделена автоматически при запуске
+        //Выбираем какая картинка будет выделена автоматически при первом запуске
+        // Цикл от 0 до 6
         for (i in 0 .. arrayCollected.size){
+            //Если значение картинки в массиве = 0, значит картинка ещё не собрана
             if (arrayCollected[i] == 0){
+                //Убираем полупрозрачный фон если картинка ещё не собрана
                 cardSelectImageArray[i].visibility = View.GONE
+                //Записываем в maxOpenImage кол-во кубиков которое можно повернуть
                 maxOpenImage = openImageArray[i]
+                //Записываем номер картинки кубики которой нужно будет поворачивать
                 selectImage = i
+                //Если кол-во очков игрока меньше кол-ва кубиков которое нужно повернуть
                 if(score < openImageArray[i]){
+                    //в scoreText записываем кол-во очков
                     scoreText.text = score.toString()
                 }else{
+                    //в scoreText записываем кол-во кубиков которое можно повернуть
                     scoreText.text = openImageArray[i].toString()
                 }
                 break
@@ -125,6 +138,7 @@ class HelpScoreDialog(private val interfaceHelpScoreDialog: InterfaceHelpScoreDi
         }
 
         cardSelectImage1.setOnClickListener(){
+            //Если картинка не собрана то позволить выделить её
             if (arrayCollected[0] == 0){
                 cardSelectImage1.visibility = View.GONE
                 cardSelectImage2.visibility = View.VISIBLE
@@ -264,7 +278,7 @@ class HelpScoreDialog(private val interfaceHelpScoreDialog: InterfaceHelpScoreDi
         }
         btUse.setOnClickListener() {
             var tempScore = scoreText.text.toString().toInt()
-            interfaceHelpScoreDialog.interfaceHelpScoreDialog(selectImage ,tempScore)
+            interfaceHelpScoreDialog.interfaceHelpScoreDialog(selectImage ,tempScore, 0)
             //interfaceFinishCongratulationDialog.interfaceFinishCongratulationDialog()
             dialog.dismiss()
         }
