@@ -24,6 +24,7 @@ import androidx.cardview.widget.CardView
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
 import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.drawerlayout.widget.DrawerLayout.DrawerListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -98,6 +99,7 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
     var positionClick = 0// Записываем позицию на которую нажали
     var positionMove = 0// Записываем позицию которую потянули
     var openItemScale = false //true - Открыт\увеличен itemScale
+    var stopClickAnimationHelp = false //Для блокировки нажатия пока идет анимация помощи поворота кубиков
     val durationAnimationCubeSpeed: Long = 300
     //var arrayInt = arrayOf(0,1,2,3,4,5)
     lateinit var itemViewGlobal: View //передаем сюда вью на который нажали, что бы была возможность использовать по всему классу
@@ -223,8 +225,41 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
             }
         }
 
+        //Кнопка отрытия driverLayout
         binding.layFragPlayPwpEasy.idBtOpenDrawer.setOnClickListener(){
-            binding.idDrawerLayout.openDrawer(GravityCompat.START)
+            if(!stopClickAnimationHelp) {
+                //Если увиличен кубик, то сразу его уменьшить, а потом открыть меню
+                if (openItemScale) {
+                    openItemScale = false
+                    animObjectMinus(
+                        positionClickOpen,
+                        arrayBitmap[0],
+                        arrayBitmap[1],
+                        arrayBitmap[2],
+                        arrayBitmap[3],
+                        arrayBitmap[4],
+                        arrayBitmap[5],
+                        arrayNumber[0],
+                        arrayNumber[1],
+                        arrayNumber[2],
+                        arrayNumber[3],
+                        arrayNumber[4],
+                        arrayNumber[5],
+                        arrayPosition[0],
+                        arrayPosition[1],
+                        arrayPosition[2],
+                        arrayPosition[3],
+                        arrayPosition[4],
+                        arrayPosition[5],
+                        positionClick,
+                        itemViewGlobal,
+                        Constans.NO_HELPSCORESTART
+                    )
+                }
+
+                //Открыть DriverLayout
+                binding.idDrawerLayout.openDrawer(GravityCompat.START)
+            }
             /*val fr =  binding.layFragPlayPwpEasy.idRcViewFragPWP.findViewHolderForAdapterPosition(0)
             val itemOne = fr?.itemView?.findViewById<ImageView>(R.id.id_item_play_with_pictures_one)
             val itemView = fr?.itemView
@@ -264,6 +299,7 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
             colorLine = true
             }
             binding.layFragPlayPwpEasy.idRcViewFragPWP.adapter = adapterEasy
+            binding.idDrawerLayout.closeDrawer(GravityCompat.START)
             Log.d("MyLog", "Слушатель imBtColorLine")
         }
 
@@ -273,6 +309,10 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
             //который передает весь масиив со всеми данными ArrayList<dataArrayBitmap>()
             // на наш фрагмен где мы и запускаем диалог выбора helpScore
             adapterEasy.helpScoreToFrag()
+            finishCloseDriver = false
+            binding.idDrawerLayout.closeDrawer(GravityCompat.START)
+
+
             Log.d("MyLog", "Слушатель imBtHelp")
         }
 
@@ -280,15 +320,26 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
             Log.d("MyLog", "Слушатель textView4")
         }
 
+
         //Слушатель действия на драйвер лэоут (Закрытие\открытие)
         binding.idDrawerLayout.addDrawerListener(object : DrawerListener {
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
-            override fun onDrawerOpened(drawerView: View) {}
+            override fun onDrawerOpened(drawerView: View) {
+                stopClickAnimationHelp = true// Заблокировать нажатия на фрагменте
+                adapterEasy.noClickForAnimationHelpScore.noClickForAnimationHelpScore = false// Заблокировать нажатия на адаптере
+                //При открытии DriverLayout Сбрасываем настройки блокировки для стандартных
+                //что бы можно юыло закрыть обратно свайпом справа на лево
+                binding.idDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNDEFINED)
+            }
             override fun onDrawerClosed(drawerView: View) {
                 if(finishCloseDriver){
                     finishCloseDriver = false
                     dialogYesNoAlert = dialogYesNo.createYesNoDialog(activity as Activity, Constans.BT_SHUFFLE)
                 }
+                stopClickAnimationHelp = false// Разблокировать нажатия на фрагменте
+                adapterEasy.noClickForAnimationHelpScore.noClickForAnimationHelpScore = true// Разблокировать нажатия на адаптере
+                //По закрытии DriverLayout выключаем возможность открыть меню свайпом с лева на право
+                binding.idDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
             }
             override fun onDrawerStateChanged(newState: Int) {
                 //Toast.makeText(activity, "state: $newState", Toast.LENGTH_SHORT).show()
@@ -309,166 +360,277 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
                 }
 
                 MotionEvent.ACTION_MOVE -> {
-                    if(clickMoveAdapter && arrayBitmap.isNotEmpty() && !openItemScale) { //проверка на то, сработал ли в адаптере onTouch и пустой ли масс. с битмапами
-                        //idImViewMove - кубик который тянем
-                        //idImViewMove2 - кубик который возращается на старое место
-                        //Log.d("MyLog", "ACTION_MOVE clickMoveAdapter $clickMoveAdapter")
-                        binding.layFragPlayPwpEasy.idImViewMove2.visibility = View.GONE
-                        binding.layFragPlayPwpEasy.idImViewMove.elevation = 1.0f
-                        binding.layFragPlayPwpEasy.idImViewMove.visibility = View.VISIBLE
-                        val scaleX = PropertyValuesHolder.ofFloat(View.SCALE_X, 1.0f)
-                        val scaleY = PropertyValuesHolder.ofFloat(View.SCALE_Y, 1.0f)
-                        //анимация увелечения кубика когда начали тянуть и он появился в руке
-                        ObjectAnimator.ofPropertyValuesHolder(binding.layFragPlayPwpEasy.idImViewMove, scaleX, scaleY).apply {
-                            duration = 50
-                            start()
+                    if(!stopClickAnimationHelp) { //проверка на то идет ли анимация помощи поворота кубиков
+                        if (clickMoveAdapter && arrayBitmap.isNotEmpty() && !openItemScale) { //проверка на то, сработал ли в адаптере onTouch и пустой ли масс. с битмапами
+                            //idImViewMove - кубик который тянем
+                            //idImViewMove2 - кубик который возращается на старое место
+                            //Log.d("MyLog", "ACTION_MOVE clickMoveAdapter $clickMoveAdapter")
+                            binding.layFragPlayPwpEasy.idImViewMove2.visibility = View.GONE
+                            binding.layFragPlayPwpEasy.idImViewMove.elevation = 1.0f
+                            binding.layFragPlayPwpEasy.idImViewMove.visibility = View.VISIBLE
+                            val scaleX = PropertyValuesHolder.ofFloat(View.SCALE_X, 1.0f)
+                            val scaleY = PropertyValuesHolder.ofFloat(View.SCALE_Y, 1.0f)
+                            //анимация увелечения кубика когда начали тянуть и он появился в руке
+                            ObjectAnimator.ofPropertyValuesHolder(
+                                binding.layFragPlayPwpEasy.idImViewMove,
+                                scaleX,
+                                scaleY
+                            ).apply {
+                                duration = 50
+                                start()
+                            }
+                            //передаем координаты кубику в зависимости где стоит палец на экране, что бы он тянулся за пальцем
+                            itemViewGlobalMove.visibility = View.GONE
+                            binding.layFragPlayPwpEasy.idImViewMove.x =
+                                eventRc.x - imItemGlobal.width / 2f
+                            binding.layFragPlayPwpEasy.idImViewMove.y = eventRc.y
+                            //binding.idImViewMove2.visibility = View.GONE
+                            //binding.idImViewMove2.x = eventRc.x - imItemGlobal.width / 2f
+                            //binding.idImViewMove2.y = eventRc.y
                         }
-                        //передаем координаты кубику в зависимости где стоит палец на экране, что бы он тянулся за пальцем
-                        itemViewGlobalMove.visibility = View.GONE
-                        binding.layFragPlayPwpEasy.idImViewMove.x = eventRc.x - imItemGlobal.width / 2f
-                        binding.layFragPlayPwpEasy.idImViewMove.y = eventRc.y
-                        //binding.idImViewMove2.visibility = View.GONE
-                        //binding.idImViewMove2.x = eventRc.x - imItemGlobal.width / 2f
-                        //binding.idImViewMove2.y = eventRc.y
                     }
-
                 }
                 MotionEvent.ACTION_UP -> {
 
-                    if (clickMoveAdapter && arrayBitmap.isNotEmpty() && noClick.clickable && noClickBack.clickable  && !openItemScale) {
-                        x2 = eventRc.x
-                        y2 = eventRc.y
-                        //Если позиция над которой отпустили кубик не равна 15 ???
-                        if (MoveItemScaleTwo.moveItemRcEasy(x2, y2, viewRc) != 15) {
-                            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-                                val rcViewX = binding.layFragPlayPwpEasy.idRcViewFragPWP.x
-                                val rcViewY = binding.layFragPlayPwpEasy.idRcViewFragPWP.y
-                                //массив с двумя координатами по x и y для кубика который тянем,
-                                // куда будет становится кубик перед тем как начать уменьшаться
-                                val coordinateImMove = MoveItemScaleTwo.movingItemScaleEasy(MoveItemScaleTwo.moveItemRcEasy(x2, y2, viewRc),
-                                    binding.layFragPlayPwpEasy.idRcViewFragPWP.width, binding.layFragPlayPwpEasy.idRcViewFragPWP.height,
-                                    binding.layFragPlayPwpEasy.idImViewMove.width, binding.layFragPlayPwpEasy.idImViewMove.height)
-                                //массив с двумя координатами по x и y для кубика который возращается,
-                                // куда будет становится кубик перед тем как начать уменьшаться
-                                val coordinateImMove2 = MoveItemScaleTwo.movingItemScaleEasy(MoveItemScaleTwo.moveItemRcEasy(x2, y2, viewRc),
-                                    binding.layFragPlayPwpEasy.idRcViewFragPWP.width, binding.layFragPlayPwpEasy.idRcViewFragPWP.height,
-                                    binding.layFragPlayPwpEasy.idImViewMove2.width, binding.layFragPlayPwpEasy.idImViewMove2.height)
-                                val coordinatePositionBackImMove2 = MoveItemScaleTwo.movingItemScaleEasy(positionMove,
-                                    binding.layFragPlayPwpEasy.idRcViewFragPWP.width, binding.layFragPlayPwpEasy.idRcViewFragPWP.height,
-                                    binding.layFragPlayPwpEasy.idImViewMove2.width, binding.layFragPlayPwpEasy.idImViewMove2.height)
-                                val coordinateBackImMove2 = listOf(coordinatePositionBackImMove2[0].toFloat()+rcViewX,
-                                    coordinatePositionBackImMove2[1].toFloat()+rcViewY)
-                                val coordinateBackStartImMove2 = listOf(coordinateImMove2[0].toFloat()+rcViewX,coordinateImMove2[1].toFloat()+rcViewY)//координаты стартовой точки для обратного полета ImMove2
-                                adapterEasy?.transferArrayAdapterToFrag(MoveItemScaleTwo.moveItemRcEasy(x2, y2, viewRc),
-                                    this, coordinateBackImMove2, coordinateBackStartImMove2, positionMove) // для возращения нового итема на старое место
-                                //патч с координатами для анимции движения кубика на центр перед уменьшением
-                                val path = Path().apply {
-                                    moveTo(binding.layFragPlayPwpEasy.idImViewMove.x,binding.layFragPlayPwpEasy.idImViewMove.y)
-                                    lineTo(coordinateImMove[0].toFloat()+rcViewX,coordinateImMove[1].toFloat()+rcViewY)
-                                }
-                                //анимация перемещения кубика которого тянули по координатам
-                                ObjectAnimator.ofFloat(binding.layFragPlayPwpEasy.idImViewMove, View.X, View.Y, path).apply {
-                                    doOnStart {
-                                        adapterEasy?.noMove?.noMoveIfOpenScale = false
-                                        adapterEasy?.click?.clickable = false
-                                        noClick.clickable = false
+                    if(!stopClickAnimationHelp) {
+                        if (clickMoveAdapter && arrayBitmap.isNotEmpty() && noClick.clickable && noClickBack.clickable && !openItemScale) {
+                            x2 = eventRc.x
+                            y2 = eventRc.y
+                            //Если позиция над которой отпустили кубик не равна 15 ???
+                            if (MoveItemScaleTwo.moveItemRcEasy(x2, y2, viewRc) != 15) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                    val rcViewX = binding.layFragPlayPwpEasy.idRcViewFragPWP.x
+                                    val rcViewY = binding.layFragPlayPwpEasy.idRcViewFragPWP.y
+                                    //массив с двумя координатами по x и y для кубика который тянем,
+                                    // куда будет становится кубик перед тем как начать уменьшаться
+                                    val coordinateImMove = MoveItemScaleTwo.movingItemScaleEasy(
+                                        MoveItemScaleTwo.moveItemRcEasy(x2, y2, viewRc),
+                                        binding.layFragPlayPwpEasy.idRcViewFragPWP.width,
+                                        binding.layFragPlayPwpEasy.idRcViewFragPWP.height,
+                                        binding.layFragPlayPwpEasy.idImViewMove.width,
+                                        binding.layFragPlayPwpEasy.idImViewMove.height
+                                    )
+                                    //массив с двумя координатами по x и y для кубика который возращается,
+                                    // куда будет становится кубик перед тем как начать уменьшаться
+                                    val coordinateImMove2 = MoveItemScaleTwo.movingItemScaleEasy(
+                                        MoveItemScaleTwo.moveItemRcEasy(x2, y2, viewRc),
+                                        binding.layFragPlayPwpEasy.idRcViewFragPWP.width,
+                                        binding.layFragPlayPwpEasy.idRcViewFragPWP.height,
+                                        binding.layFragPlayPwpEasy.idImViewMove2.width,
+                                        binding.layFragPlayPwpEasy.idImViewMove2.height
+                                    )
+                                    val coordinatePositionBackImMove2 =
+                                        MoveItemScaleTwo.movingItemScaleEasy(
+                                            positionMove,
+                                            binding.layFragPlayPwpEasy.idRcViewFragPWP.width,
+                                            binding.layFragPlayPwpEasy.idRcViewFragPWP.height,
+                                            binding.layFragPlayPwpEasy.idImViewMove2.width,
+                                            binding.layFragPlayPwpEasy.idImViewMove2.height
+                                        )
+                                    val coordinateBackImMove2 = listOf(
+                                        coordinatePositionBackImMove2[0].toFloat() + rcViewX,
+                                        coordinatePositionBackImMove2[1].toFloat() + rcViewY
+                                    )
+                                    val coordinateBackStartImMove2 = listOf(
+                                        coordinateImMove2[0].toFloat() + rcViewX,
+                                        coordinateImMove2[1].toFloat() + rcViewY
+                                    )//координаты стартовой точки для обратного полета ImMove2
+                                    adapterEasy?.transferArrayAdapterToFrag(
+                                        MoveItemScaleTwo.moveItemRcEasy(x2, y2, viewRc),
+                                        this,
+                                        coordinateBackImMove2,
+                                        coordinateBackStartImMove2,
+                                        positionMove
+                                    ) // для возращения нового итема на старое место
+                                    //патч с координатами для анимции движения кубика на центр перед уменьшением
+                                    val path = Path().apply {
+                                        moveTo(
+                                            binding.layFragPlayPwpEasy.idImViewMove.x,
+                                            binding.layFragPlayPwpEasy.idImViewMove.y
+                                        )
+                                        lineTo(
+                                            coordinateImMove[0].toFloat() + rcViewX,
+                                            coordinateImMove[1].toFloat() + rcViewY
+                                        )
                                     }
-                                    duration = 200
-                                    start()
-                                    doOnEnd {
-                                        adapterEasy?.updateAdapterPosition(arrayBitmap, arrayNumber, arrayPosition, MoveItemScaleTwo.moveItemRcEasy(x2, y2, viewRc),positionMove)
-                                        val scaleX = PropertyValuesHolder.ofFloat(View.SCALE_X, (binding.layFragPlayPwpEasy.idRcViewFragPWP.width/3f) / binding.layFragPlayPwpEasy.idImViewMove.width)
-                                        val scaleY = PropertyValuesHolder.ofFloat(View.SCALE_Y, (binding.layFragPlayPwpEasy.idRcViewFragPWP.width/3f) / binding.layFragPlayPwpEasy.idImViewMove.width)
-                                        //Когда кубик стал на место для уменьшения, начинается
-                                        //анимация уменьшения кубика на свое место
-                                        ObjectAnimator.ofPropertyValuesHolder(binding.layFragPlayPwpEasy.idImViewMove, scaleX, scaleY).apply {
-                                            duration = 220
-                                            start()
-                                            doOnEnd {
-                                                binding.layFragPlayPwpEasy.idImViewMove.visibility = View.GONE
-                                                arrayBitmap.clear()
-                                                arrayNumber.clear()
-                                                adapterEasy?.noMove?.noMoveIfOpenScale = true
-                                                adapterEasy?.click?.clickable = true
-                                                noClick.clickable = true
-                                                clickMoveAdapter = false
+                                    //анимация перемещения кубика которого тянули по координатам
+                                    ObjectAnimator.ofFloat(
+                                        binding.layFragPlayPwpEasy.idImViewMove,
+                                        View.X,
+                                        View.Y,
+                                        path
+                                    ).apply {
+                                        doOnStart {
+                                            adapterEasy?.noMove?.noMoveIfOpenScale = false
+                                            adapterEasy?.click?.clickable = false
+                                            noClick.clickable = false
+                                        }
+                                        duration = 200
+                                        start()
+                                        doOnEnd {
+                                            adapterEasy?.updateAdapterPosition(
+                                                arrayBitmap,
+                                                arrayNumber,
+                                                arrayPosition,
+                                                MoveItemScaleTwo.moveItemRcEasy(x2, y2, viewRc),
+                                                positionMove
+                                            )
+                                            val scaleX = PropertyValuesHolder.ofFloat(
+                                                View.SCALE_X,
+                                                (binding.layFragPlayPwpEasy.idRcViewFragPWP.width / 3f) / binding.layFragPlayPwpEasy.idImViewMove.width
+                                            )
+                                            val scaleY = PropertyValuesHolder.ofFloat(
+                                                View.SCALE_Y,
+                                                (binding.layFragPlayPwpEasy.idRcViewFragPWP.width / 3f) / binding.layFragPlayPwpEasy.idImViewMove.width
+                                            )
+                                            //Когда кубик стал на место для уменьшения, начинается
+                                            //анимация уменьшения кубика на свое место
+                                            ObjectAnimator.ofPropertyValuesHolder(
+                                                binding.layFragPlayPwpEasy.idImViewMove,
+                                                scaleX,
+                                                scaleY
+                                            ).apply {
+                                                duration = 220
+                                                start()
+                                                doOnEnd {
+                                                    binding.layFragPlayPwpEasy.idImViewMove.visibility =
+                                                        View.GONE
+                                                    arrayBitmap.clear()
+                                                    arrayNumber.clear()
+                                                    adapterEasy?.noMove?.noMoveIfOpenScale = true
+                                                    adapterEasy?.click?.clickable = true
+                                                    noClick.clickable = true
+                                                    clickMoveAdapter = false
+                                                }
                                             }
                                         }
                                     }
-                                }
 
-                            }else{ // Без анимации, если версия андройд меньше заданой
-                                adapterEasy?.updateAdapterPosition(
-                                    arrayBitmap, arrayNumber, arrayPosition,
-                                    MoveItemScaleTwo.moveItemRcEasy(x2, y2, viewRc), positionMove)
-                                val coordinate = MoveItemScaleTwo.movingItemScaleEasy(MoveItemScaleTwo.moveItemRcEasy(x2, y2, viewRc),
-                                    binding.layFragPlayPwpEasy.idRcViewFragPWP.width, binding.layFragPlayPwpEasy.idRcViewFragPWP.height,
-                                    binding.layFragPlayPwpEasy.idImViewMove.width, binding.layFragPlayPwpEasy.idImViewMove.height)
-                                val rcViewX = binding.layFragPlayPwpEasy.idRcViewFragPWP.x
-                                val rcViewY = binding.layFragPlayPwpEasy.idRcViewFragPWP.y
-                                val coordinateBack = listOf(coordinate[0].toFloat()+rcViewX, coordinate[1].toFloat()+rcViewY)
-                                val coordinateBackStart = listOf(coordinate[0].toFloat()+rcViewX,
-                                    coordinate[1].toFloat()+rcViewY)//координаты стартовой точки для обратного полета ImMove2
-                                adapterEasy?.transferArrayAdapterToFrag(MoveItemScaleTwo.moveItemRcEasy(x2, y2, viewRc),
-                                    this, coordinateBack, coordinateBackStart, positionMove)
-                                binding.layFragPlayPwpEasy.idImViewMove.visibility = View.GONE
-                                clickMoveAdapter = false
+                                } else { // Без анимации, если версия андройд меньше заданой
+                                    adapterEasy?.updateAdapterPosition(
+                                        arrayBitmap,
+                                        arrayNumber,
+                                        arrayPosition,
+                                        MoveItemScaleTwo.moveItemRcEasy(x2, y2, viewRc),
+                                        positionMove
+                                    )
+                                    val coordinate = MoveItemScaleTwo.movingItemScaleEasy(
+                                        MoveItemScaleTwo.moveItemRcEasy(x2, y2, viewRc),
+                                        binding.layFragPlayPwpEasy.idRcViewFragPWP.width,
+                                        binding.layFragPlayPwpEasy.idRcViewFragPWP.height,
+                                        binding.layFragPlayPwpEasy.idImViewMove.width,
+                                        binding.layFragPlayPwpEasy.idImViewMove.height
+                                    )
+                                    val rcViewX = binding.layFragPlayPwpEasy.idRcViewFragPWP.x
+                                    val rcViewY = binding.layFragPlayPwpEasy.idRcViewFragPWP.y
+                                    val coordinateBack = listOf(
+                                        coordinate[0].toFloat() + rcViewX,
+                                        coordinate[1].toFloat() + rcViewY
+                                    )
+                                    val coordinateBackStart = listOf(
+                                        coordinate[0].toFloat() + rcViewX,
+                                        coordinate[1].toFloat() + rcViewY
+                                    )//координаты стартовой точки для обратного полета ImMove2
+                                    adapterEasy?.transferArrayAdapterToFrag(
+                                        MoveItemScaleTwo.moveItemRcEasy(x2, y2, viewRc),
+                                        this, coordinateBack, coordinateBackStart, positionMove
+                                    )
+                                    binding.layFragPlayPwpEasy.idImViewMove.visibility = View.GONE
+                                    clickMoveAdapter = false
 
-                                if (!openItemScale) {//Чистим только когда итемScale закрыт
-                                    arrayBitmap.clear()
-                                    arrayNumber.clear()
-                                }
-                            }
-
-                        } else{
-                            //Анимация если вытянули кубик за приделы поля
-                            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-                                val rcViewX = binding.layFragPlayPwpEasy.idRcViewFragPWP.x
-                                val rcViewY = binding.layFragPlayPwpEasy.idRcViewFragPWP.y
-                                //массив с координатами x и y, куда возращать кубик (старое место)
-                                val coordinate = MoveItemScaleTwo.movingItemScaleEasy(positionMove, binding.layFragPlayPwpEasy.idRcViewFragPWP.width,
-                                    binding.layFragPlayPwpEasy.idRcViewFragPWP.height,
-                                    binding.layFragPlayPwpEasy.idImViewMove.width,
-                                    binding.layFragPlayPwpEasy.idImViewMove.height)
-                                //патч с координатами для анимации перемещения
-                                val path = Path().apply {
-                                    moveTo(binding.layFragPlayPwpEasy.idImViewMove.x, binding.layFragPlayPwpEasy.idImViewMove.y) //откуда
-                                    lineTo(coordinate[0].toFloat()+rcViewX,coordinate[1].toFloat()+rcViewY) //куда
-                                }
-                                //анимация перемещения кубика на старое место
-                                ObjectAnimator.ofFloat(binding.layFragPlayPwpEasy.idImViewMove, View.X, View.Y, path).apply {
-                                    doOnStart {
-                                        adapterEasy?.noMove?.noMoveIfOpenScale = false
-                                        adapterEasy?.click?.clickable = false
-                                        noClick.clickable = false
+                                    if (!openItemScale) {//Чистим только когда итемScale закрыт
+                                        arrayBitmap.clear()
+                                        arrayNumber.clear()
                                     }
-                                    duration = 300
-                                    start()
-                                    doOnEnd {
-                                        adapterEasy?.updateAdapterPosition(arrayBitmap, arrayNumber, arrayPosition, positionMove, Constans.NO_POSITION_MOVE)
-                                        val scaleX = PropertyValuesHolder.ofFloat(View.SCALE_X, (binding.layFragPlayPwpEasy.idRcViewFragPWP.width/3f) / binding.layFragPlayPwpEasy.idImViewMove.width)
-                                        val scaleY = PropertyValuesHolder.ofFloat(View.SCALE_Y, (binding.layFragPlayPwpEasy.idRcViewFragPWP.width/3f) / binding.layFragPlayPwpEasy.idImViewMove.width)
-                                        //анимация уменьшен кубика когда он прилетел на место
-                                        ObjectAnimator.ofPropertyValuesHolder(binding.layFragPlayPwpEasy.idImViewMove, scaleX, scaleY).apply {
-                                            duration = 220
-                                            start()
-                                            doOnEnd {
-                                                binding.layFragPlayPwpEasy.idImViewMove.visibility = View.GONE
-                                                arrayBitmap.clear()
-                                                arrayNumber.clear()
-                                                adapterEasy?.noMove?.noMoveIfOpenScale = true
-                                                adapterEasy?.click?.clickable = true
-                                                noClick.clickable = true
-                                                clickMoveAdapter = false
+                                }
+
+                            } else {
+                                //Анимация если вытянули кубик за приделы поля
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                    val rcViewX = binding.layFragPlayPwpEasy.idRcViewFragPWP.x
+                                    val rcViewY = binding.layFragPlayPwpEasy.idRcViewFragPWP.y
+                                    //массив с координатами x и y, куда возращать кубик (старое место)
+                                    val coordinate = MoveItemScaleTwo.movingItemScaleEasy(
+                                        positionMove,
+                                        binding.layFragPlayPwpEasy.idRcViewFragPWP.width,
+                                        binding.layFragPlayPwpEasy.idRcViewFragPWP.height,
+                                        binding.layFragPlayPwpEasy.idImViewMove.width,
+                                        binding.layFragPlayPwpEasy.idImViewMove.height
+                                    )
+                                    //патч с координатами для анимации перемещения
+                                    val path = Path().apply {
+                                        moveTo(
+                                            binding.layFragPlayPwpEasy.idImViewMove.x,
+                                            binding.layFragPlayPwpEasy.idImViewMove.y
+                                        ) //откуда
+                                        lineTo(
+                                            coordinate[0].toFloat() + rcViewX,
+                                            coordinate[1].toFloat() + rcViewY
+                                        ) //куда
+                                    }
+                                    //анимация перемещения кубика на старое место
+                                    ObjectAnimator.ofFloat(
+                                        binding.layFragPlayPwpEasy.idImViewMove,
+                                        View.X,
+                                        View.Y,
+                                        path
+                                    ).apply {
+                                        doOnStart {
+                                            adapterEasy?.noMove?.noMoveIfOpenScale = false
+                                            adapterEasy?.click?.clickable = false
+                                            noClick.clickable = false
+                                        }
+                                        duration = 300
+                                        start()
+                                        doOnEnd {
+                                            adapterEasy?.updateAdapterPosition(
+                                                arrayBitmap,
+                                                arrayNumber,
+                                                arrayPosition,
+                                                positionMove,
+                                                Constans.NO_POSITION_MOVE
+                                            )
+                                            val scaleX = PropertyValuesHolder.ofFloat(
+                                                View.SCALE_X,
+                                                (binding.layFragPlayPwpEasy.idRcViewFragPWP.width / 3f) / binding.layFragPlayPwpEasy.idImViewMove.width
+                                            )
+                                            val scaleY = PropertyValuesHolder.ofFloat(
+                                                View.SCALE_Y,
+                                                (binding.layFragPlayPwpEasy.idRcViewFragPWP.width / 3f) / binding.layFragPlayPwpEasy.idImViewMove.width
+                                            )
+                                            //анимация уменьшен кубика когда он прилетел на место
+                                            ObjectAnimator.ofPropertyValuesHolder(
+                                                binding.layFragPlayPwpEasy.idImViewMove,
+                                                scaleX,
+                                                scaleY
+                                            ).apply {
+                                                duration = 220
+                                                start()
+                                                doOnEnd {
+                                                    binding.layFragPlayPwpEasy.idImViewMove.visibility =
+                                                        View.GONE
+                                                    arrayBitmap.clear()
+                                                    arrayNumber.clear()
+                                                    adapterEasy?.noMove?.noMoveIfOpenScale = true
+                                                    adapterEasy?.click?.clickable = true
+                                                    noClick.clickable = true
+                                                    clickMoveAdapter = false
+                                                }
                                             }
                                         }
                                     }
+                                } else {
+                                    //если версия андройд меньше, без анимации перемещения(вытянули за пределы)
+                                    binding.layFragPlayPwpEasy.idImViewMove.visibility = View.GONE
+                                    adapterEasy?.updateAdapterPosition(
+                                        arrayBitmap,
+                                        arrayNumber,
+                                        arrayPosition,
+                                        positionMove,
+                                        Constans.NO_POSITION_MOVE
+                                    )
+                                    clickMoveAdapter = false
                                 }
-                            }else{
-                                //если версия андройд меньше, без анимации перемещения(вытянули за пределы)
-                                binding.layFragPlayPwpEasy.idImViewMove.visibility = View.GONE
-                                adapterEasy?.updateAdapterPosition(arrayBitmap, arrayNumber, arrayPosition, positionMove, Constans.NO_POSITION_MOVE)
-                                clickMoveAdapter = false
                             }
                         }
                     }
@@ -480,64 +642,134 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
 
         //Слушатель нажатия на увеличеный итем, если на кубике первая картинка
         binding.layFragPlayPwpEasy.idImViewScale.setOnTouchListener(){ v, event ->
-            //Не давать нажимать пока идет анимация
-            if(noClickItemScale){
-                //Log.d("MyLog", "Слушатель ViewScale")
-                val minDistance = 15
-                val minDistanceUpDown = 7
+            if(!stopClickAnimationHelp) {
+                //Не давать нажимать пока идет анимация
+                if (noClickItemScale) {
+                    //Log.d("MyLog", "Слушатель ViewScale")
+                    val minDistance = 15
+                    val minDistanceUpDown = 7
 
-                when (event.action) {
-                    MotionEvent.ACTION_DOWN -> { //Срабатывает когда коснулись экрана
-                        x1 = event.x //Позиция по оси Х куда нажали
-                        y1 = event.y //Позиция по оси Y куда нажали
-                        noReplaySwipe = true
-                    }
-                    //Определеяем в каком направлении вращать кубик
-                    MotionEvent.ACTION_MOVE -> {
-                        x2 = event.x
-                        y2 = event.y
-                        var deltaX: Float = x2 - x1
-                        var deltaY: Float = y2 - y1
-                        if (abs(deltaX) > minDistance && noReplaySwipe){
-                            if(x2 > x1){
-                                DirectionRotationCubeManager.right(0, arrayBitmap, arrayNumber, arrayPosition,
-                                    binding.layFragPlayPwpEasy.idImViewScale, binding.layFragPlayPwpEasy.idImViewScale2,
-                                    durationAnimationCubeSpeed, Constans.NO_HELPSCORESTART, adapterEasy, binding, 999, 999)
-                                noReplaySwipe = false
-                            }else {
-                                DirectionRotationCubeManager.left(0, arrayBitmap, arrayNumber, arrayPosition,
-                                    binding.layFragPlayPwpEasy.idImViewScale, binding.layFragPlayPwpEasy.idImViewScale2,
-                                    durationAnimationCubeSpeed, Constans.NO_HELPSCORESTART, adapterEasy, binding, 999, 999)
-                                noReplaySwipe = false
+                    when (event.action) {
+                        MotionEvent.ACTION_DOWN -> { //Срабатывает когда коснулись экрана
+                            x1 = event.x //Позиция по оси Х куда нажали
+                            y1 = event.y //Позиция по оси Y куда нажали
+                            noReplaySwipe = true
+                        }
+                        //Определеяем в каком направлении вращать кубик
+                        MotionEvent.ACTION_MOVE -> {
+                            x2 = event.x
+                            y2 = event.y
+                            var deltaX: Float = x2 - x1
+                            var deltaY: Float = y2 - y1
+                            if (abs(deltaX) > minDistance && noReplaySwipe) {
+                                if (x2 > x1) {
+                                    DirectionRotationCubeManager.right(
+                                        0,
+                                        arrayBitmap,
+                                        arrayNumber,
+                                        arrayPosition,
+                                        binding.layFragPlayPwpEasy.idImViewScale,
+                                        binding.layFragPlayPwpEasy.idImViewScale2,
+                                        durationAnimationCubeSpeed,
+                                        Constans.NO_HELPSCORESTART,
+                                        adapterEasy,
+                                        binding,
+                                        999,
+                                        999,
+                                        999
+                                    )
+                                    noReplaySwipe = false
+                                } else {
+                                    DirectionRotationCubeManager.left(
+                                        0,
+                                        arrayBitmap,
+                                        arrayNumber,
+                                        arrayPosition,
+                                        binding.layFragPlayPwpEasy.idImViewScale,
+                                        binding.layFragPlayPwpEasy.idImViewScale2,
+                                        durationAnimationCubeSpeed,
+                                        Constans.NO_HELPSCORESTART,
+                                        adapterEasy,
+                                        binding,
+                                        999,
+                                        999,
+                                        999
+                                    )
+                                    noReplaySwipe = false
+                                }
+                            }
+                            if (abs(deltaY) > minDistanceUpDown && noReplaySwipe) {
+                                if (y2 > y1) {
+                                    DirectionRotationCubeManager.down(
+                                        0,
+                                        arrayBitmap,
+                                        arrayNumber,
+                                        arrayPosition,
+                                        binding.layFragPlayPwpEasy.idImViewScale,
+                                        binding.layFragPlayPwpEasy.idImViewScale2,
+                                        durationAnimationCubeSpeed,
+                                        Constans.NO_HELPSCORESTART,
+                                        adapterEasy,
+                                        binding,
+                                        999,
+                                        999,
+                                        999
+                                    )
+                                    noReplaySwipe = false
+                                } else {
+                                    DirectionRotationCubeManager.up(
+                                        0,
+                                        arrayBitmap,
+                                        arrayNumber,
+                                        arrayPosition,
+                                        binding.layFragPlayPwpEasy.idImViewScale,
+                                        binding.layFragPlayPwpEasy.idImViewScale2,
+                                        durationAnimationCubeSpeed,
+                                        Constans.NO_HELPSCORESTART,
+                                        adapterEasy,
+                                        binding,
+                                        999,
+                                        999,
+                                        999
+                                    )
+                                    noReplaySwipe = false
+                                }
                             }
                         }
-                        if (abs(deltaY) > minDistanceUpDown && noReplaySwipe){
-                            if(y2 > y1){
-                                DirectionRotationCubeManager.down(0, arrayBitmap, arrayNumber, arrayPosition,
-                                    binding.layFragPlayPwpEasy.idImViewScale, binding.layFragPlayPwpEasy.idImViewScale2,
-                                    durationAnimationCubeSpeed, Constans.NO_HELPSCORESTART, adapterEasy, binding, 999, 99)
-                                noReplaySwipe = false
-                            }else {
-                                DirectionRotationCubeManager.up(0, arrayBitmap, arrayNumber, arrayPosition,
-                                    binding.layFragPlayPwpEasy.idImViewScale, binding.layFragPlayPwpEasy.idImViewScale2,
-                                    durationAnimationCubeSpeed, Constans.NO_HELPSCORESTART, adapterEasy, binding, 999, 999)
-                                noReplaySwipe = false
+
+                        MotionEvent.ACTION_UP -> {
+                            x2 = event.x
+                            y2 = event.y
+                            var deltaX: Float = x2 - x1
+                            var deltaY: Float = y2 - y1
+                            if (abs(deltaX) < minDistance && abs(deltaY) < minDistanceUpDown) {
+                                openItemScale = false
+                                //Запуск анимации уменьшения
+                                animObjectMinus(
+                                    positionClickOpen,
+                                    arrayBitmap[0],
+                                    arrayBitmap[1],
+                                    arrayBitmap[2],
+                                    arrayBitmap[3],
+                                    arrayBitmap[4],
+                                    arrayBitmap[5],
+                                    arrayNumber[0],
+                                    arrayNumber[1],
+                                    arrayNumber[2],
+                                    arrayNumber[3],
+                                    arrayNumber[4],
+                                    arrayNumber[5],
+                                    arrayPosition[0],
+                                    arrayPosition[1],
+                                    arrayPosition[2],
+                                    arrayPosition[3],
+                                    arrayPosition[4],
+                                    arrayPosition[5],
+                                    positionClick,
+                                    itemViewGlobal,
+                                    Constans.NO_HELPSCORESTART
+                                )
                             }
-                        }
-                    }
-                    MotionEvent.ACTION_UP -> {
-                        x2 = event.x
-                        y2 = event.y
-                        var deltaX: Float = x2 - x1
-                        var deltaY: Float = y2 - y1
-                        if (abs(deltaX) < minDistance && abs(deltaY) < minDistanceUpDown){
-                            openItemScale = false
-                            //Запуск анимации уменьшения
-                            animObjectMinus(positionClickOpen, arrayBitmap[0], arrayBitmap[1], arrayBitmap[2], arrayBitmap[3],
-                                arrayBitmap[4], arrayBitmap[5], arrayNumber[0],  arrayNumber[1], arrayNumber[2], arrayNumber[3],
-                                arrayNumber[4], arrayNumber[5], arrayPosition[0],  arrayPosition[1], arrayPosition[2], arrayPosition[3],
-                                arrayPosition[4], arrayPosition[5],
-                                positionClick, itemViewGlobal, Constans.NO_HELPSCORESTART)
                         }
                     }
                 }
@@ -547,65 +779,136 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
 
         //Слушатель нажатия на увеличеный итем, если на кубике вторая картинка
         binding.layFragPlayPwpEasy.idImViewScale2.setOnTouchListener { v, event ->
-            //Проверка, что бы нельзя нажать во время анимации
-            if(noClickItemScale){
-                //Log.d("MyLog", "Слушатель ViewScale2")
-                val maxSizeView = v.width
-                val minDistance = 15
-                val minDistanceUpDown = 7
+            if(!stopClickAnimationHelp) {
+                //Проверка, что бы нельзя нажать во время анимации
+                if (noClickItemScale) {
+                    //Log.d("MyLog", "Слушатель ViewScale2")
+                    val maxSizeView = v.width
+                    val minDistance = 15
+                    val minDistanceUpDown = 7
 
-                when (event.action) {
-                    MotionEvent.ACTION_DOWN -> { //Срабатывает когда коснулись экрана
-                        x1 = event.x //Позиция по оси Х куда нажали
-                        y1 = event.y //Позиция по оси Y куда нажали
-                        noReplaySwipe = true
-                    }
-                    //Определеяем в каком направлении вращать кубик
-                    MotionEvent.ACTION_MOVE -> {
-                        x2 = event.x
-                        y2 = event.y
-                        var deltaX: Float = x2 - x1
-                        var deltaY: Float = y2 - y1
-                        if (abs(deltaX) > minDistance && noReplaySwipe){
-                            if(x2 > x1){
-                                DirectionRotationCubeManager.right(0, arrayBitmap, arrayNumber, arrayPosition,
-                                    binding.layFragPlayPwpEasy.idImViewScale, binding.layFragPlayPwpEasy.idImViewScale2,
-                                    durationAnimationCubeSpeed, Constans.NO_HELPSCORESTART, adapterEasy, binding, 999, 999)
-                                noReplaySwipe = false
-                            }else {
-                                DirectionRotationCubeManager.left(0, arrayBitmap, arrayNumber, arrayPosition,
-                                    binding.layFragPlayPwpEasy.idImViewScale, binding.layFragPlayPwpEasy.idImViewScale2,
-                                    durationAnimationCubeSpeed, Constans.NO_HELPSCORESTART, adapterEasy, binding, 999, 999)
-                                noReplaySwipe = false
-                            }
+                    when (event.action) {
+                        MotionEvent.ACTION_DOWN -> { //Срабатывает когда коснулись экрана
+                            x1 = event.x //Позиция по оси Х куда нажали
+                            y1 = event.y //Позиция по оси Y куда нажали
+                            noReplaySwipe = true
                         }
-                        if (abs(deltaY) > minDistanceUpDown && noReplaySwipe){
-                            if(y2 > y1){
-                                DirectionRotationCubeManager.down(0, arrayBitmap, arrayNumber, arrayPosition,
-                                    binding.layFragPlayPwpEasy.idImViewScale, binding.layFragPlayPwpEasy.idImViewScale2,
-                                    durationAnimationCubeSpeed, Constans.NO_HELPSCORESTART, adapterEasy, binding, 999, 999)
-                                noReplaySwipe = false
-                            }else {
-                                DirectionRotationCubeManager.up(0, arrayBitmap, arrayNumber, arrayPosition,
-                                    binding.layFragPlayPwpEasy.idImViewScale, binding.layFragPlayPwpEasy.idImViewScale2,
-                                    durationAnimationCubeSpeed, Constans.NO_HELPSCORESTART, adapterEasy, binding, 999, 999)
-                                noReplaySwipe = false
+                        //Определеяем в каком направлении вращать кубик
+                        MotionEvent.ACTION_MOVE -> {
+                            x2 = event.x
+                            y2 = event.y
+                            var deltaX: Float = x2 - x1
+                            var deltaY: Float = y2 - y1
+                            if (abs(deltaX) > minDistance && noReplaySwipe) {
+                                if (x2 > x1) {
+                                    DirectionRotationCubeManager.right(
+                                        0,
+                                        arrayBitmap,
+                                        arrayNumber,
+                                        arrayPosition,
+                                        binding.layFragPlayPwpEasy.idImViewScale,
+                                        binding.layFragPlayPwpEasy.idImViewScale2,
+                                        durationAnimationCubeSpeed,
+                                        Constans.NO_HELPSCORESTART,
+                                        adapterEasy,
+                                        binding,
+                                        999,
+                                        999,
+                                        999
+                                    )
+                                    noReplaySwipe = false
+                                } else {
+                                    DirectionRotationCubeManager.left(
+                                        0,
+                                        arrayBitmap,
+                                        arrayNumber,
+                                        arrayPosition,
+                                        binding.layFragPlayPwpEasy.idImViewScale,
+                                        binding.layFragPlayPwpEasy.idImViewScale2,
+                                        durationAnimationCubeSpeed,
+                                        Constans.NO_HELPSCORESTART,
+                                        adapterEasy,
+                                        binding,
+                                        999,
+                                        999,
+                                        999
+                                    )
+                                    noReplaySwipe = false
+                                }
                             }
+                            if (abs(deltaY) > minDistanceUpDown && noReplaySwipe) {
+                                if (y2 > y1) {
+                                    DirectionRotationCubeManager.down(
+                                        0,
+                                        arrayBitmap,
+                                        arrayNumber,
+                                        arrayPosition,
+                                        binding.layFragPlayPwpEasy.idImViewScale,
+                                        binding.layFragPlayPwpEasy.idImViewScale2,
+                                        durationAnimationCubeSpeed,
+                                        Constans.NO_HELPSCORESTART,
+                                        adapterEasy,
+                                        binding,
+                                        999,
+                                        999,
+                                        999
+                                    )
+                                    noReplaySwipe = false
+                                } else {
+                                    DirectionRotationCubeManager.up(
+                                        0,
+                                        arrayBitmap,
+                                        arrayNumber,
+                                        arrayPosition,
+                                        binding.layFragPlayPwpEasy.idImViewScale,
+                                        binding.layFragPlayPwpEasy.idImViewScale2,
+                                        durationAnimationCubeSpeed,
+                                        Constans.NO_HELPSCORESTART,
+                                        adapterEasy,
+                                        binding,
+                                        999,
+                                        999,
+                                        999
+                                    )
+                                    noReplaySwipe = false
+                                }
+                            }
+
                         }
 
-                    }
-                    MotionEvent.ACTION_UP -> {
-                        x2 = event.x
-                        y2 = event.y
-                        var deltaX: Float = x2 - x1
-                        var deltaY: Float = y2 - y1
-                        if (abs(deltaX) < minDistance && abs(deltaY) < minDistanceUpDown){
-                            openItemScale = false
-                            //Запуск анимации уменьшения кубика
-                            animObjectMinus(positionClickOpen, arrayBitmap[0], arrayBitmap[1], arrayBitmap[2], arrayBitmap[3],
-                                arrayBitmap[4], arrayBitmap[5], arrayNumber[0],  arrayNumber[1], arrayNumber[2], arrayNumber[3],
-                                arrayNumber[4], arrayNumber[5], arrayPosition[0],  arrayPosition[1], arrayPosition[2], arrayPosition[3],
-                                arrayPosition[4], arrayPosition[5], positionClick, itemViewGlobal, Constans.NO_HELPSCORESTART)
+                        MotionEvent.ACTION_UP -> {
+                            x2 = event.x
+                            y2 = event.y
+                            var deltaX: Float = x2 - x1
+                            var deltaY: Float = y2 - y1
+                            if (abs(deltaX) < minDistance && abs(deltaY) < minDistanceUpDown) {
+                                openItemScale = false
+                                //Запуск анимации уменьшения кубика
+                                animObjectMinus(
+                                    positionClickOpen,
+                                    arrayBitmap[0],
+                                    arrayBitmap[1],
+                                    arrayBitmap[2],
+                                    arrayBitmap[3],
+                                    arrayBitmap[4],
+                                    arrayBitmap[5],
+                                    arrayNumber[0],
+                                    arrayNumber[1],
+                                    arrayNumber[2],
+                                    arrayNumber[3],
+                                    arrayNumber[4],
+                                    arrayNumber[5],
+                                    arrayPosition[0],
+                                    arrayPosition[1],
+                                    arrayPosition[2],
+                                    arrayPosition[3],
+                                    arrayPosition[4],
+                                    arrayPosition[5],
+                                    positionClick,
+                                    itemViewGlobal,
+                                    Constans.NO_HELPSCORESTART
+                                )
+                            }
                         }
                     }
                 }
@@ -760,7 +1063,8 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
         adapterEasy = AdapterFragPWPEasy(this, activity as FragmentActivity)
         binding.layFragPlayPwpEasy.idRcViewFragPWP.layoutManager = CustomGridLayoutManagerEasy(activity as AppCompatActivity)
         binding.layFragPlayPwpEasy.idRcViewFragPWP.adapter = adapterEasy
-
+        //Блокируем возможность открывать DriverLayout свайпом слева на право
+        binding.idDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
         //binding.layFragPlayPwpTwo.idRcViewFragPWP.layoutManager = CustomGridLayoutManagerHard(activity as AppCompatActivity)
         //binding.layFragPlayPwpTwo.idRcViewFragPWP.layoutManager = CustomGridLayoutManagerMedium(activity as AppCompatActivity)
         //adapter?.setHasStableIds(true)
@@ -802,7 +1106,8 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
         imItem: ImageView,
         directionRotation: Int,
         selectImage: Int,
-        openImage: Int
+        openImage: Int,
+        countCubeRotated: Int
     ) {
         //Log.d("MyLog", "clickScaleItem")
         binding.layFragPlayPwpEasy.idImViewScale.elevation = 1f
@@ -812,7 +1117,7 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
         positionClick = position
         binding.layFragPlayPwpEasy.idImViewMove2.visibility = View.GONE //Прячем картинку которая прилетает обратно и находится поднизом
         if (openItemScale){
-            Log.d("MyLog", "openItemScale = true")
+            //Log.d("MyLog", "openItemScale = true")
             //запускается когда итем уже увеличен, и закрывает предыдущий итем и запускает новый
             animObjectMinus(positionClickOpen, b0,b1,b2,b3,b4,b5,n0,n1,n2,n3,n4,n5, p0,p1,p2,p3,p4,p5, positionClick, itemView, directionRotation)
         }else {
@@ -843,7 +1148,7 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
             binding.layFragPlayPwpEasy.idImViewScale2.visibility = View.GONE
 
             binding.layFragPlayPwpEasy.idImViewScale.setImageBitmap(b0)
-            animObjectPlus(position, directionRotation, selectImage, openImage)
+            animObjectPlus(position, directionRotation, selectImage, openImage, countCubeRotated)
             //openItemScale = true //открыт/увеличен scaleItem
             //adapterEasy?.noMove?.noMoveIfOpenScale = false
             arrayBitmap.clear()
@@ -1086,6 +1391,7 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
 
     //Интерфейс получения данных с adaptera, после нажатия на кнопку помощи и запуска диалога подсказки
     override fun helpScore(mainArrayViewTemp: ArrayList<dataArrayBitmap>) {
+        mainArrayView.clear()
         mainArrayView.addAll(mainArrayViewTemp)
         dialogHelpScore.createHelpScoreDialog(activity as FragmentActivity, imageBitmap1, imageBitmap2,
             imageBitmap3, imageBitmap4, imageBitmap5, imageBitmap6, scoreHelp, arrayCollectedImage, mainArrayView)
@@ -1095,10 +1401,25 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
         selectImage: Int,
         openImage: Int,
         mainArrayViewTemp: ArrayList<dataArrayBitmap>,
-        posRotation: Int
+        posRotation: Int,
+        countCubeRotated: Int
     ) {
-        mainArrayView.addAll(mainArrayViewTemp)
-        HelpScoreManager.startDirectionRotationCube(selectImage, openImage, mainArrayView, binding, posRotation)
+        //Запускаем если позиция которую хотим вращать меньше чем кол-во кубиков которое нужно вращать
+        if (countCubeRotated != openImage) {
+            mainArrayView.clear()
+            mainArrayView.addAll(mainArrayViewTemp)
+            HelpScoreManager.startDirectionRotationCube(
+                selectImage,
+                openImage,
+                mainArrayView,
+                binding,
+                posRotation,
+                countCubeRotated
+            )
+        } else {
+            stopClickAnimationHelp = false// Разблокировать нажатия на фрагменте
+            adapterEasy.noClickForAnimationHelpScore.noClickForAnimationHelpScore = true// Разаблокировать нажатия на адаптере
+        }
     }
 
     //После обновления позиции в адаптере происходит проверка собрана картинка, если да то сюда приходит позиция, какую картинку собрали
@@ -1146,7 +1467,7 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
 
     //Метод анимации увелечения кубика если просто нажали
     fun animObjectPlus(position: Int, directionRotation: Int, selectImage: Int,
-                       openImage: Int){
+                       openImage: Int, countCubeRotated: Int){
         //Определяем координаты начала увелечения в зависимости от позиции на которую нажали
         when(position) {
             0 -> {
@@ -1234,7 +1555,7 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
                     DirectionRotationCubeManager.rotationHelpScore(directionRotation, position, arrayBitmap, arrayNumber, arrayPosition,
                         binding.layFragPlayPwpEasy.idImViewScale, binding.layFragPlayPwpEasy.idImViewScale2,
                         durationAnimationCubeSpeed, adapterEasy, binding, selectImage,
-                        openImage)
+                        openImage, countCubeRotated)
                     openItemScale = false
                 }
                 //binding.idImViewScale.isClickable = false
@@ -1297,7 +1618,7 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
 
                         binding.layFragPlayPwpEasy.idImViewScale.setImageBitmap(b0)
                         // 999 - Заглушка
-                        animObjectPlus(positionClickOpen, constHelpScore, 999, 999)
+                        animObjectPlus(positionClickOpen, constHelpScore, 999, 999, 999)
                         openItemScale = true
                         arrayBitmap.clear()
                         arrayBitmap.add(b0)
@@ -1372,7 +1693,7 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
 
                         binding.layFragPlayPwpEasy.idImViewScale.setImageBitmap(b0)
                         //999 - заглушка
-                        animObjectPlus(positionClickOpen, constHelpScore, 999 , 999)
+                        animObjectPlus(positionClickOpen, constHelpScore, 999 , 999, 999)
                         openItemScale = true
                         arrayBitmap.clear()
                         arrayBitmap.add(b0)
@@ -1427,7 +1748,12 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
         binding.idDrawerLayout.openDrawer(GravityCompat.START)
     }
 
-    override fun interfaceHelpScoreDialog(selectImage: Int, openImage: Int, posRotationCube: Int) {
+    override fun interfaceHelpScoreDialog(
+        selectImage: Int,
+        openImage: Int,
+        posRotationCube: Int,
+        countCubeRotated: Int
+    ) {
         binding.idDrawerLayout.closeDrawer(GravityCompat.START)
         //HelpScoreManager.startDirectionRotationCube(selectImage, openImage, mainArrayView,
         //binding, adapterEasy)
@@ -1436,27 +1762,19 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
         //mainArrayView - массив со всеми данными по полю типа  ArrayList<dataArrayBitmap>
         // posRotation - позиция которую вращаем
         HelpScoreManager.startDirectionRotationCube(selectImage, openImage, mainArrayView,
-            binding, posRotationCube)
+            binding, posRotationCube, countCubeRotated)
     }
 
-    //Метод который мы запускаем по нажатии кнопки "Выдвинуть меню"
+    //интерфейс который вызывается из диалога помощи поворота кубиков
+    //для блокировки нажатия на фрагменте пока идет анимация вращения кубиков
+    override fun interfaceStopClickAnimationHelp() {
+        stopClickAnimationHelp = true// Заблокировать нажатия на фрагменте
+        adapterEasy.noClickForAnimationHelpScore.noClickForAnimationHelpScore = false// Заблокировать нажатия на адаптере
+    }
+
     //Не используется
-    fun startDirectionRotationCube (selectImage: Int, openImage: Int, mainArrayView: ArrayList<dataArrayBitmap>,
-                                    binding: DrawerLayoutPwpEasyBinding, adapterFragPWPEasy: AdapterFragPWPEasy) {
-        binding.layFragPlayPwpEasy.idImViewScale2.visibility = View.GONE
-        binding.layFragPlayPwpEasy.idImViewMove2.visibility = View.GONE
-        binding.layFragPlayPwpEasy.idImViewMove.visibility = View.GONE
-        val fr =  binding.layFragPlayPwpEasy.idRcViewFragPWP.findViewHolderForAdapterPosition(3)
-        val itemOne = fr?.itemView?.findViewById<ImageView>(R.id.id_item_play_with_pictures_one)
-        val itemView = fr?.itemView
-        val adapter = binding.layFragPlayPwpEasy.idRcViewFragPWP.adapter as AdapterFragPWPEasy
-        if (itemView != null  && itemOne != null) {
-            //position - позиция какой кубик будет вращаться
-            //Constans.HELPSCORESTART - направление вращения кубика
-            adapter.helpScore(3, itemView, itemOne, Constans.HELPSCORESTART, 999, 999)
-
-        }
+    override fun interfaceNoStopClickAnimationHelp() {
+        TODO("Not yet implemented")
     }
-
 
 }

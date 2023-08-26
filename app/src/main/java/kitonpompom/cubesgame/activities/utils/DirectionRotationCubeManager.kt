@@ -19,7 +19,7 @@ object DirectionRotationCubeManager {
            arrayBitmap: ArrayList<Bitmap>, arrayNumber: ArrayList<Int>,
            arrayPosition: ArrayList<Int>, idImViewScale: ImageView,
            idImViewScale2: ImageView, durationAnimationCubeSpeed: Long, numberRotation: Int, adapterEasy: AdapterFragPWPEasy,
-           binding: DrawerLayoutPwpEasyBinding, selectImage: Int, openImage: Int
+           binding: DrawerLayoutPwpEasyBinding, selectImage: Int, openImage: Int, countCubeRotated:Int
     ) { //функ вращает кубик вверх
         var tempBitmap = arrayBitmap[0]
         arrayBitmap[0] = arrayBitmap[4]
@@ -61,7 +61,7 @@ object DirectionRotationCubeManager {
                     // Анимация закончилась
                     idImViewScale.visibility = View.GONE
                     if (numberRotation != Constans.NO_HELPSCORESTART) {
-                        animObjectMinus(adapterEasy, posRotationCube, binding, arrayBitmap, arrayNumber, arrayPosition, selectImage, openImage)
+                        animObjectMinus(adapterEasy, posRotationCube, binding, arrayBitmap, arrayNumber, arrayPosition, selectImage, openImage, countCubeRotated)
                     }
                 }
 
@@ -94,7 +94,7 @@ object DirectionRotationCubeManager {
                     // Анимация закончилась
                     idImViewScale2.visibility = View.GONE
                     if (numberRotation != Constans.NO_HELPSCORESTART) {
-                        animObjectMinus(adapterEasy, posRotationCube, binding, arrayBitmap, arrayNumber, arrayPosition, selectImage, openImage)
+                        animObjectMinus(adapterEasy, posRotationCube, binding, arrayBitmap, arrayNumber, arrayPosition, selectImage, openImage, countCubeRotated)
                     }
                 }
 
@@ -112,7 +112,7 @@ object DirectionRotationCubeManager {
              arrayPosition: ArrayList<Int>, idImViewScale: ImageView,
              idImViewScale2: ImageView,
              durationAnimationCubeSpeed: Long, numberRotation: Int, adapterEasy: AdapterFragPWPEasy,
-             binding: DrawerLayoutPwpEasyBinding, selectImage: Int, openImage: Int
+             binding: DrawerLayoutPwpEasyBinding, selectImage: Int, openImage: Int, countCubeRotated: Int
     ) { //функ вращает кубик вниз
         var tempBitmap = arrayBitmap[0]
         arrayBitmap[0] = arrayBitmap[3]
@@ -155,7 +155,8 @@ object DirectionRotationCubeManager {
                     // Анимация закончилась
                     idImViewScale.visibility = View.GONE
                     if (numberRotation != Constans.NO_HELPSCORESTART) {
-                        animObjectMinus(adapterEasy, posRotationCube, binding, arrayBitmap, arrayNumber, arrayPosition, selectImage, openImage)
+                        animObjectMinus(adapterEasy, posRotationCube, binding, arrayBitmap,
+                            arrayNumber, arrayPosition, selectImage, openImage, countCubeRotated)
                     }
                 }
 
@@ -187,7 +188,8 @@ object DirectionRotationCubeManager {
                     // Анимация закончилась
                     idImViewScale2.visibility = View.GONE
                     if (numberRotation != Constans.NO_HELPSCORESTART) {
-                        animObjectMinus(adapterEasy, posRotationCube, binding, arrayBitmap, arrayNumber, arrayPosition, selectImage, openImage)
+                        animObjectMinus(adapterEasy, posRotationCube, binding, arrayBitmap, arrayNumber,
+                            arrayPosition, selectImage, openImage, countCubeRotated)
                     }
                 }
 
@@ -203,7 +205,7 @@ object DirectionRotationCubeManager {
               arrayBitmap: ArrayList<Bitmap>, arrayNumber: ArrayList<Int>,
               arrayPosition: ArrayList<Int>, idImViewScale: ImageView, idImViewScale2: ImageView,
               durationAnimationCubeSpeed: Long, numberRotation: Int, adapterEasy: AdapterFragPWPEasy,
-              binding: DrawerLayoutPwpEasyBinding, selectImage: Int, openImage: Int
+              binding: DrawerLayoutPwpEasyBinding, selectImage: Int, openImage: Int, countCubeRotated: Int
     ) { //функ вращает кубик вправо
         var tempBitmap = arrayBitmap[0]
         arrayBitmap[0] = arrayBitmap[1]
@@ -246,7 +248,8 @@ object DirectionRotationCubeManager {
                     // Анимация закончилась
                     idImViewScale.visibility = View.GONE
                     if (numberRotation != Constans.NO_HELPSCORESTART) {
-                        animObjectMinus(adapterEasy, posRotationCube, binding, arrayBitmap, arrayNumber, arrayPosition, selectImage, openImage)
+                        animObjectMinus(adapterEasy, posRotationCube, binding, arrayBitmap,
+                            arrayNumber, arrayPosition, selectImage, openImage, countCubeRotated)
                     }
                 }
 
@@ -278,7 +281,8 @@ object DirectionRotationCubeManager {
                     // Анимация закончилась
                     idImViewScale2.visibility = View.GONE
                     if (numberRotation != Constans.NO_HELPSCORESTART) {
-                        animObjectMinus(adapterEasy, posRotationCube, binding, arrayBitmap, arrayNumber, arrayPosition, selectImage, openImage)
+                        animObjectMinus(adapterEasy, posRotationCube, binding,
+                            arrayBitmap, arrayNumber, arrayPosition, selectImage, openImage, countCubeRotated)
                     }
                 }
 
@@ -294,7 +298,7 @@ object DirectionRotationCubeManager {
              arrayBitmap: ArrayList<Bitmap>, arrayNumber: ArrayList<Int>,
              arrayPosition: ArrayList<Int>, idImViewScale: ImageView,
              idImViewScale2: ImageView, durationAnimationCubeSpeed: Long, numberRotation: Int, adapterEasy: AdapterFragPWPEasy,
-             binding: DrawerLayoutPwpEasyBinding, selectImage: Int, openImage: Int
+             binding: DrawerLayoutPwpEasyBinding, selectImage: Int, openImage: Int, countCubeRotated: Int
     ) { //функ вращает кубик влево
         var tempBitmap = arrayBitmap[0]
         arrayBitmap[0] = arrayBitmap[2]
@@ -337,7 +341,8 @@ object DirectionRotationCubeManager {
                     // Анимация закончилась
                     idImViewScale.visibility = View.GONE
                     if (numberRotation != Constans.NO_HELPSCORESTART) {
-                        animObjectMinus(adapterEasy, posRotationCube, binding, arrayBitmap, arrayNumber, arrayPosition, selectImage, openImage)
+                        animObjectMinus(adapterEasy, posRotationCube, binding, arrayBitmap,
+                            arrayNumber, arrayPosition, selectImage, openImage, countCubeRotated)
                     }
                 }
 
@@ -369,7 +374,8 @@ object DirectionRotationCubeManager {
                     // Анимация закончилась
                     idImViewScale2.visibility = View.GONE
                     if (numberRotation != Constans.NO_HELPSCORESTART) {
-                        animObjectMinus(adapterEasy, posRotationCube, binding, arrayBitmap, arrayNumber, arrayPosition, selectImage, openImage)
+                        animObjectMinus(adapterEasy, posRotationCube, binding, arrayBitmap,
+                            arrayNumber, arrayPosition, selectImage, openImage, countCubeRotated)
                     }
                 }
 
@@ -385,7 +391,7 @@ object DirectionRotationCubeManager {
                  arrayBitmap: ArrayList<Bitmap>, arrayNumber: ArrayList<Int>,
                  arrayPosition: ArrayList<Int>, idImViewScale: ImageView,
                  idImViewScale2: ImageView, durationAnimationCubeSpeed: Long, numberRotation: Int, adapterEasy: AdapterFragPWPEasy,
-                 binding: DrawerLayoutPwpEasyBinding, selectImage: Int, openImage: Int
+                 binding: DrawerLayoutPwpEasyBinding, selectImage: Int, openImage: Int, countCubeRotated: Int
     ) { //функ вращает кубик влево
         var tempBitmap = arrayBitmap[0]
         arrayBitmap[0] = arrayBitmap[2]
@@ -434,7 +440,7 @@ object DirectionRotationCubeManager {
                         idImViewScale,
                         idImViewScale2,
                         durationAnimationCubeSpeed,
-                        numberRotation, adapterEasy, binding, selectImage, openImage)
+                        numberRotation, adapterEasy, binding, selectImage, openImage, countCubeRotated)
                 }
 
                 override fun onAnimationRepeat(animation: Animation) {
@@ -471,7 +477,7 @@ object DirectionRotationCubeManager {
                         idImViewScale,
                         idImViewScale2,
                         durationAnimationCubeSpeed,
-                        numberRotation, adapterEasy, binding, selectImage, openImage)
+                        numberRotation, adapterEasy, binding, selectImage, openImage, countCubeRotated)
                 }
 
                 override fun onAnimationRepeat(animation: Animation) {
@@ -487,7 +493,7 @@ object DirectionRotationCubeManager {
         arrayPosition: ArrayList<Int>, idImViewScale: ImageView,
         idImViewScale2: ImageView, durationAnimationCubeSpeed: Long, adapterEasy: AdapterFragPWPEasy,
         binding: DrawerLayoutPwpEasyBinding, selectImage: Int,
-        openImage: Int
+        openImage: Int, countCubeRotated: Int
     ) {
         when (directionRotation) {
             0 -> {}
@@ -503,7 +509,8 @@ object DirectionRotationCubeManager {
                     adapterEasy,
                     binding,
                     selectImage,
-                    openImage
+                    openImage,
+                    countCubeRotated
                 )
             }
 
@@ -519,7 +526,8 @@ object DirectionRotationCubeManager {
                     adapterEasy,
                     binding,
                     selectImage,
-                    openImage
+                    openImage,
+                    countCubeRotated
                 )
             }
 
@@ -535,7 +543,8 @@ object DirectionRotationCubeManager {
                     adapterEasy,
                     binding,
                     selectImage,
-                    openImage
+                    openImage,
+                    countCubeRotated
                 )
             }
 
@@ -551,7 +560,8 @@ object DirectionRotationCubeManager {
                     adapterEasy,
                     binding,
                     selectImage,
-                    openImage
+                    openImage,
+                    countCubeRotated
                 )
             }
 
@@ -566,19 +576,21 @@ object DirectionRotationCubeManager {
                     directionRotation, adapterEasy,
                     binding,
                     selectImage,
-                    openImage
+                    openImage,
+                    countCubeRotated
                 )
             }
         }
     }
 
     fun animObjectMinus(adapterEasy: AdapterFragPWPEasy, posRotationCube: Int, binding: DrawerLayoutPwpEasyBinding,
-                        arrayBitmap: ArrayList<Bitmap>, arrayNumber: ArrayList<Int>, arrayPosition: ArrayList<Int>, selectImage: Int, openImage: Int){
+                        arrayBitmap: ArrayList<Bitmap>, arrayNumber: ArrayList<Int>, arrayPosition: ArrayList<Int>, selectImage: Int, openImage: Int, countCubeRotated: Int){
         adapterEasy?.updateAdapterPosition(arrayBitmap, arrayNumber, arrayPosition, posRotationCube, Constans.NO_POSITION_MOVE)
         val scaleX = PropertyValuesHolder.ofFloat(View.SCALE_X, (binding.layFragPlayPwpEasy.idRcViewFragPWP.width/3f) / binding.layFragPlayPwpEasy.idImViewScale.width)
         val scaleY = PropertyValuesHolder.ofFloat(View.SCALE_Y, (binding.layFragPlayPwpEasy.idRcViewFragPWP.width/3f) / binding.layFragPlayPwpEasy.idImViewScale.width)
         //Определяем какую из двух картинок уменьшать, в зависимости от того какая картинка видна
         var posRotationCube1 = posRotationCube
+        var countCubeRotated1 = countCubeRotated
         if (binding.layFragPlayPwpEasy.idImViewScale.visibility == View.VISIBLE) {
             //Анимация уменьшения кубика который крутили
             ObjectAnimator.ofPropertyValuesHolder(binding.layFragPlayPwpEasy.idImViewScale, scaleX, scaleY).apply {
@@ -599,7 +611,8 @@ object DirectionRotationCubeManager {
                     //noClickItemScale = true
                         adapterEasy?.noMove?.noMoveIfOpenScale = true
                     posRotationCube1++
-                    adapterEasy?.helpScoreToDirectionRotationCubeNext(selectImage, openImage, posRotationCube1)
+                    countCubeRotated1++
+                    adapterEasy?.helpScoreToDirectionRotationCubeNext(selectImage, openImage, posRotationCube1, countCubeRotated1)
                     }
             }
         }else{
@@ -622,7 +635,8 @@ object DirectionRotationCubeManager {
                     //noClickItemScale = true
                         adapterEasy?.noMove?.noMoveIfOpenScale = true
                     posRotationCube1++
-                    adapterEasy?.helpScoreToDirectionRotationCubeNext(selectImage, openImage, posRotationCube1)
+                    countCubeRotated1++
+                    adapterEasy?.helpScoreToDirectionRotationCubeNext(selectImage, openImage, posRotationCube1, countCubeRotated1)
                 }
             }
         }

@@ -27,6 +27,7 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
     var clickUpdateLine = ClickableStateUpdateLine() //Для блокировки перетягивания и увелечения во время обновления линий
     var noMove = NoMoveIfOpenScale()//Класс для блокировки в адаптере возможности срабатывания ОнТач, блокируется из фрагмета с рцвью когда картинка увеличена
     var noMoveBack = NoMoveIfOpenScaleBack()//Класс для пблокировки в адаптере возможности срабатывания ОнТач при обратной анимации, блокируется из фрагмета с рцвью
+    var noClickForAnimationHelpScore = NoClickForAnimationHelpScore()//класс для блокировки обновления линий без обновления картинки
     var updateLineNoImage = UpdateLineNoImage()//класс для блокировки обновления линий без обновления картинки
     var colorLine = false //Цвет линий false - черный
     lateinit var view: View
@@ -46,7 +47,8 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
             colorAnimationStars = true
         }
             //Log.d("MyLog", "OnCreateViewHolder")
-        return AdapterFragPWPEasy.ImageHolder(view, this, parent.id, click, noMove, clickBack,clickUpdateLine, noMoveBack, colorAnimationStars)
+        return AdapterFragPWPEasy.ImageHolder(view, this, parent.id, click, noMove, clickBack,clickUpdateLine,
+            noMoveBack, colorAnimationStars, noClickForAnimationHelpScore)
     }
 
     override fun onBindViewHolder(holder: ImageHolder, position: Int) {
@@ -67,7 +69,8 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
 
 
     class ImageHolder (itemView : View, val adapter: AdapterFragPWPEasy, id: Int, var clickk: ClickableState, var noMovee: NoMoveIfOpenScale,
-                       var clickkBack: ClickableStateBack, var clickkUpdateLine: ClickableStateUpdateLine, var noMoveeBack: NoMoveIfOpenScaleBack, val colorAnimation:Boolean) : RecyclerView.ViewHolder(itemView)  {
+                       var clickkBack: ClickableStateBack, var clickkUpdateLine: ClickableStateUpdateLine, var noMoveeBack: NoMoveIfOpenScaleBack,
+                       val colorAnimation:Boolean, var noClickkForAnimationHelpScore: NoClickForAnimationHelpScore) : RecyclerView.ViewHolder(itemView)  {
         lateinit var imItemOne : ImageView
         lateinit var imItemTwo : ImageView
         lateinit var lineLeft :LinearLayout
@@ -147,23 +150,41 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
 
                 imItemOne.setOnClickListener {
                     //Log.d("MyLog", "setOnClickListener ItemOne actionNoClick $actionNoClickOnTouchIfTouchOnMove")
-                    if (!actionNoClickOnTouchIfTouchOnMove) {
-                        if (!noMovee.noMoveIfOpenScale && noMoveeBack.noMoveIfOpenScale) {
-                            if (clickk.clickable && clickkBack.clickable && clickkUpdateLine.clickable) {
-                                //Log.d("MyLog", "Слушатель ImItemOne1")
-                                // selectImage = 999 - потому что это заглушка, используется только из helpScore
-                                // openImage = 999 - потому что это заглушка, используется только из helpScore
-                                clickScaleItemInterface.clickScaleItem(
-                                    item.arrayBitmap[0], item.arrayBitmap[1],
-                                    item.arrayBitmap[2], item.arrayBitmap[3],
-                                    item.arrayBitmap[4], item.arrayBitmap[5],
-                                    item.arrayNumber[0], item.arrayNumber[1],
-                                    item.arrayNumber[2], item.arrayNumber[3],
-                                    item.arrayNumber[4], item.arrayNumber[5],
-                                    item.arrayPosition[0], item.arrayPosition[1],
-                                    item.arrayPosition[2], item.arrayPosition[3],
-                                    item.arrayPosition[4], item.arrayPosition[5],
-                                    adapterPosition, itemView, imItemOne, Constans.NO_HELPSCORESTART, 999, 999)
+                    if (noClickkForAnimationHelpScore.noClickForAnimationHelpScore) {//Не запускаем если идёт анимация помощи вращения кубиков
+                        if (!actionNoClickOnTouchIfTouchOnMove) {
+                            if (!noMovee.noMoveIfOpenScale && noMoveeBack.noMoveIfOpenScale) {
+                                if (clickk.clickable && clickkBack.clickable && clickkUpdateLine.clickable) {
+                                    //Log.d("MyLog", "Слушатель ImItemOne1")
+                                    // selectImage = 999 - потому что это заглушка, используется только из helpScore
+                                    // openImage = 999 - потому что это заглушка, используется только из helpScore
+                                    clickScaleItemInterface.clickScaleItem(
+                                        item.arrayBitmap[0],
+                                        item.arrayBitmap[1],
+                                        item.arrayBitmap[2],
+                                        item.arrayBitmap[3],
+                                        item.arrayBitmap[4],
+                                        item.arrayBitmap[5],
+                                        item.arrayNumber[0],
+                                        item.arrayNumber[1],
+                                        item.arrayNumber[2],
+                                        item.arrayNumber[3],
+                                        item.arrayNumber[4],
+                                        item.arrayNumber[5],
+                                        item.arrayPosition[0],
+                                        item.arrayPosition[1],
+                                        item.arrayPosition[2],
+                                        item.arrayPosition[3],
+                                        item.arrayPosition[4],
+                                        item.arrayPosition[5],
+                                        adapterPosition,
+                                        itemView,
+                                        imItemOne,
+                                        Constans.NO_HELPSCORESTART,
+                                        999,
+                                        999,
+                                        999
+                                    )
+                                }
                             }
                         }
                     }
@@ -171,43 +192,24 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
 
                 imItemOne.setOnTouchListener(){ viewRc, eventRc ->
                     //Log.d("MyLog", "imItemOne.setOnTouchListener")
-                    if (noMovee.noMoveIfOpenScale && noMoveeBack.noMoveIfOpenScale){ //Не запускаем если открыт увеличеный Итем
-                        if (clickk.clickable && clickkBack.clickable && clickkUpdateLine.clickable) {// Не запускаем пока идет анимация
-                            //Log.d("MyLog", "Слушатель  тач ImItemOne")
-                            val minDistance = 23
-                            val minDistanceUpDown = 15
-                            when (eventRc.action) {
-                                MotionEvent.ACTION_DOWN -> { //Срабатывает когда коснулись экрана
-                                    actionMoveCheck = false
-                                    noReplaySwipe = true
-                                }
-                                MotionEvent.ACTION_MOVE -> {
-                                    //Log.d("MyLog", "ACTION_MOVE")
-                                    //actionMoveCheck = true
-                                    actionNoClickOnTouchIfTouchOnMove = true
-                                    if(noReplaySwipe){
-                                        clickScaleItemInterface.moveItem(item.arrayBitmap[0], item.arrayBitmap[1],
-                                            item.arrayBitmap[2], item.arrayBitmap[3],
-                                            item.arrayBitmap[4], item.arrayBitmap[5],
-                                            item.arrayNumber[0], item.arrayNumber[1],
-                                            item.arrayNumber[2], item.arrayNumber[3],
-                                            item.arrayNumber[4], item.arrayNumber[5],
-                                            item.arrayPosition[0], item.arrayPosition[1],
-                                            item.arrayPosition[2], item.arrayPosition[3],
-                                            item.arrayPosition[4], item.arrayPosition[5],
-                                            adapterPosition, itemView, imItemOne)
-                                        noReplaySwipe = false
+                    if (noClickkForAnimationHelpScore.noClickForAnimationHelpScore) {//Не запускаем если идёт анимация помощи вращения кубиков
+                        if (noMovee.noMoveIfOpenScale && noMoveeBack.noMoveIfOpenScale) { //Не запускаем если открыт увеличеный Итем
+                            if (clickk.clickable && clickkBack.clickable && clickkUpdateLine.clickable) {// Не запускаем пока идет анимация
+                                //Log.d("MyLog", "Слушатель  тач ImItemOne")
+                                val minDistance = 23
+                                val minDistanceUpDown = 15
+                                when (eventRc.action) {
+                                    MotionEvent.ACTION_DOWN -> { //Срабатывает когда коснулись экрана
+                                        actionMoveCheck = false
+                                        noReplaySwipe = true
                                     }
-                                }
-                                MotionEvent.ACTION_UP -> {
-                                    //Log.d("MyLog", "ACTION_UP")
-                                    actionNoClickOnTouchIfTouchOnMove = true
-                                    noReplaySwipe = false
-                                    if (clickk.clickable && clickkBack.clickable && clickkUpdateLine.clickable) {
-                                        if(!actionMoveCheck) {
-                                            // selectImage = 999 - потому что это заглушка, используется только из helpScore
-                                            // openImage = 999 - потому что это заглушка, используется только из helpScore
-                                            clickScaleItemInterface.clickScaleItem(
+
+                                    MotionEvent.ACTION_MOVE -> {
+                                        //Log.d("MyLog", "ACTION_MOVE")
+                                        //actionMoveCheck = true
+                                        actionNoClickOnTouchIfTouchOnMove = true
+                                        if (noReplaySwipe) {
+                                            clickScaleItemInterface.moveItem(
                                                 item.arrayBitmap[0], item.arrayBitmap[1],
                                                 item.arrayBitmap[2], item.arrayBitmap[3],
                                                 item.arrayBitmap[4], item.arrayBitmap[5],
@@ -217,11 +219,52 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
                                                 item.arrayPosition[0], item.arrayPosition[1],
                                                 item.arrayPosition[2], item.arrayPosition[3],
                                                 item.arrayPosition[4], item.arrayPosition[5],
-                                                adapterPosition, itemView, imItemOne, Constans.NO_HELPSCORESTART, 999, 999)
-                                        }else{
+                                                adapterPosition, itemView, imItemOne
+                                            )
+                                            noReplaySwipe = false
+                                        }
+                                    }
+
+                                    MotionEvent.ACTION_UP -> {
+                                        //Log.d("MyLog", "ACTION_UP")
+                                        actionNoClickOnTouchIfTouchOnMove = true
+                                        noReplaySwipe = false
+                                        if (clickk.clickable && clickkBack.clickable && clickkUpdateLine.clickable) {
+                                            if (!actionMoveCheck) {
+                                                // selectImage = 999 - потому что это заглушка, используется только из helpScore
+                                                // openImage = 999 - потому что это заглушка, используется только из helpScore
+                                                clickScaleItemInterface.clickScaleItem(
+                                                    item.arrayBitmap[0],
+                                                    item.arrayBitmap[1],
+                                                    item.arrayBitmap[2],
+                                                    item.arrayBitmap[3],
+                                                    item.arrayBitmap[4],
+                                                    item.arrayBitmap[5],
+                                                    item.arrayNumber[0],
+                                                    item.arrayNumber[1],
+                                                    item.arrayNumber[2],
+                                                    item.arrayNumber[3],
+                                                    item.arrayNumber[4],
+                                                    item.arrayNumber[5],
+                                                    item.arrayPosition[0],
+                                                    item.arrayPosition[1],
+                                                    item.arrayPosition[2],
+                                                    item.arrayPosition[3],
+                                                    item.arrayPosition[4],
+                                                    item.arrayPosition[5],
+                                                    adapterPosition,
+                                                    itemView,
+                                                    imItemOne,
+                                                    Constans.NO_HELPSCORESTART,
+                                                    999,
+                                                    999,
+                                                    999
+                                                )
+                                            } else {
                                                 clickScaleItemInterface.actionMoveAndActionUP(
                                                     adapterPosition
                                                 )
+                                            }
                                         }
                                     }
                                 }
@@ -263,7 +306,7 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
 
     //Запускаем из HelpScoreManager и передаем значения на fragment картинок того кубика PosRotation который
     // нужно вращать по подсказке
-    fun helpScore(posRotation:Int, itemView: View, imItemOneImage: ImageView, constHelpScore: Int, selectImage: Int, openImage: Int){
+    fun helpScore(posRotation:Int, itemView: View, imItemOneImage: ImageView, constHelpScore: Int, selectImage: Int, openImage: Int, countCubeRotated: Int){
         //constHelpScore - Если запустили для вращения то сюда приходит номер позиции на которой стоит нужная
         //нам картинка для вращения
         //posRotation - Номер кубика который будет вращаться
@@ -277,7 +320,7 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
             mainArrayView[posRotation].arrayPosition[0], mainArrayView[posRotation].arrayPosition[1],
             mainArrayView[posRotation].arrayPosition[2], mainArrayView[posRotation].arrayPosition[3],
             mainArrayView[posRotation].arrayPosition[4], mainArrayView[posRotation].arrayPosition[5],
-            posRotation, itemView, imItemOneImage, constHelpScore, selectImage, openImage)
+            posRotation, itemView, imItemOneImage, constHelpScore, selectImage, openImage, countCubeRotated)
 
     }
 
@@ -1054,15 +1097,15 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
     }
 
     //Запускаем из DirectionRotationCube когда нужно повернуть следующий кубик в помощи
-    fun helpScoreToDirectionRotationCubeNext(selectImage: Int, openImage: Int, posRotation: Int){
-        clickScaleItemInterface.helpScoreNext(selectImage, openImage, mainArrayView, posRotation)
+    fun helpScoreToDirectionRotationCubeNext(selectImage: Int, openImage: Int, posRotation: Int, countCubeRotated: Int){
+        clickScaleItemInterface.helpScoreNext(selectImage, openImage, mainArrayView, posRotation, countCubeRotated)
     }
 
     interface ClickScaleItemInterface{
         fun clickScaleItem(b0 : Bitmap, b1 : Bitmap, b2 : Bitmap, b3 : Bitmap, b4 : Bitmap,
                            b5 : Bitmap, n0: Int, n1: Int, n2: Int, n3: Int, n4: Int, n5: Int,
                            p0 : Int, p1 : Int, p2 : Int, p3 : Int, p4 : Int, p5 : Int,
-                           position: Int, itemView: View, imItem: ImageView, numberRotation: Int, selectImage: Int, openImage: Int)
+                           position: Int, itemView: View, imItem: ImageView, numberRotation: Int, selectImage: Int, openImage: Int, countCubeRotated: Int)
 
         fun moveItem(b0 : Bitmap, b1 : Bitmap, b2 : Bitmap, b3 : Bitmap, b4 : Bitmap,
                      b5 : Bitmap, n0: Int, n1: Int, n2: Int, n3: Int, n4: Int, n5: Int,
@@ -1082,7 +1125,8 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
 
         fun helpScore(arrayList : ArrayList<dataArrayBitmap>)
         //Интерфейс который запускается когда мы используем помощь, когда кубик повернулся и нужно повернуть следующий кубик
-        fun helpScoreNext(selectImage: Int, openImage: Int, arrayList : ArrayList<dataArrayBitmap>, posRotation: Int)
+        fun helpScoreNext(selectImage: Int, openImage: Int, arrayList : ArrayList<dataArrayBitmap>,
+                          posRotation: Int, countCubeRotated: Int)
 
 
         // Если картинка собрана, отправляем с какой позиции кубика картинка собрана,

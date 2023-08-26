@@ -12,17 +12,13 @@ import kitonpompom.cubesgame.databinding.DrawerLayoutPwpEasyBinding
 object HelpScoreManager {
 
     fun startDirectionRotationCube (selectImage: Int, openImage: Int, mainArrayView: ArrayList<dataArrayBitmap>,
-                                    binding: DrawerLayoutPwpEasyBinding, posRotation: Int) {
+                                    binding: DrawerLayoutPwpEasyBinding, posRotation: Int, countCubeRotated: Int) {
         var posRotationCube = posRotation
-        //Log.d("MyLog",  "connect = $posRotation")
-        //Log.d("MyLog",  "selectImage = $selectImage")
-        //Log.d("MyLog",  "openImage = $openImage")
-        //Log.d("MyLog",  "mainArrayView[conect].arrayNumber[0] = ${mainArrayView[1].arrayNumber[0]}")
-        //Запускаем если позиция которую хотим вращать меньше чем кол-во кубиков которое нужно вращать
-        if (posRotationCube < openImage) {
+
+        //Log.d("MyLog", "interfaceHelpScoreDialog в фрагменте countCubeRotated: $countCubeRotated, selectImage $selectImage, openImage $openImage, posRotationCube $posRotationCube")
             //Зпускаем цикл для того что бы если первая картинка повёрнута нужной нам стороной, то её пропустило
             //и начало проверять следующую, если норм то начать вращать следующую
-            for (i in 0..openImage) {
+            for (i in 0..mainArrayView.size) {
                 //Проверяем, если картинка на позиции 0 не равна картинке которую мы выбрали для поворота,
                 // то начать вращение
                 if (mainArrayView[posRotationCube].arrayNumber[0] != selectImage) {
@@ -56,21 +52,21 @@ object HelpScoreManager {
                                 //posRotation - кубик который собираемся вращать
                                 //posDirection - позиция на которой стоит нужный нам кубик, по которой мы выбираем сколько раз
                                 //вращать кубик на позиции posRotation
-                                adapter.helpScore(posRotationCube, itemView, itemOneImage, posDirection, selectImage, openImage)
+                                adapter.helpScore(posRotationCube, itemView, itemOneImage, posDirection, selectImage, openImage, countCubeRotated)
                             }
-                            Log.d("MyLog", "break2 повернуло")
+                            //Log.d("MyLog", "break2 повернуло")
                             break
                         }
                     }
-                    Log.d("MyLog", "break1")
+                    //Log.d("MyLog", "break1")
                     break
                 } else {
                     posRotationCube++
-                    Log.d("MyLog", "Повторка пошла $posRotationCube")
+                    //Log.d("MyLog", "Повторка пошла $posRotationCube")
 
                 }
             }
-        }
+
 
     }
 }

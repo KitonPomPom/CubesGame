@@ -90,6 +90,12 @@ class HelpScoreDialog(private val interfaceHelpScoreDialog: InterfaceHelpScoreDi
         if (arrayCollected[4] == 1) linear5.setCardBackgroundColor(act.getColor(R.color.green_main)) else linear5.setCardBackgroundColor(act.getColor(R.color.grey))
         if (arrayCollected[5] == 1) linear6.setCardBackgroundColor(act.getColor(R.color.green_main)) else linear6.setCardBackgroundColor(act.getColor(R.color.grey))
 
+        openImage1 = 0
+        openImage2 = 0
+        openImage3 = 0
+        openImage4 = 0
+        openImage5 = 0
+        openImage6 = 0
         // записываем количество кубиков повернутых к нам лицом для каждой картинки
         for (i in mainArrayView){
             when (i.arrayNumber[0]) {
@@ -105,6 +111,8 @@ class HelpScoreDialog(private val interfaceHelpScoreDialog: InterfaceHelpScoreDi
 
         //Высчитываем сколько кубиков нам нужно повернуть и записываем в массив 6 значений
         var openImageArray: ArrayList<Int> = arrayListOf()
+        Log.d("MyLog", "Запуск ${mainArrayView.size}")
+        openImageArray.clear()
         openImageArray.add(mainArrayView.size - openImage1)
         openImageArray.add(mainArrayView.size - openImage2)
         openImageArray.add(mainArrayView.size - openImage3)
@@ -117,6 +125,7 @@ class HelpScoreDialog(private val interfaceHelpScoreDialog: InterfaceHelpScoreDi
         //Выбираем какая картинка будет выделена автоматически при первом запуске
         // Цикл от 0 до 6
         for (i in 0 .. arrayCollected.size){
+            //Log.d("MyLog", "Цикл $i")
             //Если значение картинки в массиве = 0, значит картинка ещё не собрана
             if (arrayCollected[i] == 0){
                 //Убираем полупрозрачный фон если картинка ещё не собрана
@@ -126,10 +135,13 @@ class HelpScoreDialog(private val interfaceHelpScoreDialog: InterfaceHelpScoreDi
                 //Записываем номер картинки кубики которой нужно будет поворачивать
                 selectImage = i
                 //Если кол-во очков игрока меньше кол-ва кубиков которое нужно повернуть
+                //Log.d("MyLog", "score: $score, openImageArray: ${openImageArray[i]}")
                 if(score < openImageArray[i]){
                     //в scoreText записываем кол-во очков
+                    //Log.d("MyLog", "score: $score")
                     scoreText.text = score.toString()
                 }else{
+                    //Log.d("MyLog", "openImageArray: ${openImageArray[i]}")
                     //в scoreText записываем кол-во кубиков которое можно повернуть
                     scoreText.text = openImageArray[i].toString()
                 }
@@ -273,14 +285,22 @@ class HelpScoreDialog(private val interfaceHelpScoreDialog: InterfaceHelpScoreDi
         dialog.show()
         //Log.d("MyLog", "dialog 4 $dialog")
 
+        dialog.setOnDismissListener {
+            openImageArray.clear()
+        }
+
         btCancel.setOnClickListener(){
             dialog.dismiss()
         }
         btUse.setOnClickListener() {
-            var tempScore = scoreText.text.toString().toInt()
-            interfaceHelpScoreDialog.interfaceHelpScoreDialog(selectImage ,tempScore, 0)
-            //interfaceFinishCongratulationDialog.interfaceFinishCongratulationDialog()
-            dialog.dismiss()
+            //Если 0 то ничего не делать
+            if (scoreText.text.toString().toInt() != 0) {
+                var tempScore = scoreText.text.toString().toInt()
+                interfaceHelpScoreDialog.interfaceHelpScoreDialog(selectImage, tempScore, 0, 0)
+                interfaceHelpScoreDialog.interfaceStopClickAnimationHelp()
+
+                dialog.dismiss()
+            }
         }
         return dialog
     }
