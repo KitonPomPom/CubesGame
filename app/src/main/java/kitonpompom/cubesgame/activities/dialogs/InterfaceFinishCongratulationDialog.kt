@@ -3,5 +3,5 @@ package kitonpompom.cubesgame.activities.dialogs
 import android.graphics.Bitmap
 
 interface InterfaceFinishCongratulationDialog {
-    fun interfaceFinishCongratulationDialog()
+    fun interfaceFinishCongratulationDialog(score: Int)
 }

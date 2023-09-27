@@ -141,4 +141,28 @@ object FinishAnimationCongratulation {
         //setFadeOut - затухание
         return ps
     }
+    fun doAnimationScore(act: FragmentActivity, view: View, colorAnimation: Boolean) {
+        var starColor = view.context.getDrawable(R.drawable.star_black)
+        if(!colorAnimation)
+            starColor =  view.context.getDrawable(R.drawable.star_white)
+        val ps = ParticleSystem(act, 100, starColor, 2000L)
+        ps.setSpeedRange(0.1f, 0.25f)
+        ps.setScaleRange(0.7f, 1.3f)
+        ps.setSpeedRange(0.1f, 0.25f)
+        ps.setAcceleration(0.0001f, 90)
+        ps.setRotationSpeedRange(90f, 180f)
+        ps.setFadeOut(500, AccelerateInterpolator())
+        ps.setStartTime(3000L)
+        //ps.emit(1,1,100)
+        ps.oneShot(view, 10)
+        //ps.emit(binding.layFragPlayPwpEasy.idLinLineyka, 100)
+        //particlesPerSecond - кол-во звездочек в секунду (Частиц)
+        //maxParticles - кол-во частиц
+        //timeToLive - Время жизни частицын
+        //setSpeedRange - диапазон скоростей(не меняется)
+        //setScaleRange - размер частиц
+        //setAcceleration - ускорение, угол
+        //setRotationSpeedRange - диапазаон вращения
+        //setFadeOut - затухание
+    }
 }

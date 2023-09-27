@@ -29,7 +29,7 @@ class FinishCongratulationDialog(private val interfaceFinishCongratulationDialog
         val btNext = view.findViewById<Button>(R.id.id_bt_next_congr_dialog)
 
         textVTime.text = "--:--:--"
-        textVScore.text = "16"
+        textVScore.text = "5"
 
 
         builder.setView(view)
@@ -38,7 +38,7 @@ class FinishCongratulationDialog(private val interfaceFinishCongratulationDialog
         dialog.show()
         Log.d("MyLog", "dialog 4 $dialog")
         btNext.setOnClickListener() {
-            interfaceFinishCongratulationDialog.interfaceFinishCongratulationDialog()
+            interfaceFinishCongratulationDialog.interfaceFinishCongratulationDialog(textVScore.text.toString().toInt())
             dialog.dismiss()
         }
         return dialog

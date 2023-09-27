@@ -2,16 +2,12 @@ package kitonpompom.cubesgame.activities.dialogs
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.graphics.Bitmap
 import android.widget.Button
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import kitonpompom.cubesgame.R
 import kitonpompom.cubesgame.activities.utils.Constans
 import kitonpompom.cubesgame.databinding.DialogYesNoBinding
-import kitonpompom.cubesgame.databinding.DifficultyOptionDialogBinding
-import kitonpompom.cubesgame.databinding.ProgressDialogLayoutAddImageBinding
-import kitonpompom.cubesgame.databinding.ProgressDialogLayoutPwpBinding
 
 class YesNoDialog(private val interfaceYesNoDialog: InterfaceYesNoDialog) {
 
@@ -37,17 +33,28 @@ class YesNoDialog(private val interfaceYesNoDialog: InterfaceYesNoDialog) {
                 //view = rootDialogElement.root
                 textV.text = "Вы точно хотите выйти?"
             }
+
+            Constans.BT_ADS -> {
+                //val rootDialogElement = ProgressDialogLayoutPwpBinding.inflate(act.layoutInflater)
+                //view = rootDialogElement.root
+                textV.text = "Посмотреть рекламу?"
+            }
         }
-        btYes.setOnClickListener() {
-            interfaceYesNoDialog.interfaceYesNoDialog(Constans.YES)
-        }
-        btNo.setOnClickListener() {
-            interfaceYesNoDialog.interfaceYesNoDialog(Constans.NO)
-        }
+
         builder.setView(view)
         val dialog = builder.create()
         dialog.setCancelable(false)
         dialog.show()
+
+        btYes.setOnClickListener() {
+            interfaceYesNoDialog.interfaceYesNoDialog(Constans.YES, nameButton )
+            dialog.dismiss()
+        }
+        btNo.setOnClickListener() {
+            //interfaceYesNoDialog.interfaceYesNoDialog(Constans.NO, nameButton)
+            dialog.dismiss()
+        }
+
         return dialog
     }
 }

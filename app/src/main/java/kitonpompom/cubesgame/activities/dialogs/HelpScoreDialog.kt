@@ -260,7 +260,7 @@ class HelpScoreDialog(private val interfaceHelpScoreDialog: InterfaceHelpScoreDi
 
         btUp.setOnClickListener(){
             var scoreTextTemp = scoreText.text.toString().toInt()
-            if (scoreTextTemp < maxOpenImage){
+            if (scoreTextTemp < maxOpenImage && scoreTextTemp < score){
                 scoreTextTemp++
                 scoreText.text = scoreTextTemp.toString()
             }

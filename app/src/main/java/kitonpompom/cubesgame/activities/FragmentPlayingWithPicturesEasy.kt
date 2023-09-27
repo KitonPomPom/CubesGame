@@ -6,10 +6,15 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.graphics.Bitmap
+import android.graphics.BlurMaskFilter
+import android.graphics.Canvas
+import android.graphics.Paint
 import android.graphics.Path
+import android.graphics.Rect
 import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.os.Handler
 import android.util.DisplayMetrics
 import android.util.Log
@@ -30,6 +35,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LifecycleOwner
+import com.google.android.renderscript.Toolkit
+import jp.wasabeef.blurry.Blurry
 import kitonpompom.cubesgame.R
 import kitonpompom.cubesgame.activities.data.DataModel
 import kitonpompom.cubesgame.activities.data.dataArrayBitmap
@@ -47,7 +54,7 @@ import kitonpompom.cubesgame.databinding.DrawerLayoutPwpEasyBinding
 import kotlinx.coroutines.*
 import java.lang.Math.abs
 import java.util.*
-import kotlin.collections.ArrayList
+import kotlin.math.roundToInt
 
 
 class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScaleItemInterface, InterfaceYesNoDialog, InterfaceFinishCongratulationDialog, InterfaceHelpScoreDialog {
@@ -60,9 +67,10 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
     private val dialogCongratulationDialog = FinishCongratulationDialog(this)
     lateinit var dialogYesNoAlert: AlertDialog
     private var finishCloseDriver = false
+    private var timer: CountDownTimer? = null
 
-    var scoreHelp: Int = 16 //Очки игрока
     var mainArrayView = ArrayList<dataArrayBitmap>() //Массив из адаптера со всеми данными по картинкам на экране
+    var arrayInterval = arrayOf(60000,120000,180000)
     //private val adapterHard: AdapterFragPWPHard? = AdapterFragPWPHard(this)
     //private val adapterMedium: AdapterFragPWPMedium? = AdapterFragPWPMedium(this)
     lateinit var adapterEasy: AdapterFragPWPEasy
@@ -112,6 +120,7 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
     //var imMoveWidth by Delegates.notNull<Int>()
     var colorLine = true // Цвет линий
     var tempListBitmap = ArrayList<dataArrayBitmap>()
+    var score: Int = 13
 
     var optionDifficulty: Int? = null
 
@@ -136,6 +145,7 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
         super.onViewCreated(view, savedInstanceState)
         initRcView() //инициализируем адаптер и рцВью
         val displayMetrics = DisplayMetrics()
+        binding.layFragPlayPwpEasy.idTvScore.text = score.toString()
         //getWindowManager().getDefaultDisplay().getMetrics(displayMetrics)
         //val windowManager =
           //  BaseApplication.getApplication().getSystemService(Context.WINDOW_SERVICE)
@@ -145,13 +155,17 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
         initHeaderDrawerLayout(height) //инициализируем хидер в драйвер лайоуте
         mediaPlayerCubeFalling = MediaPlayer.create(activity as AppCompatActivity, R.raw.milnii_puzir2)
 
+
         //получаем картинки и пилим их на куски, потом перемешиваем и отправляем в адаптер
         dataModel.listBitmapForAdapterFragPWP.observe(activity as LifecycleOwner) {
             job = CoroutineScope(Dispatchers.Main).launch {
                 //Включаем диалог с загрузкой перед началом игры
                 delay(300L)
 
-                val dialog = ProgressDialog.createProgressDialog(activity as Activity, Constans.FRAGMENT_PLAYING_WITH_PICTURE)
+                val dialog = ProgressDialog.createProgressDialog(
+                    activity as Activity,
+                    Constans.FRAGMENT_PLAYING_WITH_PICTURE
+                )
                 //Создаем массивы с нарезаными картинками
                 val arrayCroppedImage1 = (ImageManagerTwo.croppedImageEasy(it[0]))
                 val arrayCroppedImage2 = (ImageManagerTwo.croppedImageEasy(it[1]))
@@ -161,19 +175,71 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
                 val arrayCroppedImage6 = (ImageManagerTwo.croppedImageEasy(it[5]))
                 //Если при первом запуске массив arrayCollectedImage пустой, то заполняем нулями
                 //А Если не пустой то заполняем резултаты из сохранений
-                if(arrayCollectedImage.isEmpty()) {
+                if (arrayCollectedImage.isEmpty()) {
                     for (i in 0..6) {
                         arrayCollectedImage.add(0)
                     }
                 }
 
+                //val imageView: ImageView = findViewById(R.id.my_image_view)
+                /*Glide.with(activity as FragmentActivity).asBitmap().load(it[0])
+                    .into(object : CustomTarget<Bitmap?>() {
+                        override fun onResourceReady(
+                            resource: Bitmap,
+                            @Nullable transition: Transition<in Bitmap?>?
+                        ) {
+                            Blurry.with(activity as Activity).from(resource).into(image1)
+                        }
+
+                        override fun onLoadCleared(@Nullable placeholder: Drawable?) {}
+                    })
+            //Blurry.with(activity as FragmentActivity).from(it[0]).into(image1)
+
+                val blurTransformation = BlurTransformation(25)
+                Glide.with(activity as FragmentActivity)
+                    .asBitmap()
+                    .load(it[0])
+                    //.apply(RequestOptions.bitmapTransform(BlurTransformation(20, 3)))
+                    .dontAnimate()
+                    .into(image1)*/
+
+                /*var blurredBitmap = Bitmap.createBitmap(it[0].width, it[0].height, Bitmap.Config.ARGB_8888)
+                val canvas = Canvas(blurredBitmap)
+                val paint = Paint()
+                paint.maskFilter = BlurMaskFilter(radius.toFloat(), BlurMaskFilter.Blur.NORMAL)
+                canvas.drawBitmap(it[0], null, Rect(0, 0, canvas.width, canvas.height), paint)*/
+                //val originalBitmap = it[0] // получаем первый Bitmap из списка
+
+                //val blurredBitmap = Bitmap.createBitmap(originalBitmap.width, originalBitmap.height, Bitmap.Config.ARGB_8888)
+                //val canvas = Canvas(blurredBitmap)
+                //val paint = Paint()
+                //paint.maskFilter = BlurMaskFilter(25f, BlurMaskFilter.Blur.NORMAL) // задаем радиус размытия
+                //canvas.drawBitmap(originalBitmap, null, Rect(0, 0, canvas.width, canvas.height), paint)
+
+
+                //image1.setImageBitmap(blurredBitmap) // устанавливаем размытый Bitmap в ImageView с id "image1"
+
+                val inputBitmap =  it[0]
+                val argbBitmap = inputBitmap.copy(Bitmap.Config.ARGB_8888, true)
+                val blurBitmap = Toolkit.blur(argbBitmap, 25)
+                val blurBitmap2 = Toolkit.blur(blurBitmap, 25)
+
+                val blurList = ImageManagerTwo.blurBitmap(it)
+
+
                 //Загружаем картинки в драйвер лайоут
-                image1.setImageBitmap(it[0])
-                image2.setImageBitmap(it[1])
-                image3.setImageBitmap(it[2])
-                image4.setImageBitmap(it[3])
-                image5.setImageBitmap(it[4])
-                image6.setImageBitmap(it[5])
+                image1.setImageBitmap(blurList[0])
+                image2.setImageBitmap(blurList[1])
+                image3.setImageBitmap(blurList[2])
+                image4.setImageBitmap(blurList[3])
+                image5.setImageBitmap(blurList[4])
+                image6.setImageBitmap(blurList[5])
+
+                //val bitmap = it[0]
+                //val blurredBitmap = Blurry.with(activity as FragmentActivity).from(bitmap).radius(25).sampling(2).capture().get()
+
+                //Blurry.with(activity as FragmentActivity).radius(25).sampling(2).onto(binding.root)
+                //Blurry.with(activity as FragmentActivity).from(bitmap).into(image1)
 
                 //Инициализируем и передаем битмапы в класс
                 imageBitmap1 = it[0]
@@ -182,6 +248,7 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
                 imageBitmap4 = it[3]
                 imageBitmap5 = it[4]
                 imageBitmap6 = it[5]
+
 
                 //Отрисовываем рамки в зависимости от значений массива arrayCollectedImage
                 collectedImageVisible(arrayCollectedImage)
@@ -222,6 +289,13 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
                 //Выключаем диалог после того как все загрузилось
                 dialog.dismiss()
                 //Открываем драйвер лэоут
+                binding.layFragPlayPwpEasy.idTvScore.visibility = View.VISIBLE
+                binding.layFragPlayPwpEasy.idBtOpenDrawer.visibility = View.VISIBLE
+                //перемешиваем массив с интервалами что бы запустить кубик удачи
+                arrayInterval.shuffle()
+                //запускаем таймер отсчета через сколько появится кубик удачи
+                startCountDownTimerLuckyTime(arrayInterval[0].toLong())
+                Log.d("MyLog", "Start timer ${arrayInterval[0]}, ${arrayInterval[1]}, ${arrayInterval[2]}")
             }
         }
 
@@ -308,7 +382,8 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
             //Запускаем функцию в адаптере, которая через интерфейс запускает функцию helpScore
             //который передает весь масиив со всеми данными ArrayList<dataArrayBitmap>()
             // на наш фрагмен где мы и запускаем диалог выбора helpScore
-            adapterEasy.helpScoreToFrag()
+            var score = binding.layFragPlayPwpEasy.idTvScore.text.toString().toInt()
+            adapterEasy.helpScoreToFrag(score)
             finishCloseDriver = false
             binding.idDrawerLayout.closeDrawer(GravityCompat.START)
 
@@ -316,9 +391,28 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
             Log.d("MyLog", "Слушатель imBtHelp")
         }
 
-        binding.layFragPlayPwpEasy.textView4.setOnClickListener(){
-            Log.d("MyLog", "Слушатель textView4")
+        binding.layFragPlayPwpEasy.idTvScore.setOnClickListener(){
+            dialogYesNo.createYesNoDialog(activity as Activity, Constans.BT_ADS)
+            //startCountDownTimer(5000)
+            Log.d("MyLog", "Слушатель idTvScore")
         }
+
+        binding.layFragPlayPwpEasy.tvLucky1.setOnClickListener(){
+            score += 3
+            binding.layFragPlayPwpEasy.idTvScore.text = score.toString()
+            FinishAnimationCongratulation.doAnimationScore(activity as FragmentActivity, binding.layFragPlayPwpEasy.idTvScore, colorLine)
+            timer?.onFinish()
+            Log.d("MyLog", "Слушатель tvLucky1")
+        }
+
+        binding.layFragPlayPwpEasy.tvLucky.setOnClickListener(){
+            score += 3
+            binding.layFragPlayPwpEasy.idTvScore.text = score.toString()
+            FinishAnimationCongratulation.doAnimationScore(activity as FragmentActivity, binding.layFragPlayPwpEasy.idTvScore, colorLine)
+            timer?.onFinish()
+            Log.d("MyLog", "Слушатель tvLucky")
+        }
+
 
 
         //Слушатель действия на драйвер лэоут (Закрытие\открытие)
@@ -351,12 +445,20 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
 
         //слушатель нажатия на всю РцВью
         binding.layFragPlayPwpEasy.idRcViewFragPWP.setOnTouchListener(){ viewRc, eventRc ->
+            //Здесь мы устанавливаем слушатель касаний для определенного представления (view).
+            // Внутри слушателя мы проверяем количество пальцев, задействованных в касании,
+            // и если оно больше 1, то возвращаем true, чтобы отменить обработку события.
+            if (eventRc.pointerCount > 1) {
+                return@setOnTouchListener true
+            }
             //Log.d("MyLog", "Слушатель RCView")
             when (eventRc.action) {
                 MotionEvent.ACTION_DOWN -> { //Срабатывает когда коснулись экрана
                     //x1 = eventRc.x //Позиция по оси Х куда нажали
                     //y1 = eventRgc.y //Позиция по оси Y куда нажали
                     //noReplaySwipe = true
+                    Log.d("MyLog", "event.x ${eventRc.x}")
+                    Log.d("MyLog", "event.y ${eventRc.y}")
                 }
 
                 MotionEvent.ACTION_MOVE -> {
@@ -379,11 +481,15 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
                                 duration = 50
                                 start()
                             }
+                            Log.d("MyLog", "event.x ${binding.layFragPlayPwpEasy.idRcViewFragPWP.x}")
+                            Log.d("MyLog", "event.y ${binding.layFragPlayPwpEasy.idRcViewFragPWP.y}")
                             //передаем координаты кубику в зависимости где стоит палец на экране, что бы он тянулся за пальцем
                             itemViewGlobalMove.visibility = View.GONE
+                            //binding.layFragPlayPwpEasy.idImViewMove.x =
+                            //    eventRc.x - imItemGlobal.width / 2f
                             binding.layFragPlayPwpEasy.idImViewMove.x =
-                                eventRc.x - imItemGlobal.width / 2f
-                            binding.layFragPlayPwpEasy.idImViewMove.y = eventRc.y
+                                eventRc.x + binding.layFragPlayPwpEasy.idRcViewFragPWP.x - imItemGlobal.width / 2f
+                            binding.layFragPlayPwpEasy.idImViewMove.y = eventRc.y + binding.layFragPlayPwpEasy.idRcViewFragPWP.y - imItemGlobal.height / 2f
                             //binding.idImViewMove2.visibility = View.GONE
                             //binding.idImViewMove2.x = eventRc.x - imItemGlobal.width / 2f
                             //binding.idImViewMove2.y = eventRc.y
@@ -917,6 +1023,12 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
         }
     }
 
+    //private fun blurBitmap(bitmap: Bitmap, radius: Float): Bitmap? {
+    //    var blurredBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+    //    blurredBitmap = StackBlur.blurNativelyPixels(blurredBitmap, radius.toInt(), true)
+    //    return blurredBitmap
+    //}
+
     //Перемешать массив основной массив ArrayList<dataArrayBitmap>
     fun shuffleTempListBitmap(tempListBitmap:ArrayList<dataArrayBitmap>):ArrayList<dataArrayBitmap>{
         val tempList = ArrayList<List<Bitmap>>()
@@ -1029,6 +1141,9 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
         //linLayParent.layoutParams.height = 2340
         //linLayParent.requestLayout()
         //Log.d("MyLog", "sizeHight ${linLayParent.layoutParams.height}")
+
+            //.load()
+
         image1 = binding.layFragPlayPwpEasy2.imageView1
         image2 = binding.layFragPlayPwpEasy2.imageView2
         image3 = binding.layFragPlayPwpEasy2.imageView3
@@ -1072,8 +1187,355 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
         //binding.layFragPlayPwpTwo.idRcViewFragPWP.adapter = adapterMedium
     }
 
+
+
+
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    fun collectedImageVisible(arrayCollected: ArrayList<Int>){
+        if (arrayCollected[0] == 1) linLayImage1.setCardBackgroundColor(requireActivity().getColor(R.color.green_main)) else linLayImage1.setCardBackgroundColor(requireActivity().getColor(R.color.grey))
+        if (arrayCollected[1] == 1) linLayImage2.setCardBackgroundColor(requireActivity().getColor(R.color.green_main)) else linLayImage2.setCardBackgroundColor(requireActivity().getColor(R.color.grey))
+        if (arrayCollected[2] == 1) linLayImage3.setCardBackgroundColor(requireActivity().getColor(R.color.green_main)) else linLayImage3.setCardBackgroundColor(requireActivity().getColor(R.color.grey))
+        if (arrayCollected[3] == 1) linLayImage4.setCardBackgroundColor(requireActivity().getColor(R.color.green_main)) else linLayImage4.setCardBackgroundColor(requireActivity().getColor(R.color.grey))
+        if (arrayCollected[4] == 1) linLayImage5.setCardBackgroundColor(requireActivity().getColor(R.color.green_main)) else linLayImage5.setCardBackgroundColor(requireActivity().getColor(R.color.grey))
+        if (arrayCollected[5] == 1) linLayImage6.setCardBackgroundColor(requireActivity().getColor(R.color.green_main)) else linLayImage6.setCardBackgroundColor(requireActivity().getColor(R.color.grey))
+    }
+
+    private fun startCountDownTimer(timeMillis: Long){
+        timer?.cancel()
+        binding.layFragPlayPwpEasy.tvLucky1.visibility = View.VISIBLE
+        binding.layFragPlayPwpEasy.tvLucky1.text = "5"
+        timer = object : CountDownTimer(timeMillis, 1000){
+            override fun onTick(millisUntilFinished: Long) {
+                if(binding.layFragPlayPwpEasy.tvLucky1.visibility == View.VISIBLE){
+                    binding.layFragPlayPwpEasy.tvLucky.text = (millisUntilFinished / 1000).toDouble()
+                        .roundToInt().toString()
+                    binding.layFragPlayPwpEasy.tvLucky1.startAnimation(
+                        CubeAnimation.create(
+                            CubeAnimation.LEFT, false, 800
+                        )
+                    )
+                    binding.layFragPlayPwpEasy.tvLucky.visibility = View.VISIBLE
+                    binding.layFragPlayPwpEasy.tvLucky.startAnimation(
+                        CubeAnimation.create(
+                            CubeAnimation.LEFT, true, 800
+                        )
+                    )
+                    binding.layFragPlayPwpEasy.tvLucky1.visibility = View.GONE
+                //Log.d("MyLog", "millisUnFin : $millisUntilFinished")
+                }else{
+                    binding.layFragPlayPwpEasy.tvLucky1.text = (millisUntilFinished / 1000).toDouble()
+                        .roundToInt().toString()
+                    binding.layFragPlayPwpEasy.tvLucky.startAnimation(
+                        CubeAnimation.create(
+                            CubeAnimation.LEFT, false, 800
+                        )
+                    )
+                    binding.layFragPlayPwpEasy.tvLucky1.visibility = View.VISIBLE
+                    binding.layFragPlayPwpEasy.tvLucky1.startAnimation(
+                        CubeAnimation.create(
+                            CubeAnimation.LEFT, true, 800
+                        )
+                    )
+                    binding.layFragPlayPwpEasy.tvLucky.visibility = View.GONE
+                }
+            }
+
+            override fun onFinish() {
+                timer?.cancel()
+                if(binding.layFragPlayPwpEasy.tvLucky.visibility == View.VISIBLE) binding.layFragPlayPwpEasy.tvLucky.visibility = View.GONE
+                else binding.layFragPlayPwpEasy.tvLucky1.visibility = View.GONE
+                arrayInterval.shuffle()
+                startCountDownTimerLuckyTime(arrayInterval[0].toLong())
+                //Log.d("MyLog", "Finish timer ${arrayInterval[0]}, ${arrayInterval[1]}, ${arrayInterval[2]}")
+            }
+
+        }.start()
+    }
+
+    private fun startCountDownTimerLuckyTime(timeMillis: Long){
+        timer?.cancel()
+        timer = object : CountDownTimer(timeMillis, 1000){
+            override fun onTick(millisUntilFinished: Long) {
+                //Log.d("MyLog", "timer Lucky: ${(millisUntilFinished / 1000).toDouble()
+                //    .roundToInt()}")
+            }
+
+            override fun onFinish() {
+                timer?.cancel()
+                startCountDownTimer(5000)
+                Log.d("MyLog", "Finish timer Lucky")
+            }
+
+        }.start()
+    }
+
+    //Метод анимации увелечения кубика если просто нажали
+    fun animObjectPlus(position: Int, directionRotation: Int, selectImage: Int,
+                       openImage: Int, countCubeRotated: Int){
+        //Определяем координаты начала увелечения в зависимости от позиции на которую нажали
+        when(position) {
+            0 -> {
+                binding.layFragPlayPwpEasy.idImViewScale.pivotX = 0f
+                binding.layFragPlayPwpEasy.idImViewScale.pivotY = 0f
+                binding.layFragPlayPwpEasy.idImViewScale2.pivotX = 0f
+                binding.layFragPlayPwpEasy.idImViewScale2.pivotY = 0f
+            }
+            1 ->{
+                binding.layFragPlayPwpEasy.idImViewScale.pivotX = (binding.layFragPlayPwpEasy.idImViewScale.width) / 2f
+                binding.layFragPlayPwpEasy.idImViewScale.pivotY = 0f
+                binding.layFragPlayPwpEasy.idImViewScale2.pivotX = (binding.layFragPlayPwpEasy.idImViewScale.width) / 2f
+                binding.layFragPlayPwpEasy.idImViewScale2.pivotY = 0f
+            }
+            2 -> {
+                binding.layFragPlayPwpEasy.idImViewScale.pivotX = (binding.layFragPlayPwpEasy.idImViewScale.width.toFloat())
+                binding.layFragPlayPwpEasy.idImViewScale.pivotY = 0f
+                binding.layFragPlayPwpEasy.idImViewScale2.pivotX = (binding.layFragPlayPwpEasy.idImViewScale.width.toFloat())
+                binding.layFragPlayPwpEasy.idImViewScale2.pivotY = 0f
+            }
+            3, 6, 9 ->{
+                binding.layFragPlayPwpEasy.idImViewScale.pivotX = 0f
+                binding.layFragPlayPwpEasy.idImViewScale.pivotY = (binding.layFragPlayPwpEasy.idImViewScale.width) / 2f
+                binding.layFragPlayPwpEasy.idImViewScale2.pivotX = 0f
+                binding.layFragPlayPwpEasy.idImViewScale2.pivotY = (binding.layFragPlayPwpEasy.idImViewScale.width) / 2f
+            }
+            5, 8, 11 ->{
+                binding.layFragPlayPwpEasy.idImViewScale.pivotX = (binding.layFragPlayPwpEasy.idImViewScale.width.toFloat())
+                binding.layFragPlayPwpEasy.idImViewScale.pivotY = (binding.layFragPlayPwpEasy.idImViewScale.width) / 2f
+                binding.layFragPlayPwpEasy.idImViewScale2.pivotX = (binding.layFragPlayPwpEasy.idImViewScale.width.toFloat())
+                binding.layFragPlayPwpEasy.idImViewScale2.pivotY = (binding.layFragPlayPwpEasy.idImViewScale.width) / 2f
+            }
+            12 -> {
+                binding.layFragPlayPwpEasy.idImViewScale.pivotX = 0f
+                binding.layFragPlayPwpEasy.idImViewScale.pivotY = (binding.layFragPlayPwpEasy.idImViewScale.width.toFloat())
+                binding.layFragPlayPwpEasy.idImViewScale2.pivotX = 0f
+                binding.layFragPlayPwpEasy.idImViewScale2.pivotY = (binding.layFragPlayPwpEasy.idImViewScale.width.toFloat())
+            }
+            13 ->{
+                binding.layFragPlayPwpEasy.idImViewScale.pivotX = (binding.layFragPlayPwpEasy.idImViewScale.width) / 2f
+                binding.layFragPlayPwpEasy.idImViewScale.pivotY = (binding.layFragPlayPwpEasy.idImViewScale.width.toFloat())
+                binding.layFragPlayPwpEasy.idImViewScale2.pivotX = (binding.layFragPlayPwpEasy.idImViewScale.width) / 2f
+                binding.layFragPlayPwpEasy.idImViewScale2.pivotY = (binding.layFragPlayPwpEasy.idImViewScale.width.toFloat())
+            }
+            14 ->{
+                binding.layFragPlayPwpEasy.idImViewScale.pivotX = (binding.layFragPlayPwpEasy.idImViewScale.width.toFloat())
+                binding.layFragPlayPwpEasy.idImViewScale.pivotY = (binding.layFragPlayPwpEasy.idImViewScale.width.toFloat())
+                binding.layFragPlayPwpEasy.idImViewScale2.pivotX = (binding.layFragPlayPwpEasy.idImViewScale.width.toFloat())
+                binding.layFragPlayPwpEasy.idImViewScale2.pivotY = (binding.layFragPlayPwpEasy.idImViewScale.width.toFloat())
+            }else -> {
+            binding.layFragPlayPwpEasy.idImViewScale.pivotX = binding.layFragPlayPwpEasy.idImViewScale.width / 2f
+            binding.layFragPlayPwpEasy.idImViewScale.pivotY = binding.layFragPlayPwpEasy.idImViewScale.width / 2f
+            binding.layFragPlayPwpEasy.idImViewScale2.pivotX = binding.layFragPlayPwpEasy.idImViewScale.width / 2f
+            binding.layFragPlayPwpEasy.idImViewScale2.pivotY = binding.layFragPlayPwpEasy.idImViewScale.width / 2f
+        }
+        }
+
+        binding.layFragPlayPwpEasy.idImViewScale.scaleX = (binding.layFragPlayPwpEasy.idRcViewFragPWP.width/3f) / binding.layFragPlayPwpEasy.idImViewScale.width
+        binding.layFragPlayPwpEasy.idImViewScale.scaleY = (binding.layFragPlayPwpEasy.idRcViewFragPWP.width/3f) / binding.layFragPlayPwpEasy.idImViewScale.width
+        binding.layFragPlayPwpEasy.idImViewScale2.scaleX = (binding.layFragPlayPwpEasy.idRcViewFragPWP.width/3f) / binding.layFragPlayPwpEasy.idImViewScale.width
+        binding.layFragPlayPwpEasy.idImViewScale2.scaleY = (binding.layFragPlayPwpEasy.idRcViewFragPWP.width/3f) / binding.layFragPlayPwpEasy.idImViewScale.width
+        val scaleX = PropertyValuesHolder.ofFloat(View.SCALE_X, 1.0f)
+        val scaleY = PropertyValuesHolder.ofFloat(View.SCALE_Y, 1.0f)
+        //val alpha = PropertyValuesHolder.ofFloat(View.ALPHA, 1.0f)
+        //Анимация увелечения кубика для вращения
+        ObjectAnimator.ofPropertyValuesHolder(binding.layFragPlayPwpEasy.idImViewScale, scaleX, scaleY).apply {
+            duration = 400
+            doOnStart {
+                //Начало анимации
+                //touchHelper.attachToRecyclerView(null)
+                openItemScale = true //открыт/увеличен scaleItem
+                adapterEasy?.click?.clickable = false //для блокировки нажатия на итем в адаптере пока запущена анимация
+                noClickItemScale = false //для блокировки в фрагменте нажатия на увеличевующийся итем
+                adapterEasy?.noMove?.noMoveIfOpenScale = false //для блокировки в адаптере возможности срабатывания ОнТач, блокируется из фрагмета с рцвью когда картинка увеличена
+            }
+            start()
+            doOnEnd {
+                //Log.d("MyLog", "end animation plus")
+                adapterEasy?.click?.clickable = true
+                noClickItemScale = true//Отключить блакировку нажатия на увеличивающийся итем после окончания анимации увелечения
+
+                //Если в numberRotation пришел номер положения для вращения кубика, то исполнить. А если
+                //заглушка Constans.NO_HELPSCORESTART, то не выполнять
+                if (Constans.NO_HELPSCORESTART != directionRotation){
+                    DirectionRotationCubeManager.rotationHelpScore(directionRotation, position, arrayBitmap, arrayNumber, arrayPosition,
+                        binding.layFragPlayPwpEasy.idImViewScale, binding.layFragPlayPwpEasy.idImViewScale2,
+                        durationAnimationCubeSpeed, adapterEasy, binding, selectImage,
+                        openImage, countCubeRotated)
+                    openItemScale = false
+                }
+                //binding.idImViewScale.isClickable = false
+                //binding.idImViewScale2.isClickable = false
+            }
+        }
+    }
+
+    //Метод уменьшения анимации
+    fun animObjectMinus(positionClickOp: Int, b0 : Bitmap, b1 : Bitmap, b2 : Bitmap,
+                        b3 : Bitmap, b4 : Bitmap, b5 : Bitmap, n0: Int, n1: Int, n2: Int, n3: Int, n4: Int, n5: Int,
+                        p0: Int, p1: Int, p2: Int, p3: Int, p4: Int, p5: Int,
+                        positionClick: Int, itemViewGl: View, constHelpScore: Int){
+        adapterEasy?.updateAdapterPosition(arrayBitmap, arrayNumber, arrayPosition, positionClickOp, Constans.NO_POSITION_MOVE)
+        val scaleX = PropertyValuesHolder.ofFloat(View.SCALE_X, (binding.layFragPlayPwpEasy.idRcViewFragPWP.width/3f) / binding.layFragPlayPwpEasy.idImViewScale.width)
+        val scaleY = PropertyValuesHolder.ofFloat(View.SCALE_Y, (binding.layFragPlayPwpEasy.idRcViewFragPWP.width/3f) / binding.layFragPlayPwpEasy.idImViewScale.width)
+        //Определяем какую из двух картинок уменьшать, в зависимости от того какая картинка видна
+        if (binding.layFragPlayPwpEasy.idImViewScale.visibility == View.VISIBLE) {
+            //Анимация уменьшения кубика который крутили
+            ObjectAnimator.ofPropertyValuesHolder(binding.layFragPlayPwpEasy.idImViewScale, scaleX, scaleY).apply {
+                duration = 400
+                doOnStart {
+                    //Log.d("MyLog", "start animation minus scale")
+                    adapterEasy?.click?.clickable = false
+                    noClickItemScale = false//Выключить возможность нажатия на увеличеный итем пока идет анимация уменьшения
+                    //включится только когда заново увеличится картинка
+                }
+                start()
+                doOnEnd {
+                    //Log.d("MyLog", "end animation minus scale")
+                    binding.layFragPlayPwpEasy.idImViewScale.visibility = View.GONE
+                    binding.layFragPlayPwpEasy.idImViewScale2.visibility = View.GONE
+                    adapterEasy?.click?.clickable = true
+                    //touchHelper.attachToRecyclerView(binding.idRcViewFragPWP)
+                    //noClickItemScale = true
+                    // Часть запускается если был не закрыт итем
+                    if(openItemScale){
+                        //Log.d("MyLog", "2end animation minus scale")
+                        itemViewGl.visibility = View.INVISIBLE
+                        positionClickOpen = positionClick
+                        val withRc = binding.layFragPlayPwpEasy.idRcViewFragPWP.width
+                        val heightRc = binding.layFragPlayPwpEasy.idRcViewFragPWP.height
+                        val withIm = binding.layFragPlayPwpEasy.idImViewScale.width
+                        val heightIm = binding.layFragPlayPwpEasy.idImViewScale.height
+                        //Log.d("MyLog", "position $position")
+                        //меняем координаты появления scaleView
+                        var paramsScale = binding.layFragPlayPwpEasy.idImViewScale.layoutParams as ViewGroup.MarginLayoutParams
+                        var paramsScale2 = binding.layFragPlayPwpEasy.idImViewScale2.layoutParams as ViewGroup.MarginLayoutParams
+                        val coordinates =
+                            MoveItemScaleTwo.movingItemScaleEasy(positionClick, withRc, heightRc, withIm, heightIm)
+                        paramsScale.leftMargin = coordinates[0]
+                        paramsScale.topMargin = coordinates[1]
+                        paramsScale2.leftMargin = coordinates[0]
+                        paramsScale2.topMargin = coordinates[1]
+                        binding.layFragPlayPwpEasy.idImViewScale.layoutParams = paramsScale
+                        binding.layFragPlayPwpEasy.idImViewScale2.layoutParams = paramsScale2
+
+                        binding.layFragPlayPwpEasy.idImViewScale.visibility = View.VISIBLE
+                        binding.layFragPlayPwpEasy.idImViewScale2.visibility = View.GONE
+
+                        binding.layFragPlayPwpEasy.idImViewScale.setImageBitmap(b0)
+                        // 999 - Заглушка
+                        animObjectPlus(positionClickOpen, constHelpScore, 999, 999, 999)
+                        openItemScale = true
+                        arrayBitmap.clear()
+                        arrayBitmap.add(b0)
+                        arrayBitmap.add(b1)
+                        arrayBitmap.add(b2)
+                        arrayBitmap.add(b3)
+                        arrayBitmap.add(b4)
+                        arrayBitmap.add(b5)
+                        arrayNumber.clear()
+                        arrayNumber.add(n0)
+                        arrayNumber.add(n1)
+                        arrayNumber.add(n2)
+                        arrayNumber.add(n3)
+                        arrayNumber.add(n4)
+                        arrayNumber.add(n5)
+                        arrayPosition.clear()
+                        arrayPosition.add(p0)
+                        arrayPosition.add(p1)
+                        arrayPosition.add(p2)
+                        arrayPosition.add(p3)
+                        arrayPosition.add(p4)
+                        arrayPosition.add(p5)
+                        //touchHelper.attachToRecyclerView(binding.idRcViewFragPWP)
+                        //adapter?.click?.clickable = true
+                        //noClickItemScale = true
+                    }else{
+                        adapterEasy?.noMove?.noMoveIfOpenScale = true
+                    }
+                }
+            }
+        }else{
+            //Анимация уменьшения второй картинки если она на кубике видна в данный мемент
+            ObjectAnimator.ofPropertyValuesHolder(binding.layFragPlayPwpEasy.idImViewScale2, scaleX, scaleY).apply {
+                duration = 400
+                doOnStart {
+                    //Log.d("MyLog", "start animation minus scale2")
+                    adapterEasy?.click?.clickable = false
+                    noClickItemScale = false//Выключить возможность нажатия на увеличеный итем пока идет анимация уменьшения
+                    //включится только когда заново увеличится картинка
+                }
+                start()
+                doOnEnd {
+                    //Log.d("MyLog", "end animation minus scale2")
+                    binding.layFragPlayPwpEasy.idImViewScale2.visibility = View.GONE
+                    binding.layFragPlayPwpEasy.idImViewScale.visibility = View.GONE
+                    adapterEasy?.click?.clickable = true
+                    //touchHelper.attachToRecyclerView(binding.idRcViewFragPWP)
+                    //noClickItemScale = true
+                    // Часть запускается если был не закрыт итем
+                    if(openItemScale){
+                        //Log.d("MyLog", "2end animation minus scale2")
+                        itemViewGl.visibility = View.INVISIBLE
+                        positionClickOpen = positionClick
+                        val withRc = binding.layFragPlayPwpEasy.idRcViewFragPWP.width
+                        val heightRc = binding.layFragPlayPwpEasy.idRcViewFragPWP.height
+                        val withIm = binding.layFragPlayPwpEasy.idImViewScale.width
+                        val heightIm = binding.layFragPlayPwpEasy.idImViewScale.height
+                        //Log.d("MyLog", "position $position")
+                        //меняем координаты появления scaleView
+                        var paramsScale = binding.layFragPlayPwpEasy.idImViewScale.layoutParams as ViewGroup.MarginLayoutParams
+                        var paramsScale2 = binding.layFragPlayPwpEasy.idImViewScale2.layoutParams as ViewGroup.MarginLayoutParams
+                        val coordinates = MoveItemScaleTwo.movingItemScaleEasy(positionClick, withRc, heightRc, withIm, heightIm)
+                        paramsScale.leftMargin = coordinates[0]
+                        paramsScale.topMargin = coordinates[1]
+                        paramsScale2.leftMargin = coordinates[0]
+                        paramsScale2.topMargin = coordinates[1]
+                        binding.layFragPlayPwpEasy.idImViewScale.layoutParams = paramsScale
+                        binding.layFragPlayPwpEasy.idImViewScale2.layoutParams = paramsScale2
+
+                        binding.layFragPlayPwpEasy.idImViewScale.visibility = View.VISIBLE
+                        binding.layFragPlayPwpEasy.idImViewScale2.visibility = View.GONE
+
+                        binding.layFragPlayPwpEasy.idImViewScale.setImageBitmap(b0)
+                        //999 - заглушка
+                        animObjectPlus(positionClickOpen, constHelpScore, 999 , 999, 999)
+                        openItemScale = true
+                        arrayBitmap.clear()
+                        arrayBitmap.add(b0)
+                        arrayBitmap.add(b1)
+                        arrayBitmap.add(b2)
+                        arrayBitmap.add(b3)
+                        arrayBitmap.add(b4)
+                        arrayBitmap.add(b5)
+                        arrayNumber.clear()
+                        arrayNumber.add(n0)
+                        arrayNumber.add(n1)
+                        arrayNumber.add(n2)
+                        arrayNumber.add(n3)
+                        arrayNumber.add(n4)
+                        arrayNumber.add(n5)
+                        arrayPosition.clear()
+                        arrayPosition.add(p0)
+                        arrayPosition.add(p1)
+                        arrayPosition.add(p2)
+                        arrayPosition.add(p3)
+                        arrayPosition.add(p4)
+                        arrayPosition.add(p5)
+
+                        //touchHelper.attachToRecyclerView(binding.idRcViewFragPWP)
+                        //adapter?.click?.clickable = true
+                        //noClickItemScale = true
+                    }else{
+                        adapterEasy?.noMove?.noMoveIfOpenScale = true
+                    }
+                }
+            }
+        }
+    }
+
     override fun onDetach() {
         super.onDetach()
+        timer?.cancel()
         job?.cancel()
     }
 
@@ -1390,11 +1852,11 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
     }
 
     //Интерфейс получения данных с adaptera, после нажатия на кнопку помощи и запуска диалога подсказки
-    override fun helpScore(mainArrayViewTemp: ArrayList<dataArrayBitmap>) {
+    override fun helpScore(mainArrayViewTemp: ArrayList<dataArrayBitmap>, score: Int) {
         mainArrayView.clear()
         mainArrayView.addAll(mainArrayViewTemp)
         dialogHelpScore.createHelpScoreDialog(activity as FragmentActivity, imageBitmap1, imageBitmap2,
-            imageBitmap3, imageBitmap4, imageBitmap5, imageBitmap6, scoreHelp, arrayCollectedImage, mainArrayView)
+            imageBitmap3, imageBitmap4, imageBitmap5, imageBitmap6, score, arrayCollectedImage, mainArrayView)
     }
     //Интерфейс получения данных с adaptera, после того как кубик повернулся и нужно новый повернуть
     override fun helpScoreNext(
@@ -1416,7 +1878,11 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
                 posRotation,
                 countCubeRotated
             )
+            score--
+            binding.layFragPlayPwpEasy.idTvScore.text = score.toString()
         } else {
+            score--
+            binding.layFragPlayPwpEasy.idTvScore.text = score.toString()
             stopClickAnimationHelp = false// Разблокировать нажатия на фрагменте
             adapterEasy.noClickForAnimationHelpScore.noClickForAnimationHelpScore = true// Разаблокировать нажатия на адаптере
         }
@@ -1453,298 +1919,35 @@ class FragmentPlayingWithPicturesEasy : Fragment(), AdapterFragPWPEasy.ClickScal
         adapterEasy.updateLinePosTwo(position, numberLine)
     }
 
-
-
-    @RequiresApi(Build.VERSION_CODES.M)
-    fun collectedImageVisible(arrayCollected: ArrayList<Int>){
-        if (arrayCollected[0] == 1) linLayImage1.setCardBackgroundColor(activity!!.getColor(R.color.green_main)) else linLayImage1.setCardBackgroundColor(activity!!.getColor(R.color.grey))
-        if (arrayCollected[1] == 1) linLayImage2.setCardBackgroundColor(activity!!.getColor(R.color.green_main)) else linLayImage2.setCardBackgroundColor(activity!!.getColor(R.color.grey))
-        if (arrayCollected[2] == 1) linLayImage3.setCardBackgroundColor(activity!!.getColor(R.color.green_main)) else linLayImage3.setCardBackgroundColor(activity!!.getColor(R.color.grey))
-        if (arrayCollected[3] == 1) linLayImage4.setCardBackgroundColor(activity!!.getColor(R.color.green_main)) else linLayImage4.setCardBackgroundColor(activity!!.getColor(R.color.grey))
-        if (arrayCollected[4] == 1) linLayImage5.setCardBackgroundColor(activity!!.getColor(R.color.green_main)) else linLayImage5.setCardBackgroundColor(activity!!.getColor(R.color.grey))
-        if (arrayCollected[5] == 1) linLayImage6.setCardBackgroundColor(activity!!.getColor(R.color.green_main)) else linLayImage6.setCardBackgroundColor(activity!!.getColor(R.color.grey))
-    }
-
-    //Метод анимации увелечения кубика если просто нажали
-    fun animObjectPlus(position: Int, directionRotation: Int, selectImage: Int,
-                       openImage: Int, countCubeRotated: Int){
-        //Определяем координаты начала увелечения в зависимости от позиции на которую нажали
-        when(position) {
-            0 -> {
-                binding.layFragPlayPwpEasy.idImViewScale.pivotX = 0f
-                binding.layFragPlayPwpEasy.idImViewScale.pivotY = 0f
-                binding.layFragPlayPwpEasy.idImViewScale2.pivotX = 0f
-                binding.layFragPlayPwpEasy.idImViewScale2.pivotY = 0f
-            }
-            1 ->{
-                binding.layFragPlayPwpEasy.idImViewScale.pivotX = (binding.layFragPlayPwpEasy.idImViewScale.width) / 2f
-                binding.layFragPlayPwpEasy.idImViewScale.pivotY = 0f
-                binding.layFragPlayPwpEasy.idImViewScale2.pivotX = (binding.layFragPlayPwpEasy.idImViewScale.width) / 2f
-                binding.layFragPlayPwpEasy.idImViewScale2.pivotY = 0f
-            }
-            2 -> {
-                binding.layFragPlayPwpEasy.idImViewScale.pivotX = (binding.layFragPlayPwpEasy.idImViewScale.width.toFloat())
-                binding.layFragPlayPwpEasy.idImViewScale.pivotY = 0f
-                binding.layFragPlayPwpEasy.idImViewScale2.pivotX = (binding.layFragPlayPwpEasy.idImViewScale.width.toFloat())
-                binding.layFragPlayPwpEasy.idImViewScale2.pivotY = 0f
-            }
-            3, 6, 9 ->{
-                binding.layFragPlayPwpEasy.idImViewScale.pivotX = 0f
-                binding.layFragPlayPwpEasy.idImViewScale.pivotY = (binding.layFragPlayPwpEasy.idImViewScale.width) / 2f
-                binding.layFragPlayPwpEasy.idImViewScale2.pivotX = 0f
-                binding.layFragPlayPwpEasy.idImViewScale2.pivotY = (binding.layFragPlayPwpEasy.idImViewScale.width) / 2f
-            }
-            5, 8, 11 ->{
-                binding.layFragPlayPwpEasy.idImViewScale.pivotX = (binding.layFragPlayPwpEasy.idImViewScale.width.toFloat())
-                binding.layFragPlayPwpEasy.idImViewScale.pivotY = (binding.layFragPlayPwpEasy.idImViewScale.width) / 2f
-                binding.layFragPlayPwpEasy.idImViewScale2.pivotX = (binding.layFragPlayPwpEasy.idImViewScale.width.toFloat())
-                binding.layFragPlayPwpEasy.idImViewScale2.pivotY = (binding.layFragPlayPwpEasy.idImViewScale.width) / 2f
-            }
-            12 -> {
-                binding.layFragPlayPwpEasy.idImViewScale.pivotX = 0f
-                binding.layFragPlayPwpEasy.idImViewScale.pivotY = (binding.layFragPlayPwpEasy.idImViewScale.width.toFloat())
-                binding.layFragPlayPwpEasy.idImViewScale2.pivotX = 0f
-                binding.layFragPlayPwpEasy.idImViewScale2.pivotY = (binding.layFragPlayPwpEasy.idImViewScale.width.toFloat())
-            }
-            13 ->{
-                binding.layFragPlayPwpEasy.idImViewScale.pivotX = (binding.layFragPlayPwpEasy.idImViewScale.width) / 2f
-                binding.layFragPlayPwpEasy.idImViewScale.pivotY = (binding.layFragPlayPwpEasy.idImViewScale.width.toFloat())
-                binding.layFragPlayPwpEasy.idImViewScale2.pivotX = (binding.layFragPlayPwpEasy.idImViewScale.width) / 2f
-                binding.layFragPlayPwpEasy.idImViewScale2.pivotY = (binding.layFragPlayPwpEasy.idImViewScale.width.toFloat())
-            }
-            14 ->{
-                binding.layFragPlayPwpEasy.idImViewScale.pivotX = (binding.layFragPlayPwpEasy.idImViewScale.width.toFloat())
-                binding.layFragPlayPwpEasy.idImViewScale.pivotY = (binding.layFragPlayPwpEasy.idImViewScale.width.toFloat())
-                binding.layFragPlayPwpEasy.idImViewScale2.pivotX = (binding.layFragPlayPwpEasy.idImViewScale.width.toFloat())
-                binding.layFragPlayPwpEasy.idImViewScale2.pivotY = (binding.layFragPlayPwpEasy.idImViewScale.width.toFloat())
-            }else -> {
-            binding.layFragPlayPwpEasy.idImViewScale.pivotX = binding.layFragPlayPwpEasy.idImViewScale.width / 2f
-            binding.layFragPlayPwpEasy.idImViewScale.pivotY = binding.layFragPlayPwpEasy.idImViewScale.width / 2f
-            binding.layFragPlayPwpEasy.idImViewScale2.pivotX = binding.layFragPlayPwpEasy.idImViewScale.width / 2f
-            binding.layFragPlayPwpEasy.idImViewScale2.pivotY = binding.layFragPlayPwpEasy.idImViewScale.width / 2f
-        }
-        }
-
-        binding.layFragPlayPwpEasy.idImViewScale.scaleX = (binding.layFragPlayPwpEasy.idRcViewFragPWP.width/3f) / binding.layFragPlayPwpEasy.idImViewScale.width
-        binding.layFragPlayPwpEasy.idImViewScale.scaleY = (binding.layFragPlayPwpEasy.idRcViewFragPWP.width/3f) / binding.layFragPlayPwpEasy.idImViewScale.width
-        binding.layFragPlayPwpEasy.idImViewScale2.scaleX = (binding.layFragPlayPwpEasy.idRcViewFragPWP.width/3f) / binding.layFragPlayPwpEasy.idImViewScale.width
-        binding.layFragPlayPwpEasy.idImViewScale2.scaleY = (binding.layFragPlayPwpEasy.idRcViewFragPWP.width/3f) / binding.layFragPlayPwpEasy.idImViewScale.width
-        val scaleX = PropertyValuesHolder.ofFloat(View.SCALE_X, 1.0f)
-        val scaleY = PropertyValuesHolder.ofFloat(View.SCALE_Y, 1.0f)
-        //val alpha = PropertyValuesHolder.ofFloat(View.ALPHA, 1.0f)
-        //Анимация увелечения кубика для вращения
-        ObjectAnimator.ofPropertyValuesHolder(binding.layFragPlayPwpEasy.idImViewScale, scaleX, scaleY).apply {
-            duration = 400
-            doOnStart {
-                //Начало анимации
-                //touchHelper.attachToRecyclerView(null)
-                openItemScale = true //открыт/увеличен scaleItem
-                adapterEasy?.click?.clickable = false //для блокировки нажатия на итем в адаптере пока запущена анимация
-                noClickItemScale = false //для блокировки в фрагменте нажатия на увеличевующийся итем
-                adapterEasy?.noMove?.noMoveIfOpenScale = false //для блокировки в адаптере возможности срабатывания ОнТач, блокируется из фрагмета с рцвью когда картинка увеличена
-            }
-            start()
-            doOnEnd {
-                //Log.d("MyLog", "end animation plus")
-                adapterEasy?.click?.clickable = true
-                noClickItemScale = true//Отключить блакировку нажатия на увеличивающийся итем после окончания анимации увелечения
-
-                //Если в numberRotation пришел номер положения для вращения кубика, то исполнить. А если
-                //заглушка Constans.NO_HELPSCORESTART, то не выполнять
-                if (Constans.NO_HELPSCORESTART != directionRotation){
-                    DirectionRotationCubeManager.rotationHelpScore(directionRotation, position, arrayBitmap, arrayNumber, arrayPosition,
-                        binding.layFragPlayPwpEasy.idImViewScale, binding.layFragPlayPwpEasy.idImViewScale2,
-                        durationAnimationCubeSpeed, adapterEasy, binding, selectImage,
-                        openImage, countCubeRotated)
-                    openItemScale = false
-                }
-                //binding.idImViewScale.isClickable = false
-                //binding.idImViewScale2.isClickable = false
-            }
-        }
-    }
-
-    //Метод уменьшения анимации
-    fun animObjectMinus(positionClickOp: Int, b0 : Bitmap, b1 : Bitmap, b2 : Bitmap,
-                        b3 : Bitmap, b4 : Bitmap, b5 : Bitmap, n0: Int, n1: Int, n2: Int, n3: Int, n4: Int, n5: Int,
-                        p0: Int, p1: Int, p2: Int, p3: Int, p4: Int, p5: Int,
-                        positionClick: Int, itemViewGl: View, constHelpScore: Int){
-        adapterEasy?.updateAdapterPosition(arrayBitmap, arrayNumber, arrayPosition, positionClickOp, Constans.NO_POSITION_MOVE)
-        val scaleX = PropertyValuesHolder.ofFloat(View.SCALE_X, (binding.layFragPlayPwpEasy.idRcViewFragPWP.width/3f) / binding.layFragPlayPwpEasy.idImViewScale.width)
-        val scaleY = PropertyValuesHolder.ofFloat(View.SCALE_Y, (binding.layFragPlayPwpEasy.idRcViewFragPWP.width/3f) / binding.layFragPlayPwpEasy.idImViewScale.width)
-        //Определяем какую из двух картинок уменьшать, в зависимости от того какая картинка видна
-        if (binding.layFragPlayPwpEasy.idImViewScale.visibility == View.VISIBLE) {
-            //Анимация уменьшения кубика который крутили
-            ObjectAnimator.ofPropertyValuesHolder(binding.layFragPlayPwpEasy.idImViewScale, scaleX, scaleY).apply {
-                duration = 400
-                doOnStart {
-                    //Log.d("MyLog", "start animation minus scale")
-                    adapterEasy?.click?.clickable = false
-                    noClickItemScale = false//Выключить возможность нажатия на увеличеный итем пока идет анимация уменьшения
-                    //включится только когда заново увеличится картинка
-                }
-                start()
-                doOnEnd {
-                    //Log.d("MyLog", "end animation minus scale")
-                    binding.layFragPlayPwpEasy.idImViewScale.visibility = View.GONE
-                    binding.layFragPlayPwpEasy.idImViewScale2.visibility = View.GONE
-                    adapterEasy?.click?.clickable = true
-                    //touchHelper.attachToRecyclerView(binding.idRcViewFragPWP)
-                    //noClickItemScale = true
-                    // Часть запускается если был не закрыт итем
-                    if(openItemScale){
-                        //Log.d("MyLog", "2end animation minus scale")
-                        itemViewGl.visibility = View.INVISIBLE
-                        positionClickOpen = positionClick
-                        val withRc = binding.layFragPlayPwpEasy.idRcViewFragPWP.width
-                        val heightRc = binding.layFragPlayPwpEasy.idRcViewFragPWP.height
-                        val withIm = binding.layFragPlayPwpEasy.idImViewScale.width
-                        val heightIm = binding.layFragPlayPwpEasy.idImViewScale.height
-                        //Log.d("MyLog", "position $position")
-                        //меняем координаты появления scaleView
-                        var paramsScale = binding.layFragPlayPwpEasy.idImViewScale.layoutParams as ViewGroup.MarginLayoutParams
-                        var paramsScale2 = binding.layFragPlayPwpEasy.idImViewScale2.layoutParams as ViewGroup.MarginLayoutParams
-                        val coordinates =
-                            MoveItemScaleTwo.movingItemScaleEasy(positionClick, withRc, heightRc, withIm, heightIm)
-                        paramsScale.leftMargin = coordinates[0]
-                        paramsScale.topMargin = coordinates[1]
-                        paramsScale2.leftMargin = coordinates[0]
-                        paramsScale2.topMargin = coordinates[1]
-                        binding.layFragPlayPwpEasy.idImViewScale.layoutParams = paramsScale
-                        binding.layFragPlayPwpEasy.idImViewScale2.layoutParams = paramsScale2
-
-                        binding.layFragPlayPwpEasy.idImViewScale.visibility = View.VISIBLE
-                        binding.layFragPlayPwpEasy.idImViewScale2.visibility = View.GONE
-
-                        binding.layFragPlayPwpEasy.idImViewScale.setImageBitmap(b0)
-                        // 999 - Заглушка
-                        animObjectPlus(positionClickOpen, constHelpScore, 999, 999, 999)
-                        openItemScale = true
-                        arrayBitmap.clear()
-                        arrayBitmap.add(b0)
-                        arrayBitmap.add(b1)
-                        arrayBitmap.add(b2)
-                        arrayBitmap.add(b3)
-                        arrayBitmap.add(b4)
-                        arrayBitmap.add(b5)
-                        arrayNumber.clear()
-                        arrayNumber.add(n0)
-                        arrayNumber.add(n1)
-                        arrayNumber.add(n2)
-                        arrayNumber.add(n3)
-                        arrayNumber.add(n4)
-                        arrayNumber.add(n5)
-                        arrayPosition.clear()
-                        arrayPosition.add(p0)
-                        arrayPosition.add(p1)
-                        arrayPosition.add(p2)
-                        arrayPosition.add(p3)
-                        arrayPosition.add(p4)
-                        arrayPosition.add(p5)
-                        //touchHelper.attachToRecyclerView(binding.idRcViewFragPWP)
-                        //adapter?.click?.clickable = true
-                        //noClickItemScale = true
-                    }else{
-                        adapterEasy?.noMove?.noMoveIfOpenScale = true
-                    }
-                }
-            }
-        }else{
-            //Анимация уменьшения второй картинки если она на кубике видна в данный мемент
-            ObjectAnimator.ofPropertyValuesHolder(binding.layFragPlayPwpEasy.idImViewScale2, scaleX, scaleY).apply {
-                duration = 400
-                doOnStart {
-                    //Log.d("MyLog", "start animation minus scale2")
-                    adapterEasy?.click?.clickable = false
-                    noClickItemScale = false//Выключить возможность нажатия на увеличеный итем пока идет анимация уменьшения
-                    //включится только когда заново увеличится картинка
-                }
-                start()
-                doOnEnd {
-                    //Log.d("MyLog", "end animation minus scale2")
-                    binding.layFragPlayPwpEasy.idImViewScale2.visibility = View.GONE
-                    binding.layFragPlayPwpEasy.idImViewScale.visibility = View.GONE
-                    adapterEasy?.click?.clickable = true
-                    //touchHelper.attachToRecyclerView(binding.idRcViewFragPWP)
-                    //noClickItemScale = true
-                    // Часть запускается если был не закрыт итем
-                    if(openItemScale){
-                        //Log.d("MyLog", "2end animation minus scale2")
-                        itemViewGl.visibility = View.INVISIBLE
-                        positionClickOpen = positionClick
-                        val withRc = binding.layFragPlayPwpEasy.idRcViewFragPWP.width
-                        val heightRc = binding.layFragPlayPwpEasy.idRcViewFragPWP.height
-                        val withIm = binding.layFragPlayPwpEasy.idImViewScale.width
-                        val heightIm = binding.layFragPlayPwpEasy.idImViewScale.height
-                        //Log.d("MyLog", "position $position")
-                        //меняем координаты появления scaleView
-                        var paramsScale = binding.layFragPlayPwpEasy.idImViewScale.layoutParams as ViewGroup.MarginLayoutParams
-                        var paramsScale2 = binding.layFragPlayPwpEasy.idImViewScale2.layoutParams as ViewGroup.MarginLayoutParams
-                        val coordinates = MoveItemScaleTwo.movingItemScaleEasy(positionClick, withRc, heightRc, withIm, heightIm)
-                        paramsScale.leftMargin = coordinates[0]
-                        paramsScale.topMargin = coordinates[1]
-                        paramsScale2.leftMargin = coordinates[0]
-                        paramsScale2.topMargin = coordinates[1]
-                        binding.layFragPlayPwpEasy.idImViewScale.layoutParams = paramsScale
-                        binding.layFragPlayPwpEasy.idImViewScale2.layoutParams = paramsScale2
-
-                        binding.layFragPlayPwpEasy.idImViewScale.visibility = View.VISIBLE
-                        binding.layFragPlayPwpEasy.idImViewScale2.visibility = View.GONE
-
-                        binding.layFragPlayPwpEasy.idImViewScale.setImageBitmap(b0)
-                        //999 - заглушка
-                        animObjectPlus(positionClickOpen, constHelpScore, 999 , 999, 999)
-                        openItemScale = true
-                        arrayBitmap.clear()
-                        arrayBitmap.add(b0)
-                        arrayBitmap.add(b1)
-                        arrayBitmap.add(b2)
-                        arrayBitmap.add(b3)
-                        arrayBitmap.add(b4)
-                        arrayBitmap.add(b5)
-                        arrayNumber.clear()
-                        arrayNumber.add(n0)
-                        arrayNumber.add(n1)
-                        arrayNumber.add(n2)
-                        arrayNumber.add(n3)
-                        arrayNumber.add(n4)
-                        arrayNumber.add(n5)
-                        arrayPosition.clear()
-                        arrayPosition.add(p0)
-                        arrayPosition.add(p1)
-                        arrayPosition.add(p2)
-                        arrayPosition.add(p3)
-                        arrayPosition.add(p4)
-                        arrayPosition.add(p5)
-
-                        //touchHelper.attachToRecyclerView(binding.idRcViewFragPWP)
-                        //adapter?.click?.clickable = true
-                        //noClickItemScale = true
-                    }else{
-                        adapterEasy?.noMove?.noMoveIfOpenScale = true
-                    }
-                }
-            }
-        }
-    }
-
-
     //Интерфейс который срабатывает в диалоге Да\Нет
-    override fun interfaceYesNoDialog(optionDifficulty: Int) {
+    override fun interfaceYesNoDialog(optionDifficulty: Int, nameButton: Int) {
         when (optionDifficulty){
             Constans.YES -> {
-                binding.idDrawerLayout.closeDrawer(GravityCompat.START)
-                adapterEasy?.updateAdapter(shuffleTempListBitmap(tempListBitmap))
-                dialogYesNoAlert.dismiss()
+                when (nameButton) {
+                    Constans.BT_SHUFFLE -> {
+                        binding.idDrawerLayout.closeDrawer(GravityCompat.START)
+                        adapterEasy?.updateAdapter(shuffleTempListBitmap(tempListBitmap))
+                        //dialogYesNoAlert.dismiss()
+                    }
+                    Constans.BT_ADS ->{
+                        //Тут должна запуститься реклама
+                        score += 1
+                        binding.layFragPlayPwpEasy.idTvScore.text = score.toString()
+                        FinishAnimationCongratulation.doAnimationScore(activity as FragmentActivity, binding.layFragPlayPwpEasy.idTvScore, colorLine)
+                       // dialogYesNoAlert.dismiss()
+                    }
+                }
             }
             Constans.NO -> {
-                dialogYesNoAlert.dismiss()
+                //dialogYesNoAlert.dismiss()
             }
         }
     }
 
 
-    override fun interfaceFinishCongratulationDialog() {
+    override fun interfaceFinishCongratulationDialog(scor: Int) {
+        score += scor
+        binding.layFragPlayPwpEasy.idTvScore.text = score.toString()
         binding.idDrawerLayout.openDrawer(GravityCompat.START)
     }
 

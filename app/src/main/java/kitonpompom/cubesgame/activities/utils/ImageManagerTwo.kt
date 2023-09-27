@@ -1,16 +1,15 @@
 package kitonpompom.cubesgame.activities.utils
 
-import android.R.id
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import android.util.Log
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.exifinterface.media.ExifInterface
+import com.google.android.renderscript.Toolkit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -408,6 +407,26 @@ object ImageManagerTwo {
         tempArray.add(Bitmap.createBitmap(bitMap, 708, 1416, 354, 354))
 
         return@withContext tempArray
+    }
+
+    suspend fun blurBitmap(
+        listBitmap: List<Bitmap>
+    ): ArrayList<Bitmap> {
+        val arrayList = ArrayList<Bitmap>()
+
+        for (bit in listBitmap) {
+            //Log.d("MyLog", "listBitmap: $i")
+            val argbBitmap0 = bit.copy(Bitmap.Config.ARGB_8888, true)
+            val blurBitmapOne = Toolkit.blur(argbBitmap0, 25)
+            argbBitmap0.recycle()
+            val blurBitmapTwo = Toolkit.blur(blurBitmapOne, 25)
+            blurBitmapOne.recycle()
+            val blurBitmapThree = Toolkit.blur(blurBitmapTwo, 25)
+            blurBitmapTwo.recycle()
+            arrayList.add(blurBitmapThree)
+        }
+
+        return arrayList
     }
 
 }
