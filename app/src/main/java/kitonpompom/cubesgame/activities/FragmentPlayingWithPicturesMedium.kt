@@ -32,7 +32,6 @@ import kitonpompom.cubesgame.activities.data.dataPosNumBit
 import kitonpompom.cubesgame.activities.dialogs.ProgressDialog
 import kitonpompom.cubesgame.activities.utils.*
 import kitonpompom.cubesgame.databinding.DrawerLayoutPwpMediumBinding
-import kitonpompom.cubesgame.databinding.DrawerLayoutPwpTwoBinding
 import kotlinx.coroutines.*
 import java.lang.Math.abs
 

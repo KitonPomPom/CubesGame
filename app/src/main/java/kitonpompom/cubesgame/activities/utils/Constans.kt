@@ -31,5 +31,8 @@ object Constans {
     //Передаем параметр загрузки HelpScore в адаптер, что бы указать что увелечение было для подсказки
     const val HELPSCORESTART = 942
     const val NO_HELPSCORESTART = 762 //Заглушка
-    const val NO_POSROTATION = 932 //Заглушка
+    //Передаем флаг для того что бы интерфейс передал через helpScoreToFrag из адаптера массив с данными
+    //для проверки доктором или для загрузки в helpScoreDilog из метода helpScore
+    const val DOCTOR = 932
+
 }

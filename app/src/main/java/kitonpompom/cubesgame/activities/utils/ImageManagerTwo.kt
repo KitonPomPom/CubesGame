@@ -12,6 +12,10 @@ import androidx.exifinterface.media.ExifInterface
 import com.google.android.renderscript.Toolkit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.Executors
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.TimeUnit
 
 //Класс для обрезки\преобразования фото по нужному размеру
 object ImageManagerTwo {
@@ -155,7 +159,7 @@ object ImageManagerTwo {
                         val resultScaled: Bitmap =
                             Bitmap.createScaledBitmap(crBitmap, 1062, 1770, false)
                         if(crBitmap != bitmap && crBitmap != resultScaled)
-                        crBitmap.recycle()
+                            crBitmap.recycle()
                         //Добавляем в массив полученый Bitmap
                         bitmapList.add(resultScaled)
                     }else if(kP < 0.6){
@@ -203,8 +207,7 @@ object ImageManagerTwo {
                         //Уменьшаем пришедший битмап пропорцианально, соответствуя размерам 1080 * 1920
                         val resultScaled: Bitmap =
                             Bitmap.createScaledBitmap(crBitmap, 1062, 1770, true)
-                        if(crBitmap != bitmap && crBitmap != resultScaled)
-                        crBitmap.recycle()
+                        if(crBitmap != bitmap && crBitmap != resultScaled) crBitmap.recycle()
 
                         //Log.d("MyLog", "Полученая высота после уменьшения: ${resultScaled.height}")
                         //Log.d("MyLog", "Полученя ширина после уменьшения: ${resultScaled.width}")
@@ -226,8 +229,7 @@ object ImageManagerTwo {
                         //Уменьшаем пришедший битмап пропорцианально, соответствуя размерам 1080 * 1920
                         val resultScaled: Bitmap =
                             Bitmap.createScaledBitmap(crBitmap, 1062, 1770, true)
-                        if(crBitmap != bitmap && crBitmap != resultScaled)
-                        crBitmap.recycle()
+                        if(crBitmap != bitmap && crBitmap != resultScaled) crBitmap.recycle()
                         //Добавляем в массив полученый Bitmap
                         //Чистим битмап хеш
                         //crBitmap.recycle()
@@ -409,24 +411,109 @@ object ImageManagerTwo {
         return@withContext tempArray
     }
 
-    suspend fun blurBitmap(
+    /*suspend fun blurBitmap(
         listBitmap: List<Bitmap>
     ): ArrayList<Bitmap> {
         val arrayList = ArrayList<Bitmap>()
 
         for (bit in listBitmap) {
             //Log.d("MyLog", "listBitmap: $i")
-            val argbBitmap0 = bit.copy(Bitmap.Config.ARGB_8888, true)
-            val blurBitmapOne = Toolkit.blur(argbBitmap0, 25)
-            argbBitmap0.recycle()
-            val blurBitmapTwo = Toolkit.blur(blurBitmapOne, 25)
-            blurBitmapOne.recycle()
-            val blurBitmapThree = Toolkit.blur(blurBitmapTwo, 25)
-            blurBitmapTwo.recycle()
-            arrayList.add(blurBitmapThree)
+            val thread = Thread(Runnable {
+                val argbBitmap0 = bit.copy(Bitmap.Config.ARGB_8888, true)
+                val blurBitmapOne = Toolkit.blur(argbBitmap0, 25)
+                argbBitmap0.recycle()
+                val blurBitmapTwo = Toolkit.blur(blurBitmapOne, 25)
+                blurBitmapOne.recycle()
+                val blurBitmapThree = Toolkit.blur(blurBitmapTwo, 25)
+                blurBitmapTwo.recycle()
+                arrayList.add(blurBitmapThree)
+            })
+            thread.start()
+        }
+        return arrayList
+    }*/
+
+    //Метод преоброзования размытых битмапов из обычных
+    /*suspend fun blurBitmap(listBitmap: List<Bitmap>): List<Bitmap> {
+        //Потокобезопасный массив CopyOnWriteArrayList
+        val result = LinkedBlockingQueue<Bitmap>()
+        //пул потоков, чтобы избежать создания большого количества потоков и улучшить производительность.
+        val pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
+
+        //Создаем потоки на основе пришедшего нам listBitmap
+        for (bit in listBitmap) {
+            pool.execute {
+                //Меняем формат пришедшего битмапа на Config ARGB_8888
+                val argbBitmap0 = bit.copy(Bitmap.Config.ARGB_8888, true)
+                //Применяем блюр к битмапу
+                val blurBitmapOne = Toolkit.blur(argbBitmap0, 25)
+                //Очищаем память от уже не нужного битмапа
+                argbBitmap0.recycle()
+                //Применяем блюр к уже размытому битмапу что бы размыть ещё больше
+                val blurBitmapTwo = Toolkit.blur(blurBitmapOne, 25)
+                //Очищаем память от уже не нужного битмапа
+                blurBitmapOne.recycle()
+                //Применяем блюр к уже размытому битмапу что бы размыть ещё больше
+                val blurBitmapThree = Toolkit.blur(blurBitmapTwo, 25)
+                //Очищаем память от уже не нужного битмапа
+                blurBitmapTwo.recycle()
+                result.add(blurBitmapThree)
+            }
+        }
+        //чтобы метод заканчивал свою работу только после того, как завершатся все потоки
+        //Этот метод блокирует выполнение текущего потока до тех пор, пока все задачи в
+        // пуле потоков не завершатся или не истечет время ожидания.
+        pool.shutdown()
+        withContext(Dispatchers.IO) {
+            pool.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS)
         }
 
-        return arrayList
+        return result.toList()
+    }*/
+
+    suspend fun blurBitmap(listBitmap: List<Bitmap>): List<Bitmap> {
+        val pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
+
+        // Создаем список пар (индекс, битмап), чтобы сохранить порядок элементов
+        val indexedBitmaps = listBitmap.mapIndexed { index, bitmap ->
+            index to bitmap
+        }
+
+        // Сортируем список по индексу
+        val sortedBitmaps = indexedBitmaps.sortedBy { it.first }
+
+        // Создаем очередь для хранения результатов
+        val result = LinkedBlockingQueue<Pair<Int, Bitmap>>()
+
+        // Запускаем потоки на обработку битмапов
+        for ((index, bit) in sortedBitmaps) {
+            pool.execute {
+                val argbBitmap0 = bit.copy(Bitmap.Config.ARGB_8888, true)
+                val blurBitmapOne = Toolkit.blur(argbBitmap0, 25)
+                argbBitmap0.recycle()
+                val blurBitmapTwo = Toolkit.blur(blurBitmapOne, 25)
+                blurBitmapOne.recycle()
+                val blurBitmapThree = Toolkit.blur(blurBitmapTwo, 25)
+                blurBitmapTwo.recycle()
+
+                // Добавляем результат в очередь с сохранением порядка
+                result.add(index to blurBitmapThree)
+            }
+        }
+
+        pool.shutdown()
+        withContext(Dispatchers.IO) {
+            pool.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS)
+        }
+
+        // Сортируем результаты по индексу и возвращаем только битмапы
+        return result.sortedBy { it.first }.map { it.second }.toList()
     }
+
+        /*В этом коде мы создаем список indexedBitmaps, который содержит пары (индекс, битмап),
+        чтобы сохранить порядок элементов. Затем мы сортируем этот список по индексу и запускаем
+        потоки на обработку битмапов. Результаты мы добавляем в очередь result с сохранением
+        порядка индексов. После завершения всех потоков мы сортируем результаты по индексу и
+        возвращаем только битмапы.*/
 
 }

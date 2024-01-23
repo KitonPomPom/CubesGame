@@ -29,4 +29,9 @@
         <style name="ActionBarCustom">
         <item name="android:textColorSecondary">@color/green_main</item>
         </style>
+
+        <style name="MyCardViewShadowStyle" >
+            <item name="android:ambientShadowAlpha">0</item>
+            <item name="android:spotShadowAlpha">0</item>
+        </style>
 </resources>

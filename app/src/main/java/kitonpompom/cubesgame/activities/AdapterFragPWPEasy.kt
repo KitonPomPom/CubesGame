@@ -1092,8 +1092,8 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
     }
 
     //Запускаем с фрагмента для того что бы передать массив с картинками и открыть диалог помощи
-    fun helpScoreToFrag(score: Int){
-        clickScaleItemInterface.helpScore(mainArrayView, score)
+    fun helpScoreToFrag(score: Int, flag: Int){
+        clickScaleItemInterface.helpScore(mainArrayView, score, flag)
     }
 
     //Запускаем из DirectionRotationCube когда нужно повернуть следующий кубик в помощи
@@ -1123,7 +1123,7 @@ class AdapterFragPWPEasy(val clickScaleItemInterface: ClickScaleItemInterface, v
         //Интерфейс который запускается когда нажали кнопку помощи, забирает массив с картинками и открывает
         //диалог с выбором картинок которые нужно повернуть
 
-        fun helpScore(arrayList : ArrayList<dataArrayBitmap>, score:Int)
+        fun helpScore(arrayList : ArrayList<dataArrayBitmap>, score:Int, flag: Int)
         //Интерфейс который запускается когда мы используем помощь, когда кубик повернулся и нужно повернуть следующий кубик
         fun helpScoreNext(selectImage: Int, openImage: Int, arrayList : ArrayList<dataArrayBitmap>,
                           posRotation: Int, countCubeRotated: Int)

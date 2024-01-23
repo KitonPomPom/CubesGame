@@ -6,6 +6,7 @@
     android:layout_height="wrap_content"
     android:background="@color/grey">
 
+
     <ImageView
         android:id="@+id/id_item_play_with_pictures_one"
         android:layout_width="128dp"

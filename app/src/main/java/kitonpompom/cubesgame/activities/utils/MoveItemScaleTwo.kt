@@ -903,4 +903,88 @@ object MoveItemScaleTwo {
         return tempPos
     }
 
+    /*
+    fun movingShadowEasy(position: Int, withRc: Int, heightRc: Int, withIm: Int, heightIm: Int): ArrayList<Int> {
+        val arrayTemp = ArrayList<Int>()
+        when (position) {
+            0 -> {
+                arrayTemp.add(withRc - withRc)
+                arrayTemp.add(heightRc - heightRc)
+            }
+            1 ->{
+                val x: Float = ((withRc/(3f/1f)+((withRc/3f)/2f))-(heightIm/2f)).toFloat()
+                val y: Float = (heightRc - heightRc).toFloat()
+                arrayTemp.add(x.toInt())
+                arrayTemp.add(y.toInt())
+            }
+            2 ->{
+                arrayTemp.add(withRc - withIm)
+                arrayTemp.add(heightRc - heightRc)
+            }
+            3 ->{
+                val y: Float = ((heightRc/(5f/1f)+((heightRc/5f)/2f))-(heightIm/2f))
+                arrayTemp.add((withRc - withRc))
+                arrayTemp.add(y.toInt())
+            }
+            4 ->{
+                val x: Float = ((withRc/(3f/1f)+((withRc/3f)/2f))-(heightIm/2f))
+                val y: Float = ((heightRc/(5f/1f)+((heightRc/5f)/2f))-(heightIm/2f))
+                arrayTemp.add(x.toInt())
+                arrayTemp.add(y.toInt())
+            }
+            5 ->{
+                val y: Float = ((heightRc/(5f/1f)+((heightRc/5f)/2f))-(heightIm/2f))
+                arrayTemp.add(withRc - withIm)
+                arrayTemp.add(y.toInt())
+            }
+            6 ->{
+                val y: Float = ((heightRc/(5f/2f)+((heightRc/5f)/2f))-(heightIm/2f))
+                arrayTemp.add(withRc - withRc)
+                arrayTemp.add(y.toInt())
+            }
+            7 ->{
+                val x: Float = ((withRc/(3f/1f)+((withRc/3f)/2f))-(heightIm/2f))
+                val y: Float = ((heightRc/(5f/2f)+((heightRc/5f)/2f))-(heightIm/2f))
+                arrayTemp.add(x.toInt())
+                arrayTemp.add(y.toInt())
+            }
+            8 ->{
+                val y: Float = ((heightRc/(5f/2f)+((heightRc/5f)/2f))-(heightIm/2f))
+                arrayTemp.add(withRc - withIm)
+                arrayTemp.add(y.toInt())
+            }
+            9 ->{
+                val y: Float = ((heightRc/(5f/3f)+((heightRc/5f)/2f))-(heightIm/2f))
+                arrayTemp.add(withRc - withRc)
+                arrayTemp.add(y.toInt())
+            }
+            10 ->{
+                val x: Float = ((withRc/(3f/1f)+((withRc/3f)/2f))-(heightIm/2f))
+                val y: Float = ((heightRc/(5f/3f)+((heightRc/5f)/2f))-(heightIm/2f))
+                arrayTemp.add(x.toInt())
+                arrayTemp.add(y.toInt())
+            }
+            11 ->{
+                val y: Float = ((heightRc/(5f/3f)+((heightRc/5f)/2f))-(heightIm/2f))
+                arrayTemp.add(withRc - withIm)
+                arrayTemp.add(y.toInt())
+            }
+            12 ->{
+                arrayTemp.add(withRc - withRc)
+                arrayTemp.add(heightRc - withIm)
+            }
+            13 ->{
+                val x: Float = ((withRc/(3f/1f)+((withRc/3f)/2f))-(heightIm/2f))
+                arrayTemp.add(x.toInt())
+                arrayTemp.add(heightRc - withIm)
+            }
+            14 -> {
+                arrayTemp.add(withRc - withIm)
+                arrayTemp.add(heightRc - heightIm)
+            }
+        }
+        return arrayTemp
+    }
+     */
+
 }

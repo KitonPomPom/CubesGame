@@ -28,11 +28,8 @@ import kitonpompom.cubesgame.activities.data.dataArrayPositionAndNumberBitmap
 import kitonpompom.cubesgame.activities.data.dataPosNumBit
 import kitonpompom.cubesgame.activities.utils.*
 import kitonpompom.cubesgame.databinding.DrawerLayoutPwpBinding
-import kitonpompom.cubesgame.databinding.FragmentPlayingWithPicturesBinding
 import kotlinx.coroutines.*
 import java.lang.Math.abs
-import java.util.Collections.shuffle
-import kotlin.properties.Delegates
 import kotlin.random.Random
 
 

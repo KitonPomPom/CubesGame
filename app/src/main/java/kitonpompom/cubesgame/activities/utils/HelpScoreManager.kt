@@ -32,9 +32,9 @@ object HelpScoreManager {
                             //получаем позицию posDirection на которой на данный момент стоит наша картинка
                             //Log.d("MyLog",  "posDirection if value = selectImage: $posDirection")
                             //прячем все картинки что бы они не отображались под вращающимся кубиком
-                            binding.layFragPlayPwpEasy.idImViewScale2.visibility = View.GONE
-                            binding.layFragPlayPwpEasy.idImViewMove2.visibility = View.GONE
-                            binding.layFragPlayPwpEasy.idImViewMove.visibility = View.GONE
+                            binding.layFragPlayPwpEasy.idCardImViewScale2.visibility = View.GONE
+                            binding.layFragPlayPwpEasy.idCardImViewMove2.visibility = View.GONE
+                            binding.layFragPlayPwpEasy.idCardImViewMove.visibility = View.GONE
                             //Получаем весь View из Adapter вытаскивая его из RecycleView по позиции и записываем в fr
                             val fr =
                                 binding.layFragPlayPwpEasy.idRcViewFragPWP.findViewHolderForAdapterPosition(

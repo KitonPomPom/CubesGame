@@ -21,9 +21,8 @@ class HelpScoreDialog(private val interfaceHelpScoreDialog: InterfaceHelpScoreDi
 
     lateinit var view: ConstraintLayout
 
-    fun createHelpScoreDialog(act: Activity, image1: Bitmap, image2: Bitmap, image3: Bitmap,
-                              image4: Bitmap,image5: Bitmap, image6: Bitmap, score: Int,
-                              arrayCollected: ArrayList<Int>, mainArrayView: ArrayList<dataArrayBitmap>): AlertDialog {
+    fun createHelpScoreDialog(act: Activity, arrayBitmap: ArrayList<Bitmap>, arrayBlurBitmap: ArrayList<Bitmap>, score: Int,
+                              arrayCollected: ArrayList<Int>, mainArrayView: ArrayList<dataArrayBitmap>, blur: Boolean): AlertDialog {
 
         val builder = AlertDialog.Builder(act)
         val rootDialogElement = DialogHelpPwpBinding.inflate(act.layoutInflater)
@@ -60,19 +59,22 @@ class HelpScoreDialog(private val interfaceHelpScoreDialog: InterfaceHelpScoreDi
         val cardSelectImage6 = view.findViewById<CardView>(R.id.card_select_image6)
         val cardSelectImageArray: Array<CardView> = arrayOf(cardSelectImage1, cardSelectImage2, cardSelectImage3,
             cardSelectImage4, cardSelectImage5, cardSelectImage6)
-        val imView1 = view.findViewById<ImageView>(R.id.imageV1)
-        val imView2 = view.findViewById<ImageView>(R.id.imageV2)
-        val imView3 = view.findViewById<ImageView>(R.id.imageV3)
-        val imView4 = view.findViewById<ImageView>(R.id.imageV4)
-        val imView5 = view.findViewById<ImageView>(R.id.imageV5)
-        val imView6 = view.findViewById<ImageView>(R.id.imageV6)
+        var arrayImView = ArrayList<ImageView>()
+        arrayImView.add(view.findViewById<ImageView>(R.id.imageV1))
+        arrayImView.add(view.findViewById<ImageView>(R.id.imageV2))
+        arrayImView.add(view.findViewById<ImageView>(R.id.imageV3))
+        arrayImView.add(view.findViewById<ImageView>(R.id.imageV4))
+        arrayImView.add(view.findViewById<ImageView>(R.id.imageV5))
+        arrayImView.add(view.findViewById<ImageView>(R.id.imageV6))
 
-        imView1.setImageBitmap(image1)
-        imView2.setImageBitmap(image2)
-        imView3.setImageBitmap(image3)
-        imView4.setImageBitmap(image4)
-        imView5.setImageBitmap(image5)
-        imView6.setImageBitmap(image6)
+
+
+        if(blur) {
+
+            for(i in 0 until arrayCollected.size - 1){
+                if (arrayCollected[i] == 1) arrayImView[i].setImageBitmap(arrayBitmap[i]) else arrayImView[i].setImageBitmap(arrayBlurBitmap[i])
+            }
+        }
 
             //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         //Временно отрисовываем рамки для проверки
@@ -124,7 +126,7 @@ class HelpScoreDialog(private val interfaceHelpScoreDialog: InterfaceHelpScoreDi
 
         //Выбираем какая картинка будет выделена автоматически при первом запуске
         // Цикл от 0 до 6
-        for (i in 0 .. arrayCollected.size){
+        for (i in 0 until arrayCollected.size - 1){
             //Log.d("MyLog", "Цикл $i")
             //Если значение картинки в массиве = 0, значит картинка ещё не собрана
             if (arrayCollected[i] == 0){

@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/grey_header_3"
+    android:background="@color/white"
+    android:clipToPadding="false"
     tools:context=".activities.FragmentPlayingWithPicturesEasy">
 
     <!-- TODO: Update blank fragment layout -->
@@ -12,7 +13,8 @@
         android:id="@+id/id_constLayPwP"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/cast_bg_lin_circle_vin">
+        android:background="@color/surface_color_pix"
+        android:clipToPadding="false">
 
         <TextView
             android:id="@+id/id_tv_score"
@@ -62,79 +64,139 @@
             android:layout_marginStart="100dp"
             android:layout_marginEnd="100dp"
             android:layout_marginBottom="8dp"
+            android:elevation="10dp"
+            android:background="#00FFFFFF"
             android:nestedScrollingEnabled="false"
+            android:overScrollMode="never"
+            android:clipToPadding="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"/>
 
-        <ImageView
-            android:id="@+id/id_imView_scale"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/id_card_imView_scale"
             android:layout_width="178dp"
             android:layout_height="178dp"
-            android:elevation="-1dp"
+            app:cardElevation="-1dp"
             android:visibility="visible"
             app:layout_constraintStart_toStartOf="@+id/id_rcView_FragPWP"
             app:layout_constraintTop_toTopOf="@+id/id_rcView_FragPWP"
-            tools:src="@tools:sample/avatars" />
+            style="@style/MyCardViewShadowStyle">
+
+            <ImageView
+                android:id="@+id/id_imView_scale"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:src="@tools:sample/avatars" />
+        </androidx.cardview.widget.CardView>
 
 
-        <ImageView
-            android:id="@+id/id_imView_scale2"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/id_card_imView_scale2"
             android:layout_width="178dp"
             android:layout_height="178dp"
+            android:elevation="30dp"
             android:visibility="gone"
             app:layout_constraintStart_toStartOf="@+id/id_rcView_FragPWP"
-            app:layout_constraintTop_toTopOf="@+id/id_rcView_FragPWP"
-            tools:src="@tools:sample/avatars" />
+            app:layout_constraintTop_toTopOf="@+id/id_rcView_FragPWP">
 
-        <ImageView
-            android:id="@+id/id_imView_move"
+            <ImageView
+                android:id="@+id/id_imView_scale2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:src="@tools:sample/avatars" />
+        </androidx.cardview.widget.CardView>
+
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/id_card_imView_move"
             android:layout_width="130dp"
             android:layout_height="130dp"
-            android:elevation="-1dp"
+            app:cardElevation="-1dp"
             android:visibility="visible"
             app:layout_constraintStart_toStartOf="@+id/id_rcView_FragPWP"
-            app:layout_constraintTop_toTopOf="@+id/id_rcView_FragPWP"
-            tools:src="@tools:sample/avatars" />
+            app:layout_constraintTop_toTopOf="@+id/id_rcView_FragPWP">
+            <ImageView
+                android:id="@+id/id_imView_move"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_constraintStart_toStartOf="@+id/id_rcView_FragPWP"
+                app:layout_constraintTop_toTopOf="@+id/id_rcView_FragPWP"
+                tools:src="@tools:sample/avatars" />
+        </androidx.cardview.widget.CardView>
 
-        <ImageView
-            android:id="@+id/id_imView_move2"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/id_card_imView_move2"
             android:layout_width="115dp"
             android:layout_height="115dp"
-            android:elevation="-1dp"
+            app:cardElevation="-1dp"
             android:visibility="visible"
             app:layout_constraintStart_toStartOf="@+id/id_rcView_FragPWP"
             app:layout_constraintTop_toTopOf="@+id/id_rcView_FragPWP"
+            >
+
+            <ImageView
+                android:id="@+id/id_imView_move2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_constraintStart_toStartOf="@+id/id_rcView_FragPWP"
+                app:layout_constraintTop_toTopOf="@+id/id_rcView_FragPWP"
+                tools:src="@tools:sample/avatars" />
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card_tv_lucky1"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:visibility="gone"
+            app:layout_constraintStart_toEndOf="@+id/id_bt_open_drawer"
+            app:layout_constraintTop_toTopOf="@+id/id_bt_open_drawer">
+
+            <TextView
+                android:id="@+id/tv_lucky1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/cast_bg_bt_buttom_activity_pressed"
+                android:gravity="center"
+                android:text="6"
+                android:textSize="20sp"
+                android:visibility="visible" />
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card_tv_lucky"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:visibility="gone"
+            app:layout_constraintStart_toEndOf="@+id/id_bt_open_drawer"
+            app:layout_constraintTop_toTopOf="@+id/id_bt_open_drawer">
+
+            <TextView
+                android:id="@+id/tv_lucky"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/cast_bg_bt_buttom_activity_pressed"
+                android:gravity="center"
+                android:text="7"
+                android:textSize="20sp"
+                android:visibility="visible" />
+        </androidx.cardview.widget.CardView>
+
+        <ImageView
+            android:id="@+id/id_imDemanstrationImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="200dp"
+            android:layout_marginBottom="200dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             tools:src="@tools:sample/avatars" />
-
-        <TextView
-            android:id="@+id/tv_lucky1"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="8dp"
-            android:background="@drawable/cast_bg_bt_buttom_activity_pressed"
-            android:gravity="center"
-            android:text="6"
-            android:textSize="20sp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/id_bt_open_drawer"
-            app:layout_constraintStart_toEndOf="@+id/id_bt_open_drawer"
-            app:layout_constraintTop_toTopOf="@+id/id_bt_open_drawer" />
-
-        <TextView
-            android:id="@+id/tv_lucky"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="8dp"
-            android:background="@drawable/cast_bg_bt_buttom_activity_pressed"
-            android:gravity="center"
-            android:text="7"
-            android:textSize="20sp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/id_bt_open_drawer"
-            app:layout_constraintStart_toEndOf="@+id/id_bt_open_drawer"
-            app:layout_constraintTop_toTopOf="@+id/id_bt_open_drawer" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
